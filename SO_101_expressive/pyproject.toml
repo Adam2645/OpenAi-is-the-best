@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "so101-expressive"
+version = "0.1.0"
+description = "Ekspresyjny robot konwersacyjny na ramieniu SO-101 (symulacja MuJoCo, Gemini Live)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+dependencies = [
+    "mujoco>=3.3",
+    "numpy>=1.26",
+    "opencv-python>=4.10",
+    "sounddevice>=0.5",
+    "google-genai>=2.20",
+    "python-dotenv>=1.0",
+    "pillow>=10",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "soundfile>=0.12"]
+
+[project.scripts]
+so101-expressive = "so101_expressive.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+so101_expressive = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+markers = [
+    "physics: testy uruchamiajace fizyke MuJoCo (wolniejsze)",
+]
