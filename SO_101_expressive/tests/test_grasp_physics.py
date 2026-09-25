@@ -92,6 +92,19 @@ def test_pick_succeeds_from_various_start_poses(body, start, offset):
     assert body.state.grip_evidence.source == "physics" and body.sim.cube_position()[2] > 0.05
 
 
+# awaryjny stop podczas zamykania chwytaka nie psuje chwytu po zwolnieniu, bo czas zatrzymania nie liczy się do limitów faz
+def test_estop_during_closing_then_grasp_completes(body):
+    body.post(Command("pick"))
+    t, _ = run_until(body, 0.0, lambda s: s.grip is GripPhase.CLOSING, 8.0)
+    body.post(Command("estop", {"reason": "test"}))
+    t, _ = run_for(body, t, 3.0)
+    assert body.state.manipulation is ManipulationPhase.CLOSE and body.state.grip is GripPhase.CLOSING
+    body.post(Command("reset"))
+    run_until(body, t, lambda s: s.grip is GripPhase.HOLDING, 8.0)
+    assert ManipulationPhase.FAILED not in body.journal.values("manipulation")
+    assert body.sim.cube_position()[2] > 0.05
+
+
 # bez obiektu szczęka w fizyce nadąża za obwiednią dźwięku w chwili jego wyjścia z głośnika
 def test_jaw_moves_with_played_audio_when_gripper_free(body):
     t, _ = run_for(body, 0.0, 0.3)

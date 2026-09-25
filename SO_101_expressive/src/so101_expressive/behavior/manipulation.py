@@ -75,6 +75,7 @@ class PickPlaceSkill:
         self._since: float | None = None
         self._bad_since: float | None = None
         self._paused = False
+        self._pause_t = 0.0
         self._last: np.ndarray | None = None
 
     # aktywne zadanie przejmuje ramię i chwytak na wyłączność
@@ -198,17 +199,30 @@ class PickPlaceSkill:
             self._bad_since = t
         return t - self._bad_since >= hold_s
 
+    # czas awaryjnego stopu nie może liczyć się do limitów faz ani potwierdzeń czujników, więc liczniki przesuwamy o przerwę
+    def _resume(self, t: float) -> None:
+        shift = max(0.0, t - self._pause_t)
+        self._t_phase += shift
+        if self._since is not None:
+            self._since += shift
+        if self._bad_since is not None:
+            self._bad_since += shift
+        if self._seg is not None:
+            remaining = max(0.6, self._seg.t0 + self._seg.duration - self._pause_t)
+            self._seg = _Segment(self._last, self._seg.q_to, t, remaining)
+        self._paused = False
+
     # automat faz rozdziela komendę chwytu od potwierdzenia fizycznego i reaguje na utratę obiektu
     def update(self, t: float, q_meas: np.ndarray, evidence: GripEvidence, estop: bool) -> ManipulationOutput:
         if not self.active:
             return ManipulationOutput(None, self.phase, self.grip, 1.0, self.message)
         if estop:
-            self._paused = True
+            if not self._paused:
+                self._paused = True
+                self._pause_t = t
             return ManipulationOutput(self._last.copy(), self.phase, self.grip, 0.5, self.message)
-        if self._paused and self._seg is not None:
-            remaining = max(0.6, self._seg.t0 + self._seg.duration - t)
-            self._seg = _Segment(self._last, self._seg.q_to, t, remaining)
-            self._paused = False
+        if self._paused:
+            self._resume(t)
         phase = self.phase
         if phase is ManipulationPhase.APPROACH and self._reached(t, q_meas):
             self._enter(ManipulationPhase.DESCEND, t, self._pose(self._plan["grasp"], GRIPPER_OPEN), duration=1.0)

@@ -17,7 +17,7 @@ from .budget import CostMeter
 from .config import Settings
 from .conversation.base import AudioChunk, ConversationBackend, IntentRequest, Interrupted
 from .conversation.gemini_live import GeminiLiveBackend
-from .conversation.scripted import LocalTTS, ScriptedBackend
+from .conversation.scripted import LocalTTS, ScriptedBackend, speech_events
 from .inputs.audio_pipeline import AudioPipeline
 from .inputs.camera import VisionUplink, synthetic_frame
 from .inputs.face import ScriptedPerson
@@ -25,7 +25,7 @@ from .inputs.playback import PlaybackBuffer
 from .inputs.virtual import VirtualAudioRig, clip_source
 from .runtime import AudioStatus, Command, create_body
 from .ui import PANEL_H
-from .state import ApiStatus, GripPhase, PersonStatus, RobotState
+from .state import ApiStatus, GripPhase, PersonStatus, RobotState, StateJournal
 from .util import LatestValue
 
 log = logging.getLogger("so101")
@@ -90,15 +90,18 @@ class StateLogWriter:
         self.path = directory / time.strftime("state-%Y%m%d-%H%M%S.jsonl")
         self._written = 0
 
-    # dopisywane są tylko nowe wpisy od ostatniego zapisu
-    def write(self, entries: list) -> None:
-        new = entries[self._written :]
-        if not new:
+    # postęp liczony monotonicznym licznikiem zmian nie zatrzymuje zapisu po zapełnieniu dziennika i odnotowuje utracone wpisy
+    def write(self, journal: StateJournal) -> None:
+        new, total, dropped = journal.since(self._written)
+        if not new and not dropped:
             return
         with self.path.open("a", encoding="utf-8") as fh:
+            if dropped:
+                first_t = round(new[0][0], 3) if new else None
+                fh.write(json.dumps({"t": first_t, "pole": "pominięte wpisy", "z": "", "na": str(dropped)}, ensure_ascii=False) + "\n")
             for t, name, old, value in new:
                 fh.write(json.dumps({"t": round(t, 3), "pole": name, "z": str(old), "na": str(value)}, ensure_ascii=False) + "\n")
-        self._written = len(entries)
+        self._written = total
 
 
 # aplikacja łączy wszystkie warstwy i prowadzi pętlę interfejsu w głównym wątku, czego wymaga macos
@@ -240,7 +243,7 @@ class RobotApp:
                     self.backend.wake()
             for text in self.narrator.update(state):
                 self.backend.send_context(text)
-        self.state_log.write(self.body.journal.entries())
+        self.state_log.write(self.body.journal)
 
     # zamknięcie w odwrotnej kolejności startu kończy połączenie przed zapisem wydatków i domknięciem nagrania
     def _shutdown(self, closers: list, audio: Path | None = None) -> None:
@@ -253,7 +256,7 @@ class RobotApp:
                 close()
             except Exception as exc:
                 log.warning("błąd przy zamykaniu: %s", exc)
-        self.state_log.write(self.body.journal.entries())
+        self.state_log.write(self.body.journal)
         if self.record is not None and self._raw_record is not None and self._raw_record.exists():
             self.recording_info = finalize_recording(self._raw_record, self.record, audio)
             log.info("nagranie %s: %s", self.record, self.recording_info)
@@ -345,13 +348,18 @@ class RobotApp:
             (3.0, "użytkownik mówi", lambda t: rig.add_source(clip_source(user16, 16000, t, gain=1.0))),
             (20.0, "muzyka w pokoju", lambda t: rig.add_source(clip_source(music, 16000, t, gain=1.0))),
             (34.0, "chwyć kostkę", lambda t: self.body.post(Command("pick"))),
-            (43.0, "mowa podczas trzymania", lambda t: self.backend.say("Trzymam teraz kostkę. Mówię, ale chwytak pozostaje nieruchomy.") if self.backend else None),
+            (43.0, "mowa podczas trzymania", lambda t: self._speak_locally(tts, "Trzymam teraz kostkę. Mówię, ale chwytak pozostaje nieruchomy.")),
             (50.0, "odłóż kostkę", lambda t: self.body.post(Command("place"))),
             (59.0, "gest radości", lambda t: self.body.post(Command("gesture", {"name": "happy"}))),
             (59.6, "awaryjny stop", lambda t: self.body.post(Command("estop", {"reason": "test w demie"}))),
             (62.0, "zwolnienie stopu", lambda t: self.body.post(Command("reset"))),
         ]
         return person, events
+
+    # mowa z osi czasu dema jest syntezowana lokalnie, więc działa z każdym backendem rozmowy, także z gemini i bez backendu
+    def _speak_locally(self, tts, text: str) -> None:
+        for event in speech_events(tts.synth(text), tts.rate):
+            self._on_event(event)
 
     # muzyka do dema pochodzi z pliku użytkownika albo z syntezy perkusji i akordów
     def _music_clip(self) -> np.ndarray:

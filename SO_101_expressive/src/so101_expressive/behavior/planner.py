@@ -62,6 +62,7 @@ class BehaviorPlanner:
         self.micro = MicroMotion()
         self.gesture: GesturePlayback | None = None
         self._gesture_call: str | None = None
+        self._manip_call: str | None = None
         self._pending: tuple[str, float, str | None] | None = None
         self._music_dance = False
         self._mock_grip: GripPhase | None = None
@@ -118,7 +119,7 @@ class BehaviorPlanner:
         return IntentResult(True, "patrzę na rozmówcę")
 
     # chwyt jest prośbą do zadania manipulacji, które samo sprawdzi zasięg i stan chwytaka
-    def request_pick(self, t: float, state: RobotState, q_meas: np.ndarray) -> IntentResult:
+    def request_pick(self, t: float, state: RobotState, q_meas: np.ndarray, call_id: str | None = None) -> IntentResult:
         if state.estop:
             return IntentResult(False, "awaryjny stop jest aktywny")
         if self.skill is None:
@@ -127,15 +128,19 @@ class BehaviorPlanner:
             return IntentResult(False, "aktywny jest pozorowany stan chwytu testowego")
         self._cancel_expressive(t)
         ok, msg = self.skill.request_pick(t, q_meas)
+        if ok:
+            self._manip_call = call_id
         return IntentResult(ok, msg)
 
     # odłożenie przechodzi przez to samo zadanie, które potwierdziło trzymanie
-    def request_place(self, t: float, state: RobotState, q_meas: np.ndarray) -> IntentResult:
+    def request_place(self, t: float, state: RobotState, q_meas: np.ndarray, call_id: str | None = None) -> IntentResult:
         if state.estop:
             return IntentResult(False, "awaryjny stop jest aktywny")
         if self.skill is None:
             return IntentResult(False, "manipulacja jest niedostępna w tym trybie")
         ok, msg = self.skill.request_place(t, q_meas)
+        if ok:
+            self._manip_call = call_id
         return IntentResult(ok, msg)
 
     # łagodny stop z rozmowy tylko zmniejsza ruch, a trzymany obiekt pozostaje w chwytaku
@@ -159,9 +164,9 @@ class BehaviorPlanner:
         if name == "manipulate":
             action = str(args.get("action", ""))
             if action == "pick_cube":
-                return self.request_pick(t, state, q_meas)
+                return self.request_pick(t, state, q_meas, call_id)
             if action == "place_cube":
-                return self.request_place(t, state, q_meas)
+                return self.request_place(t, state, q_meas, call_id)
             return IntentResult(False, f"nieznana akcja manipulacji: {action}")
         if name == "stop_motion":
             return self.soft_stop(t)
@@ -169,12 +174,16 @@ class BehaviorPlanner:
             return IntentResult(True, "aktualny stan robota", {"stan": state.summary_pl()})
         return IntentResult(False, f"nieznana czynność: {name}")
 
-    # anulowanie wywołania przez serwer wygasza gest, który z niego wynikał
+    # anulowanie wywołania przez serwer wygasza wynikający z niego gest i bezpiecznie przerywa rozpoczęte przez nie zadanie chwytu
     def cancel_calls(self, ids: tuple[str, ...], t: float) -> None:
         if self.gesture is not None and self._gesture_call in ids:
             self.gesture.cancel(t)
         if self._pending is not None and self._pending[2] in ids:
             self._pending = None
+        if self._manip_call is not None and self._manip_call in ids:
+            self._manip_call = None
+            if self.skill is not None and self.skill.active:
+                self.skill.abort(t)
 
     # przerwanie wypowiedzi kończy gest towarzyszący mowie zamiast dograć go do końca
     def on_interrupted(self, t: float) -> None:

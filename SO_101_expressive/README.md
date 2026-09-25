@@ -71,6 +71,11 @@ Okno ma trzy części: podgląd kamery z ramką twarzy (lewa), symulację (prawa
 Rozmowa: po prostu mów. Robot może sam wywołać gest, taniec, podniesienie lub odłożenie kostki
 („podnieś kostkę”), sprawdzić swój stan („co teraz robisz?”) albo spojrzeć przez kamerę („co widzisz?”).
 
+**Prywatność kamery:** obraz jest analizowany lokalnie (śledzenie twarzy). Do chmury trafia pojedyncza,
+pomniejszona klatka tylko wtedy, gdy model poprosi o spojrzenie — zwykle gdy zapytasz „co widzisz?”.
+Cykliczne wysyłanie klatek (bogatszy kontekst rozmowy, wyższy koszt) włączysz w `.env`,
+np. `VISION_UPLINK_INTERVAL_S=12`.
+
 Pasek stanu pokazuje czynności robota (słucha, mówi, odtwarza audio, śledzi rozmówcę, wykonuje gest,
 tańczy, sięga po obiekt, trzyma obiekt, zatrzymany, bez chmury), fazę chwytu ze źródłem pomiaru,
 kto steruje ramieniem i chwytakiem, co jest **wstrzymane i dlaczego**, poziomy mikrofonu i głośnika,
@@ -127,7 +132,7 @@ w symulowanym echu. **Na prawdziwym MacBooku trzeba je dostroić.** Przy słucha
 ## Testy
 
 ```bash
-.venv/bin/python -m pytest -q                      # 67 testów, ok. 30 s
+.venv/bin/python -m pytest -q                      # 76 testów, ok. 30 s
 .venv/bin/python scripts/fetch_test_data.py --audio   # opcjonalne dane: portret (domena publiczna) i nagrania CC
 .venv/bin/python scripts/eval_music_detector.py --music utwór.mp3 --other mowa.wav
 ```

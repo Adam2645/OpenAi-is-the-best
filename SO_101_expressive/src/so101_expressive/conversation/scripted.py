@@ -13,7 +13,7 @@ from typing import Callable
 import numpy as np
 
 from ..state import ApiStatus
-from .base import AudioChunk, ConversationBackend, EventSink, IntentRequest, TurnComplete, TurnStarted
+from .base import AudioChunk, ConversationBackend, ConversationEvent, EventSink, IntentRequest, TurnComplete, TurnStarted
 
 CANNED_REPLIES = [
     ("Cześć! Jestem Robo. Działam teraz w trybie lokalnym, bez chmury.", "wave"),
@@ -68,6 +68,13 @@ def babble(seconds: float, rate: int = 24000, seed: int = 3) -> np.ndarray:
     voiced = sum(np.sin(k * phase) / k for k in range(1, 8))
     syllables = np.clip(np.sin(2 * np.pi * 4.2 * t + rng.uniform(0, 3)), 0, None) ** 1.5
     return (0.25 * voiced * syllables / 1.6 * 32767).astype(np.int16)
+
+
+# wspólny podział wypowiedzi na zdarzenia tury pozwala oś czasu dema mówić bez względu na wybrany backend
+def speech_events(pcm: np.ndarray, rate: int, chunk_s: float = 0.1) -> list[ConversationEvent]:
+    step = max(1, int(chunk_s * rate))
+    chunks = [AudioChunk(pcm[i : i + step].tobytes(), rate) for i in range(0, pcm.size, step)]
+    return [TurnStarted(), *chunks, TurnComplete()]
 
 
 # lokalny backend skryptowy pokazuje przepływ rozmowy bez chmury i jest jawnie oznaczony w stanie
@@ -148,12 +155,10 @@ class ScriptedBackend(ConversationBackend):
 
     # zdarzenia tury są takie same jak z gemini live, więc reszta systemu nie rozróżnia źródła
     def _emit(self, text: str, gesture: str | None) -> None:
-        pcm = self.tts.synth(text)
+        events = speech_events(self.tts.synth(text), self.tts.rate)
         self._n += 1
-        self.sink(TurnStarted())
+        self.sink(events[0])
         if gesture:
             self.sink(IntentRequest(f"local-{self._n}", "perform_gesture", {"gesture": gesture, "intensity": "normal"}))
-        step = int(0.1 * self.tts.rate)
-        for i in range(0, pcm.size, step):
-            self.sink(AudioChunk(pcm[i : i + step].tobytes(), self.tts.rate))
-        self.sink(TurnComplete())
+        for event in events[1:]:
+            self.sink(event)

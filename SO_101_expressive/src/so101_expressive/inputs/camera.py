@@ -78,7 +78,7 @@ def synthetic_frame(obs: PersonObservation | None, width: int = 640, height: int
 
 # rzadkie klatki dla chmury są oddzielone od szybkiej pętli śledzenia i wysyłane tylko gdy mają sens
 class VisionUplink:
-    # domyślny odstęp kilkunastu sekund ogranicza koszt i narastanie kontekstu sesji live
+    # zero oznacza wysyłanie obrazu wyłącznie na prośbę modelu, bo cykliczne przesyłanie kadrów do chmury wymaga świadomego włączenia
     def __init__(self, interval_s: float, width: int = 512) -> None:
         self.interval_s = interval_s
         self.width = width

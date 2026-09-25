@@ -25,6 +25,7 @@ from .conversation.base import (
     TurnComplete,
     TurnStarted,
 )
+from .conversation.tools import validate_call
 from .motion.controller import ControllerReport, SafeMotionController
 from .motion.kinematics import So101Kinematics
 from .motion.limits import GRIPPER, NEUTRAL_POSE, build_limits, ranges_from_model
@@ -177,13 +178,15 @@ class BodyRuntime:
                 self.sim.reset_cube()
         self.command_log.append((t, cmd, result))
 
-    # prośby modelu są wykonywane lub odrzucane, a wynik zawsze wraca do rozmowy
+    # prośby modelu są walidowane w jednym miejscu przed każdą obsługą, a wynik, także odmowa, zawsze wraca do rozmowy
     def _intent(self, item: IntentRequest, t: float) -> None:
-        special = self.special_intents.get(item.name)
-        if special is not None:
-            result = special(item, self.state.snapshot())
+        ok, parsed = validate_call(item.name, item.args)
+        if not ok:
+            result = IntentResult(False, str(parsed))
+        elif item.name in self.special_intents:
+            result = self.special_intents[item.name](item, self.state.snapshot())
         else:
-            result = self.planner.handle_intent(item.name, item.args, t, self.state, self.sim.joint_q(), item.call_id)
+            result = self.planner.handle_intent(item.name, parsed, t, self.state, self.sim.joint_q(), item.call_id)
         self.intent_log.append((t, item, result))
         if self.intent_responder is not None:
             self.intent_responder(item, result)

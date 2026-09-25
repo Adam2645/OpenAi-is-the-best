@@ -232,6 +232,7 @@ class StateJournal:
         self._entries: deque[tuple[float, str, object, object]] = deque(maxlen=maxlen)
         self._last: dict[str, object] | None = None
         self._lock = threading.Lock()
+        self._total = 0
 
     # porównanie z poprzednim stanem zapisuje wyłącznie faktyczne zmiany pól
     def observe(self, state: RobotState) -> list[tuple[float, str, object, object]]:
@@ -244,7 +245,19 @@ class StateJournal:
                         changes.append((state.t, name, self._last[name], value))
             self._last = current
             self._entries.extend(changes)
+            self._total += len(changes)
         return changes
+
+    # przyrostowy odczyt według licznika wszystkich zmian działa także po zapełnieniu bufora i podaje liczbę utraconych wpisów
+    def since(self, seq: int) -> tuple[list[tuple[float, str, object, object]], int, int]:
+        with self._lock:
+            total = self._total
+            items = list(self._entries)
+        fresh = total - seq
+        if fresh <= 0:
+            return [], total, 0
+        kept = items[-fresh:] if fresh < len(items) else items
+        return kept, total, max(0, fresh - len(items))
 
     # odczyt kopii wpisów jest bezpieczny wątkowo dla interfejsu i testów
     def entries(self, name: str | None = None) -> list[tuple[float, str, object, object]]:

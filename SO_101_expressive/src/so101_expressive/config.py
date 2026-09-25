@@ -65,7 +65,7 @@ class Settings:
     barge_in_ratio: float = 3.0
     barge_in_min_ms: int = 120
     mute_speech_while_holding: bool = False
-    vision_uplink_interval_s: float = 12.0
+    vision_uplink_interval_s: float = 0.0
     vision_uplink_width: int = 512
     camera_index: int = 0
     camera_width: int = 640
