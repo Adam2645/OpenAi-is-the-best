@@ -67,6 +67,8 @@ class Settings:
     mute_speech_while_holding: bool = False
     vision_uplink_interval_s: float = 0.0
     vision_uplink_width: int = 512
+    camera_cloud: str = "on_request"
+    camera_request_window_s: float = 20.0
     camera_index: int = 0
     camera_width: int = 640
     camera_height: int = 480
@@ -98,6 +100,10 @@ class Settings:
             problems.append("MIC_STREAM_MODE musi mieć wartość vad albo continuous")
         if self.echo_mode not in {"half_duplex", "off"}:
             problems.append("ECHO_MODE musi mieć wartość half_duplex albo off")
+        if self.camera_cloud not in {"on_request", "off"}:
+            problems.append("CAMERA_CLOUD musi mieć wartość on_request albo off")
+        if self.camera_request_window_s <= 0:
+            problems.append("CAMERA_REQUEST_WINDOW_S musi być dodatnie")
         if not 0.1 <= self.speed_scale <= 1.0:
             problems.append("SPEED_SCALE musi być w przedziale [0.1, 1.0]")
         if self.control_hz < 50 or self.control_hz > 500:

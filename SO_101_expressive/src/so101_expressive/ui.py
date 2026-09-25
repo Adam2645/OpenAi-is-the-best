@@ -163,7 +163,8 @@ class Dashboard:
         panel += [
             (12, 6, f"SO-101 robot rozmowny  |  {self.mode_label}", white, False),
             (bar_x0 - 12 - self._width(budget_text), 7, budget_text, grey, True),
-            (12, 62, f"Rozmowa: {state.conversation.value}   |   API: {api}", white, False),
+            (12, 62, f"Rozmowa: {state.conversation.value}   |   API: {api}   |   "
+             f"Klatki kamery do chmury: {extra.get('frames_sent', 0)}", white, False),
             (12, 86, f"Osoba: {state.person.value} (pewność {state.person_confidence:.2f})   |   Muzyka: "
              f"{'tak' if state.music else 'nie'} (wynik {state.music_score:.2f}{tempo})   |   "
              f"Mikrofon: {_db(extra.get('mic_rms', 0.0))} {'[bramka otwarta]' if extra.get('gate_open', True) else '[bramka echa]'}"

@@ -76,26 +76,19 @@ def synthetic_frame(obs: PersonObservation | None, width: int = 640, height: int
     return frame
 
 
-# rzadkie klatki dla chmury są oddzielone od szybkiej pętli śledzenia i wysyłane tylko gdy mają sens
+# klatki dla chmury są oddzielone od szybkiej pętli śledzenia i wysyłane od razu albo wcale, bez oczekujących żądań
 class VisionUplink:
-    # zero oznacza wysyłanie obrazu wyłącznie na prośbę modelu, bo cykliczne przesyłanie kadrów do chmury wymaga świadomego włączenia
+    # zero wyłącza wysyłanie cykliczne, bo przesyłanie kadrów do chmury w tle wymaga świadomego włączenia
     def __init__(self, interval_s: float, width: int = 512) -> None:
         self.interval_s = interval_s
         self.width = width
         self._last = -1e9
-        self._requested = False
+        self._lock = threading.Lock()
         self.sent = 0
 
-    # model może poprosić o świeże spojrzenie na scenę, np. gdy użytkownik pyta, co robot widzi
-    def request(self) -> None:
-        self._requested = True
-
-    # klatka jest wysyłana przy prośbie albo cyklicznie, ale tylko przy połączeniu i widocznym rozmówcy
-    def maybe_send(self, backend, frame: np.ndarray | None, t: float, person: PersonStatus) -> bool:
+    # natychmiastowe wysłanie jednej klatki nie zostawia żądania, które mógłby później spełnić inny kadr
+    def send_now(self, backend, frame: np.ndarray | None, t: float) -> bool:
         if frame is None or backend is None or backend.status is not ApiStatus.CONNECTED:
-            return False
-        periodic = self.interval_s > 0 and person is PersonStatus.TRACKED and t - self._last >= self.interval_s
-        if not (self._requested or periodic):
             return False
         import cv2
 
@@ -104,8 +97,14 @@ class VisionUplink:
         ok, jpeg = cv2.imencode(".jpg", small, [int(cv2.IMWRITE_JPEG_QUALITY), 70])
         if not ok:
             return False
-        backend.send_image(jpeg.tobytes())
-        self._last = t
-        self._requested = False
-        self.sent += 1
+        with self._lock:
+            backend.send_image(jpeg.tobytes())
+            self._last = t
+            self.sent += 1
         return True
+
+    # wysyłka cykliczna działa tylko po jawnym ustawieniu odstępu i przy widocznym rozmówcy
+    def maybe_send(self, backend, frame: np.ndarray | None, t: float, person: PersonStatus) -> bool:
+        if self.interval_s <= 0 or person is not PersonStatus.TRACKED or t - self._last < self.interval_s:
+            return False
+        return self.send_now(backend, frame, t)

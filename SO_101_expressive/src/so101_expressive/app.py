@@ -30,6 +30,7 @@ from .util import LatestValue
 
 log = logging.getLogger("so101")
 GESTURE_CYCLE = ("nod", "wave", "shrug", "think", "happy", "curious", "shake_head", "surprised", "bow", "look_around")
+FRAME_MAX_AGE_S = 1.0
 
 
 # przeglądarki i komunikatory nie odtwarzają kodeka mp4v z opencv, więc przy dostępnym ffmpeg nagranie jest kodowane do h.264
@@ -138,7 +139,9 @@ class RobotApp:
             intent_responder=self._respond, special_intents={"look_at_scene": self._look},
         )
         self.pipeline = AudioPipeline(settings, self.playback, self.audio, self.backend)
-        self.uplink = VisionUplink(settings.vision_uplink_interval_s, settings.vision_uplink_width)
+        periodic_s = settings.vision_uplink_interval_s if settings.camera_cloud != "off" else 0.0
+        self.uplink = VisionUplink(periodic_s, settings.vision_uplink_width)
+        self.camera = None
         self.narrator = SensorNarrator()
         self.state_log = StateLogWriter(settings.resolve_path(settings.log_dir))
         self.message = ""
@@ -183,12 +186,21 @@ class RobotApp:
             self.backend.respond_intent(intent.call_id, intent.name, result.as_response())
         self.message = f"{intent.name}: {result.message}"
 
-    # prośba modelu o spojrzenie wysyła najbliższą klatkę z kamery do chmury
+    # prośba modelu o obraz jest spełniana od razu jedną świeżą klatką i tylko tuż po wypowiedzi rozmówcy usłyszanej lokalnie
     def _look(self, intent: IntentRequest, state: RobotState) -> IntentResult:
+        if self.settings.camera_cloud == "off":
+            return IntentResult(False, "wysyłanie obrazu do chmury jest wyłączone (CAMERA_CLOUD=off)")
         if self.backend is None or self.backend.status is not ApiStatus.CONNECTED:
             return IntentResult(False, "brak połączenia z chmurą - nie mogę pokazać obrazu")
-        self.uplink.request()
-        return IntentResult(True, "wysłałem aktualną klatkę z kamery")
+        if state.t - self.pipeline.last_user_speech_t > self.settings.camera_request_window_s:
+            return IntentResult(False, "obraz wysyłam tylko tuż po pytaniu rozmówcy - nikt nie mówił do mnie przed chwilą")
+        item = self.camera.latest() if self.camera is not None else None
+        if item is None or state.t - item[1] > FRAME_MAX_AGE_S:
+            return IntentResult(False, "brak aktualnego obrazu z kamery")
+        if not self.uplink.send_now(self.backend, item[0], state.t):
+            return IntentResult(False, "nie udało się wysłać klatki z kamery")
+        log.info("wysłano klatkę kamery do chmury na prośbę modelu (łącznie %d)", self.uplink.sent)
+        return IntentResult(True, "wysłałem jedną aktualną klatkę z kamery")
 
     # dodatkowe pola panelu pochodzą z potoku audio i ostatniej decyzji arbitra
     def _extra(self) -> dict:
@@ -200,6 +212,7 @@ class RobotApp:
             "arm_owner": rec.decision.arm_owner if rec else "-",
             "gripper_owner": rec.decision.gripper_owner if rec else "-",
             "message": self.message,
+            "frames_sent": self.uplink.sent,
         }
 
     # obsługa klawiszy zamienia je na polecenia, które przechodzą przez te same reguły co prośby modelu
@@ -276,6 +289,7 @@ class RobotApp:
                 try:
                     camera = CameraSource(self.settings.camera_index, self.settings.camera_width, self.settings.camera_height)
                     camera.start()
+                    self.camera = camera
                     closers.append(camera.close)
                     detector = FaceDetector(self.settings.resolve_path(self.settings.face_model_path))
                     tracker = FaceTracker(self.settings.face_score_acquire, self.settings.face_score_keep)

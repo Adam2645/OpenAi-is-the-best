@@ -22,7 +22,7 @@ rzeczywiste opóźnienie Live API, jakość polskiego głosu, zgodność rozlicz
 
 ```
  kamera ─► YuNet ─► FaceTracker ──(15 Hz, lokalnie)──────────────┐
-   └──► VisionUplink (klatka tylko na prośbę modelu) ────────┐    │
+   └──► VisionUplink (1 klatka na prośbę, po mowie rozmówcy) ┐    │
  mikrofon ─► VAD ─► bramka echa ─► detektor muzyki           │    ▼
                      │                                        │  stan robota ◄── dziennik
                      ▼                                        ▼    │
@@ -102,7 +102,7 @@ przy zamykaniu plus wzrost obciążenia. Stan ma być pokazany z pewnością est
 
 | Sprawdzenie | Wynik |
 |---|---|
-| `pytest` (76 testów: jednostkowe i 7 scenariuszy z briefu) | 76/76 zaliczone |
+| `pytest` (80 testów: jednostkowe i 7 scenariuszy z briefu) | 80/80 zaliczone |
 | Sterownik: 3000 kroków losowych celów | zakresy, prędkości i przyspieszenia zawsze w limitach (test wykrył i pomógł usunąć błąd dyskretnego hamowania) |
 | Chwyt w fizyce MuJoCo | komenda → kontakt → potwierdzenie → uniesienie ≈9 cm → odłożenie ≤3 cm od celu; także z 3 innych póz startowych, przy kostce przesuniętej o 1–1,5 cm i po 3-sekundowym awaryjnym stopie w trakcie zamykania chwytaka (czas stopu nie liczy się do limitów faz); przy mowie i przy e-stopie chwytak bez zmian. Drugie nagranie demo ujawniło błąd wyboru gałęzi IK (pół obrotu nadgarstka nad kostką), poprawiony preferencją ciągłości i testem regresyjnym |
 | Szczęka a dźwięk | zmierzona pozycja szczęki zgodna z obwiednią dźwięku w chwili wyjścia: opóźnienie ≤ 40 ms, korelacja ok. 0,7 przy `JAW_LEAD_S=0.11` |

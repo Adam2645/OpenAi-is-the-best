@@ -72,7 +72,10 @@ Rozmowa: po prostu mów. Robot może sam wywołać gest, taniec, podniesienie lu
 („podnieś kostkę”), sprawdzić swój stan („co teraz robisz?”) albo spojrzeć przez kamerę („co widzisz?”).
 
 **Prywatność kamery:** obraz jest analizowany lokalnie (śledzenie twarzy). Do chmury trafia pojedyncza,
-pomniejszona klatka tylko wtedy, gdy model poprosi o spojrzenie — zwykle gdy zapytasz „co widzisz?”.
+pomniejszona klatka tylko wtedy, gdy model poprosi o spojrzenie (zwykle gdy zapytasz „co widzisz?”)
+**i** gdy lokalny detektor mowy usłyszał Cię w ostatnich 20 s (`CAMERA_REQUEST_WINDOW_S`).
+Klatka jest wysyłana od razu albo wcale — nie ma oczekujących żądań, które wysłałyby obraz później.
+Licznik wysłanych klatek widać na pasku stanu. `CAMERA_CLOUD=off` całkowicie wyłącza wysyłanie obrazu.
 Cykliczne wysyłanie klatek (bogatszy kontekst rozmowy, wyższy koszt) włączysz w `.env`,
 np. `VISION_UPLINK_INTERVAL_S=12`.
 
@@ -132,7 +135,7 @@ w symulowanym echu. **Na prawdziwym MacBooku trzeba je dostroić.** Przy słucha
 ## Testy
 
 ```bash
-.venv/bin/python -m pytest -q                      # 76 testów, ok. 30 s
+.venv/bin/python -m pytest -q                      # 80 testów, ok. 30 s
 .venv/bin/python scripts/fetch_test_data.py --audio   # opcjonalne dane: portret (domena publiczna) i nagrania CC
 .venv/bin/python scripts/eval_music_detector.py --music utwór.mp3 --other mowa.wav
 ```

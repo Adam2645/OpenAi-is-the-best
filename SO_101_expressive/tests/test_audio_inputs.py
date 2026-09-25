@@ -139,10 +139,13 @@ def test_pipeline_sends_user_speech_but_not_robot_echo(tmp_path):
     playback.enqueue(synthetic_speech(3.0))
     t = advance(r, t, 3.5)
     assert backend.seconds() == 0.0 and status.get().user_speaking is False
-    r.add_source(clip_source(speech16(2.0), R, t_start=t + 0.2, gain=1.0))
+    assert pipeline.last_user_speech_t < 0
+    t_user = t + 0.2
+    r.add_source(clip_source(speech16(2.0), R, t_start=t_user, gain=1.0))
     t = advance(r, t, 3.5)
     assert 1.8 <= backend.seconds() <= 3.2
     assert backend.ends == 1
+    assert t_user < pipeline.last_user_speech_t <= t
 
 
 # głośne wejście w słowo podczas mowy robota zostaje wykryte i przepuszczone do serwera
