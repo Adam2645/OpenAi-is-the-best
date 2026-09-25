@@ -126,7 +126,7 @@ class ScriptedBackend(ConversationBackend):
         self._user_s = 0.0
 
     # obraz nie jest analizowany w trybie lokalnym
-    def send_image(self, jpeg: bytes) -> None:
+    def send_image(self, jpeg: bytes, allow=None) -> None:
         return None
 
     # kontekst z czujników nie ma odbiorcy w trybie lokalnym
@@ -134,7 +134,7 @@ class ScriptedBackend(ConversationBackend):
         return None
 
     # wyniki próśb są zapamiętywane, żeby testy mogły sprawdzić decyzje planisty
-    def respond_intent(self, call_id: str, name: str, result: dict) -> None:
+    def respond_intent(self, call_id: str, name: str, result: dict, allow=None) -> None:
         self.intent_results.append((call_id, name, result))
 
     # wypowiedź z opcjonalnym gestem może być wywołana także z osi czasu dema bez urządzeń

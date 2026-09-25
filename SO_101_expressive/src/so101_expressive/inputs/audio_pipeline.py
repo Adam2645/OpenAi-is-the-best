@@ -59,6 +59,8 @@ class AudioPipeline:
         self.sent_seconds = 0.0
         self.barge_ins = 0
         self.last_vad_speech_t = -1e9
+        self.utterances = 0
+        self.on_utterance_start: Callable[[float], None] | None = None
         self.on_barge_in: Callable[[float], None] | None = None
         self.stats = PipelineStats()
 
@@ -87,6 +89,10 @@ class AudioPipeline:
             if self.on_barge_in is not None:
                 self.on_barge_in(t)
         vad = self.vad.process(block) if gate.pass_audio else self.vad.suspend(rms)
+        if vad.started:
+            self.utterances += 1
+            if self.on_utterance_start is not None:
+                self.on_utterance_start(t)
         ms = self.music.update(block, own_playback=own)
         user_speaking = vad.speech and gate.pass_audio
         if user_speaking:
@@ -104,7 +110,7 @@ class AudioPipeline:
         if vad.started and self.backend is not None and self.backend.status is ApiStatus.IDLE:
             self.backend.wake()
         self.stats = PipelineStats(vad.rms, vad.floor, gate.pass_audio, own, self._streaming, ms.score)
-        self.status_out.set(self._status_cls(user_speaking, ms.music, ms.score, ms.bpm))
+        self.status_out.set(self._status_cls(user_speaking, ms.music, ms.score, ms.bpm, self.utterances))
 
 
 # wejście mikrofonu przez sounddevice oddaje bloki do kolejki, bo callback karty nie może liczyć cech

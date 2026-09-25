@@ -15,7 +15,15 @@ import numpy as np
 from .behavior.planner import IntentResult
 from .budget import CostMeter
 from .config import Settings
-from .conversation.base import AudioChunk, ConversationBackend, IntentCancelled, IntentRequest, Interrupted, StatusChanged
+from .conversation.base import (
+    AudioChunk,
+    ConversationBackend,
+    IntentCancelled,
+    IntentRequest,
+    Interrupted,
+    StatusChanged,
+    Transcript,
+)
 from .conversation.gemini_live import GeminiLiveBackend
 from .conversation.scripted import LocalTTS, ScriptedBackend, speech_events
 from .inputs.audio_pipeline import AudioPipeline
@@ -143,6 +151,7 @@ class RobotApp:
         periodic_s = settings.vision_uplink_interval_s if settings.camera_cloud != "off" else 0.0
         self.uplink = VisionUplink(periodic_s, settings.vision_uplink_width)
         self.consent = CameraConsent(settings.camera_request_window_s, LOOK_GRACE_S)
+        self.pipeline.on_utterance_start = lambda t: self.consent.boundary()
         self.camera = None
         self.narrator = SensorNarrator()
         self.state_log = StateLogWriter(settings.resolve_path(settings.log_dir))
@@ -180,16 +189,18 @@ class RobotApp:
             return
         if isinstance(event, Interrupted):
             self.playback.flush()
+        elif isinstance(event, Transcript) and event.role == "user":
+            self.consent.hear(event.text)
         elif isinstance(event, IntentCancelled):
             self.consent.cancel(event.ids)
         elif isinstance(event, StatusChanged) and event.status is not ApiStatus.CONNECTED:
             self.consent.cancel()
         self.body.post(event)
 
-    # wynik planisty wraca do modelu jako odpowiedź funkcji
-    def _respond(self, intent: IntentRequest, result: IntentResult) -> None:
+    # wynik planisty wraca do modelu jako odpowiedź funkcji, pomijana przy wysyłaniu, gdy warunek wskaże anulowanie
+    def _respond(self, intent: IntentRequest, result: IntentResult, allow=None) -> None:
         if self.backend is not None:
-            self.backend.respond_intent(intent.call_id, intent.name, result.as_response())
+            self.backend.respond_intent(intent.call_id, intent.name, result.as_response(), allow=allow)
         self.message = f"{intent.name}: {result.message}"
 
     # prośba modelu o obraz po wstępnych warunkach czeka krótko na rozpoznaną prośbę rozmówcy, a decyzja zapada w obsłudze panelu
@@ -207,30 +218,33 @@ class RobotApp:
         return None
 
     # oczekująca prośba o obraz kończy się jedną klatką po rozpoznanej prośbie rozmówcy albo odmową po terminie
-    def _resolve_look(self, state: RobotState, now: float) -> None:
+    def _resolve_look(self, now: float) -> None:
         pending = self.consent.pending
         if pending is None:
             return
         call_id, deadline, intent = pending
-        ok, reason = self.consent.check(state.last_user_text, state.user_text_t, state.user_turn, now)
+        ok, reason = self.consent.check(now)
         if not ok and now < deadline:
             return
         if not self.consent.finish(call_id):
             return
-        result = self._send_look_frame(state.user_turn, now) if ok else IntentResult(False, reason)
+        result = self._send_look_frame(call_id, now) if ok else IntentResult(False, reason)
+        if result.accepted:
+            self.consent.consume(now)
+        else:
+            self.consent.release(call_id)
         self.body.intent_log.append((now, intent, result))
-        self._respond(intent, result)
+        self._respond(intent, result, allow=lambda: self.consent.allows(call_id))
 
-    # klatka po zgodzie musi być świeża i trafia do modelu przed odpowiedzią funkcji, a zgoda z tej wypowiedzi wygasa
-    def _send_look_frame(self, turn: int, now: float) -> IntentResult:
+    # klatka po zgodzie musi być świeża, trafia do modelu przed odpowiedzią funkcji i do chwili wysłania można ją odwołać
+    def _send_look_frame(self, call_id: str, now: float) -> IntentResult:
         if self.backend is None or self.backend.status is not ApiStatus.CONNECTED:
             return IntentResult(False, "brak połączenia z chmurą - nie mogę pokazać obrazu")
         item = self.camera.latest() if self.camera is not None else None
         if item is None or now - item[1] > FRAME_MAX_AGE_S:
             return IntentResult(False, "brak aktualnego obrazu z kamery")
-        if not self.uplink.send_now(self.backend, item[0], now):
+        if not self.uplink.send_now(self.backend, item[0], now, allow=lambda: self.consent.disclose(call_id)):
             return IntentResult(False, "nie udało się wysłać klatki z kamery")
-        self.consent.consume(turn)
         log.info("wysłano klatkę kamery do chmury po prośbie rozmówcy (łącznie %d)", self.uplink.sent)
         return IntentResult(True, "wysłałem jedną aktualną klatkę z kamery")
 
@@ -280,7 +294,8 @@ class RobotApp:
     # zadania okresowe: klatki dla chmury, podtrzymanie sesji, komunikaty czujników i zapis dziennika
     def _housekeeping(self, state: RobotState, frame: np.ndarray | None, now: float) -> None:
         if self.backend is not None:
-            self._resolve_look(state, now)
+            self.consent.stamp(now)
+            self._resolve_look(now)
             self.uplink.maybe_send(self.backend, frame, now, state.person)
             if state.person is PersonStatus.TRACKED:
                 if hasattr(self.backend, "note_activity"):

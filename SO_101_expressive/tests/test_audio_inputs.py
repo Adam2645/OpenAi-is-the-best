@@ -44,7 +44,7 @@ class RecordingBackend(ConversationBackend):
         self.ends += 1
 
     # obraz nie jest używany w tych testach
-    def send_image(self, jpeg: bytes) -> None:
+    def send_image(self, jpeg: bytes, allow=None) -> None:
         return None
 
     # kontekst nie jest używany w tych testach
@@ -52,7 +52,7 @@ class RecordingBackend(ConversationBackend):
         return None
 
     # odpowiedzi funkcji nie są używane w tych testach
-    def respond_intent(self, call_id: str, name: str, result: dict) -> None:
+    def respond_intent(self, call_id: str, name: str, result: dict, allow=None) -> None:
         return None
 
     # sekundy wysłanego dźwięku ułatwiają porównania
@@ -135,17 +135,30 @@ def test_echo_gate_blocks_echo_and_detects_barge_in():
 # gdy robot mówi przez głośnik, do chmury nie trafia nic, a mowa użytkownika po ciszy trafia z buforem wstępnym
 def test_pipeline_sends_user_speech_but_not_robot_echo(tmp_path):
     r, playback, pipeline, backend, status = rig(tmp_path)
+    starts: list[float] = []
+    pipeline.on_utterance_start = starts.append
     t = advance(r, 0.0, 1.0)
     playback.enqueue(synthetic_speech(3.0))
     t = advance(r, t, 3.5)
     assert backend.seconds() == 0.0 and status.get().user_speaking is False
-    assert pipeline.last_vad_speech_t < 0
+    assert pipeline.last_vad_speech_t < 0 and pipeline.utterances == 0 and starts == []
     t_user = t + 0.2
     r.add_source(clip_source(speech16(2.0), R, t_start=t_user, gain=1.0))
     t = advance(r, t, 3.5)
     assert 1.8 <= backend.seconds() <= 3.2
     assert backend.ends == 1
     assert t_user < pipeline.last_vad_speech_t <= t
+    assert pipeline.utterances == 1 and status.get().utterance == 1 and t_user <= starts[0] <= t_user + 0.5
+
+
+# każda wypowiedź oddzielona ciszą jest osobną granicą, którą liczy lokalny vad, a nie kolejność transkrypcji
+def test_pipeline_counts_separate_utterances(tmp_path):
+    r, playback, pipeline, backend, status = rig(tmp_path)
+    t = advance(r, 0.0, 1.0)
+    r.add_source(clip_source(speech16(1.2, seed=2), R, t_start=t, gain=1.0))
+    r.add_source(clip_source(speech16(1.2, seed=3), R, t_start=t + 3.0, gain=1.0))
+    advance(r, t, 5.5)
+    assert pipeline.utterances == 2 and status.get().utterance == 2 and backend.ends == 2
 
 
 # głośne wejście w słowo podczas mowy robota zostaje wykryte i przepuszczone do serwera

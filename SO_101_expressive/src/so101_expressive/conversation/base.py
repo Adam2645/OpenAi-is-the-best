@@ -102,17 +102,17 @@ class ConversationBackend(ABC):
     @abstractmethod
     def end_audio(self) -> None: ...
 
-    # rzadka klatka obrazu daje kontekst wizualny bez udziału w szybkiej pętli śledzenia
+    # rzadka klatka obrazu daje kontekst wizualny, a warunek sprawdzany tuż przed wysłaniem pozwala ją jeszcze odwołać
     @abstractmethod
-    def send_image(self, jpeg: bytes) -> None: ...
+    def send_image(self, jpeg: bytes, allow: Callable[[], bool] | None = None) -> None: ...
 
     # krótka informacja tekstowa o zdarzeniu z czujników, np. o wykrytej muzyce
     @abstractmethod
     def send_context(self, text: str) -> None: ...
 
-    # odpowiedź na prośbę modelu mówi, czy ciało wykonało czynność i dlaczego nie
+    # odpowiedź na prośbę modelu mówi, czy ciało wykonało czynność, a warunek pozwala pominąć ją dla anulowanego wywołania
     @abstractmethod
-    def respond_intent(self, call_id: str, name: str, result: dict) -> None: ...
+    def respond_intent(self, call_id: str, name: str, result: dict, allow: Callable[[], bool] | None = None) -> None: ...
 
     # wybudzenie po bezczynności pozwala rozłączać sesję, gdy nikogo nie ma, i oszczędzać budżet
     def wake(self) -> None:

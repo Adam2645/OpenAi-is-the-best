@@ -5,6 +5,8 @@ import sys
 import threading
 import time
 import unicodedata
+from collections import deque
+from typing import Callable
 
 import numpy as np
 
@@ -12,10 +14,42 @@ from ..behavior.tracking import PersonObservation
 from ..state import ApiStatus, PersonStatus
 from ..util import LatestValue
 
-LOOK_PATTERN = re.compile(
-    r"(?<!\w)(widzi\w*|widac|zobacz\w*|spojrz\w*|popatrz\w*|patrz\w*|pokaz\w*|kamer\w*|wyglad\w*|rozpozna\w*"
-    r"|co trzymam|see|look\w*|camera\w*|show\w*)"
-)
+QUOTED = re.compile(r"[„“”\"«»][^„“”\"«»]*[„“”\"«»]")
+CLAUSE_SPLIT = re.compile(r"[.,;:!?\n]+|\s+-\s+|\s+(?:ale|lecz|jednak|tylko|but|however)\s+")
+NEGATOR = re.compile(r"\b(nie|nigdy|przestan\w*|dont|don't|do not|never|not|stop)\b")
+LOOK_REQUESTS = tuple(re.compile(pattern) for pattern in (
+    r"\b(spojrz|spojrzcie|popatrz|popatrzcie|patrz|patrzcie|zobacz|zobaczcie|obejrzyj|obejrzyjcie|zerknij|zerknijcie)\b",
+    r"\brzuc(cie)?\s+okiem\b",
+    r"\b(mozesz|moglbys|moglabys|mozecie|potrafisz|sprobuj|chce zebys|chcialbym zebys|chcialabym zebys)\b"
+    r"(\s+\w+){0,2}?\s+(spojrzec|popatrzec|zobaczyc|obejrzec|zerknac|patrzec)\b",
+    r"\b(co|czy|kogo|ile)\b(\s+\w+){0,2}?\s+(widzisz|widac)\b",
+    r"\bwidzisz\s+(mnie|to|tu|tutaj|go|ja|je|te|ten|ta|cos|kogos)\b",
+    r"\b(jak|czy)\b(\s+\w+){0,2}?\s+wygladam\b",
+    r"\bco\s+(teraz\s+)?(trzymam|mam\s+w\s+(rece|rekach|dloni))\b",
+    r"\b(pokaze|pokazuje)\s+(ci|tobie|wam)\b",
+    r"\b(uzyj|wlacz|sprawdz)\s+(swojej\s+|swoja\s+)?kamer\w*",
+    r"^(please\s+|now\s+|just\s+|hey\s+)?look\b",
+    r"\b(can|could|would|will)\s+you\s+(please\s+)?(take\s+a\s+look|have\s+a\s+look|look)\b",
+    r"^(please\s+)?(take|have)\s+a\s+look\b",
+    r"\b(what|who)\s+(do|can)\s+you\s+see\b",
+    r"\b(can|could|do)\s+you\s+see\b",
+    r"\bhow\s+do\s+i\s+look\b",
+    r"\bwhat\s+am\s+i\s+holding\b",
+    r"\b(let\s+me|i'll|i\s+will|i\s+want\s+to)\s+show\s+you\b",
+    r"\buse\s+(the|your)\s+camera\b",
+))
+LOOK_DENIALS = tuple(re.compile(pattern) for pattern in (
+    r"\bnie\s+(\w+\s+)?(nagrywaj\w*|filmuj\w*|fotografuj\w*|rob\w*\s+zdjec\w*|uzywaj\w*\s+kamer\w*|wysylaj\w*"
+    r"|pokazuj\w*|ogladaj\w*|spogladaj\w*|zagladaj\w*|podgladaj\w*|obserwuj\w*)",
+    r"\b(wylacz|zaslon|zakryj)\s+(\w+\s+)?kamer\w*",
+    r"\bbez\s+kamery\b",
+    r"\bprzestan\w*\s+(\w+\s+)?(patrzec|obserwowac|nagrywac|filmowac|podgladac)\b",
+    r"\b(stop|quit)\s+(looking|watching|recording|filming)\b",
+    r"\b(turn\s+off|cover|disable)\s+(the\s+|your\s+)?camera\b",
+    r"\bno\s+camera\b",
+))
+REVOKE_HEADS = frozenset({"nie", "niewazne", "stop", "cancel", "nevermind", "never"})
+REVOKE_WORDS = REVOKE_HEADS | frozenset({"a", "zreszta", "wlasciwie", "juz", "trzeba", "potrzeba", "actually", "mind", "oh", "please"})
 
 
 # brak kamery lub uprawnień ma dać zrozumiały komunikat zamiast cichego braku obrazu
@@ -94,7 +128,7 @@ class VisionUplink:
         self.sent = 0
 
     # natychmiastowe wysłanie jednej klatki nie zostawia żądania, które mógłby później spełnić inny kadr
-    def send_now(self, backend, frame: np.ndarray | None, t: float) -> bool:
+    def send_now(self, backend, frame: np.ndarray | None, t: float, allow: Callable[[], bool] | None = None) -> bool:
         if frame is None or backend is None or backend.status is not ApiStatus.CONNECTED:
             return False
         import cv2
@@ -105,7 +139,7 @@ class VisionUplink:
         if not ok:
             return False
         with self._lock:
-            backend.send_image(jpeg.tobytes())
+            backend.send_image(jpeg.tobytes(), allow=allow)
             self._last = t
             self.sent += 1
         return True
@@ -119,40 +153,94 @@ class VisionUplink:
 
 # rozpoznany tekst porównujemy bez wielkich liter i polskich znaków, bo zapis transkrypcji mowy bywa niejednolity
 def _normalize(text: str) -> str:
-    text = text.lower().replace("ł", "l")
+    text = text.lower().replace("ł", "l").replace("’", "'").replace("‘", "'")
     return "".join(ch for ch in unicodedata.normalize("NFKD", text) if not unicodedata.combining(ch))
 
 
-# wprost wyrażona prośba o spojrzenie wiąże wysłanie klatki z tym, co rozmówca faktycznie powiedział
+# przeczenie działa w obrębie zdania składowego, a cytat nie jest prośbą mówiącego, więc tekst dzielimy i usuwamy cytaty
+def _clauses(text: str) -> list[str]:
+    normalized = _normalize(QUOTED.sub(" . ", text))
+    return [part.strip() for part in CLAUSE_SPLIT.split(normalized) if part.strip()]
+
+
+# kolejne wzmianki o patrzeniu są prośbami albo zakazami, a przeczenie przed końcem prośby zamienia ją w zakaz
+def _look_events(clauses: list[str]) -> list[str]:
+    events: list[str] = []
+    for clause in clauses:
+        found: list[tuple[int, str]] = []
+        for pattern in LOOK_REQUESTS:
+            for match in pattern.finditer(clause):
+                negated = NEGATOR.search(clause, 0, match.end()) is not None
+                found.append((match.start(), "deny" if negated else "ask"))
+        for pattern in LOOK_DENIALS:
+            found.extend((match.start(), "deny") for match in pattern.finditer(clause))
+        events.extend(kind for _, kind in sorted(found))
+    return events
+
+
+# samo „nie” albo „a zresztą nie” na końcu wypowiedzi odwołuje wcześniejszą prośbę
+def _revoked(clauses: list[str]) -> bool:
+    words = set(clauses[-1].split()) if clauses else set()
+    return bool(words) and words <= REVOKE_WORDS and bool(words & REVOKE_HEADS)
+
+
+# zgodą jest tylko twierdząca prośba w trybie rozkazującym lub pytającym, która jest ostatnią wzmianką o patrzeniu
 def asks_to_look(text: str) -> bool:
-    return bool(LOOK_PATTERN.search(_normalize(text)))
+    clauses = _clauses(text)
+    events = _look_events(clauses)
+    return bool(events) and events[-1] == "ask" and not _revoked(clauses)
 
 
-# zgoda na klatkę pochodzi z rozpoznanej wypowiedzi rozmówcy, jest jednorazowa, a oczekiwanie na nią ma twardy termin
+# zgoda na klatkę pochodzi z rozpoznanych wypowiedzi rozmówcy, jest jednorazowa i do chwili wysłania można ją odwołać
 class CameraConsent:
     # okno świeżości wypowiedzi i krótki termin oczekiwania ograniczają, jak długo prośba modelu może czekać na zgodę
     def __init__(self, window_s: float, grace_s: float = 3.0) -> None:
         self.window_s = window_s
         self.grace_s = grace_s
         self._lock = threading.Lock()
+        self._heard: list[list] = []
+        self._consumed_t = -1e9
         self._pending: tuple[str, float, object] | None = None
-        self._used_turn: int | None = None
+        self._in_flight: str | None = None
+        self._revoked: deque[str] = deque(maxlen=32)
 
-    # ocena bieżącej wypowiedzi zwraca zgodę albo powód, dla którego klatka nie może zostać wysłana
-    def check(self, text: str, text_t: float, turn: int, t: float) -> tuple[bool, str]:
-        if t - text_t > self.window_s or not text.strip():
+    # fragment rozpoznanej wypowiedzi rozmówcy trafia do bufora zgody, a czas nadaje mu dopiero pętla panelu
+    def hear(self, text: str) -> None:
+        with self._lock:
+            self._heard.append([text, None])
+
+    # granica wypowiedzi z lokalnego vad oddziela zdania, żeby przeczenie z nowej wypowiedzi nie skleiło się z poprzednią
+    def boundary(self) -> None:
+        with self._lock:
+            if self._heard and self._heard[-1][0] != ". ":
+                self._heard.append([". ", None])
+
+    # czas nadawany przy pierwszym odczycie mierzy świeżość zgody zegarem pętli panelu, także w symulacji
+    def stamp(self, now: float) -> None:
+        with self._lock:
+            for entry in self._heard:
+                if entry[1] is None:
+                    entry[1] = now
+            self._heard = [entry for entry in self._heard if now - entry[1] <= self.window_s]
+
+    # ocena świeżych wypowiedzi zwraca zgodę albo powód, dla którego klatka nie może zostać wysłana
+    def check(self, now: float) -> tuple[bool, str]:
+        with self._lock:
+            text = "".join(entry[0] for entry in self._heard if entry[1] is not None and now - entry[1] <= self.window_s)
+            recently_used = now - self._consumed_t <= self.window_s
+        if not text.strip(" ."):
+            if recently_used:
+                return False, "do tej prośby wysłałem już jedną klatkę - poproś ponownie, jeśli mam spojrzeć jeszcze raz"
             return False, "nie usłyszałem prośby o spojrzenie - powiedz np. „co widzisz?” albo „spójrz”"
         if not asks_to_look(text):
             return False, "obraz wysyłam tylko, gdy rozmówca wprost o to poprosi, np. „co widzisz?” albo „spójrz”"
-        with self._lock:
-            if self._used_turn == turn:
-                return False, "do tej prośby wysłałem już jedną klatkę - poproś ponownie, jeśli mam spojrzeć jeszcze raz"
         return True, ""
 
-    # po wysłaniu klatki zgoda z tej wypowiedzi wygasa, więc kolejne prośby modelu nie wyślą następnych kadrów
-    def consume(self, turn: int) -> None:
+    # wysłanie klatki zużywa usłyszaną prośbę, więc kolejna klatka wymaga nowej wypowiedzi rozmówcy
+    def consume(self, now: float) -> None:
         with self._lock:
-            self._used_turn = turn
+            self._heard.clear()
+            self._consumed_t = now
 
     # oczekiwać może tylko jedna prośba naraz, z terminem liczonym od jej nadejścia
     def begin(self, call_id: str, t: float, payload: object = None) -> bool:
@@ -168,18 +256,44 @@ class CameraConsent:
         with self._lock:
             return self._pending
 
-    # przejęcie prośby przed decyzją chroni przed wysłaniem klatki dla wywołania anulowanego w międzyczasie
+    # przejęcie prośby zapobiega dwóm decyzjom dla jednego wywołania, które do chwili wysłania pozostaje odwoływalne
     def finish(self, call_id: str) -> bool:
         with self._lock:
             if self._pending is None or self._pending[0] != call_id:
                 return False
             self._pending = None
+            self._in_flight = call_id
             return True
 
-    # anulowanie przez serwer lub rozłączenie usuwa oczekującą prośbę bez wysyłania klatki
+    # odmowa lub nieudane przygotowanie klatki kończy wywołanie bez ujawnienia obrazu
+    def release(self, call_id: str) -> None:
+        with self._lock:
+            if self._in_flight == call_id:
+                self._in_flight = None
+
+    # sprawdzenie tuż przed wysłaniem klatki jest punktem ujawnienia, po którym anulowanie niczego już nie cofa
+    def disclose(self, call_id: str) -> bool:
+        with self._lock:
+            if call_id in self._revoked:
+                return False
+            if self._in_flight == call_id:
+                self._in_flight = None
+            return True
+
+    # odpowiedź funkcji dla anulowanego wywołania nie jest wysyłana, bo serwer już je odrzucił
+    def allows(self, call_id: str) -> bool:
+        with self._lock:
+            return call_id not in self._revoked
+
+    # anulowanie przez serwer lub rozłączenie usuwa oczekującą prośbę i odwołuje klatkę, która jeszcze nie wyszła
     def cancel(self, ids: tuple[str, ...] | None = None) -> bool:
         with self._lock:
-            if self._pending is None or (ids is not None and self._pending[0] not in ids):
-                return False
-            self._pending = None
-            return True
+            hit = False
+            if self._pending is not None and (ids is None or self._pending[0] in ids):
+                self._pending = None
+                hit = True
+            if self._in_flight is not None and (ids is None or self._in_flight in ids):
+                self._revoked.append(self._in_flight)
+                self._in_flight = None
+                hit = True
+            return hit

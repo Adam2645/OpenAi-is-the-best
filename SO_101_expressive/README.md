@@ -75,16 +75,25 @@ Rozmowa: po prostu mów. Robot może sam wywołać gest, taniec, podniesienie lu
 pomniejszona klatka tylko wtedy, gdy jednocześnie:
 
 1. model poprosi o spojrzenie;
-2. Twoja wypowiedź, rozpoznana przez transkrypcję w ostatnich 20 s (`CAMERA_REQUEST_WINDOW_S`), wprost
-   prosi o spojrzenie — np. „co widzisz?”, „spójrz”, „popatrz”, „pokażę ci…”, „jak wyglądam?”;
+2. Twoja wypowiedź, rozpoznana przez transkrypcję w ostatnich 20 s (`CAMERA_REQUEST_WINDOW_S`), zawiera
+   **twierdzącą prośbę** o spojrzenie w formie polecenia lub pytania — np. „co widzisz?”, „spójrz”,
+   „czy możesz spojrzeć?”, „pokażę ci…”, „jak wyglądam?”. Przeczenia („nie patrz”, „wyłącz kamerę”,
+   „nie nagrywaj”), zdania oznajmujące („patrzę”, „wyglądasz”) i cytaty nie są zgodą. Liczy się ostatnia
+   wzmianka: późniejsze „nie patrz” albo „a zresztą nie” cofa wcześniejsze „spójrz”;
 3. lokalny detektor mowy usłyszał Cię w tym czasie.
 
-Jedna taka wypowiedź odblokowuje najwyżej jedną klatkę. Transkrypcja przychodzi bez gwarancji kolejności,
-więc prośba modelu czeka na rozpoznanie wypowiedzi najwyżej 3 s; znika po odmowie, anulowaniu lub rozłączeniu.
+Jedna prośba odblokowuje najwyżej jedną klatkę — kolejna wymaga nowej wypowiedzi (granice wypowiedzi wyznacza
+lokalny detektor mowy). Transkrypcja przychodzi bez gwarancji kolejności, więc prośba modelu czeka na rozpoznanie
+wypowiedzi najwyżej 3 s; znika po odmowie, anulowaniu lub rozłączeniu. Anulowanie przez serwer lub rozłączenie
+cofa też klatkę, która czeka jeszcze w kolejce do wysłania, a klatka czekająca dłużej niż 2 s jest odrzucana.
 Sama muzyka czy hałas niczego nie odblokują. Wymaga to włączonej transkrypcji (`LIVE_TRANSCRIPTS`, domyślnie
 włączona). Licznik wysłanych klatek widać na pasku stanu, a `CAMERA_CLOUD=off` całkowicie wyłącza wysyłanie
 obrazu. Cykliczne wysyłanie klatek (bogatszy kontekst rozmowy, wyższy koszt) włączysz w `.env`,
 np. `VISION_UPLINK_INTERVAL_S=12` — wtedy klatki idą w tle niezależnie od powyższych warunków.
+
+Rozpoznawanie prośby to reguły na tekście transkrypcji, a nie rozumienie języka: zdanie zależne czy mowa
+zależna bez cudzysłowu mogą zostać źle ocenione, a przeczenie w tym samym zdaniu bez przecinka
+(„nie wiem co to zobacz”) blokuje prośbę. Przy wątpliwości reguły wybierają odmowę.
 
 Pasek stanu pokazuje czynności robota (słucha, mówi, odtwarza audio, śledzi rozmówcę, wykonuje gest,
 tańczy, sięga po obiekt, trzyma obiekt, zatrzymany, bez chmury), fazę chwytu ze źródłem pomiaru,
@@ -142,7 +151,7 @@ w symulowanym echu. **Na prawdziwym MacBooku trzeba je dostroić.** Przy słucha
 ## Testy
 
 ```bash
-.venv/bin/python -m pytest -q                      # 96 testów, ok. 30 s
+.venv/bin/python -m pytest -q                      # 129 testów, ok. 30 s
 .venv/bin/python scripts/fetch_test_data.py --audio   # opcjonalne dane: portret (domena publiczna) i nagrania CC
 .venv/bin/python scripts/eval_music_detector.py --music utwór.mp3 --other mowa.wav
 ```

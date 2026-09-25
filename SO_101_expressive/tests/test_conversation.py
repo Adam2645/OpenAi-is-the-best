@@ -212,3 +212,22 @@ def test_idle_disconnect_and_wake(tmp_path):
     backend.wake()
     wait_for(lambda: backend.status is ApiStatus.CONNECTED and len(connector.configs) == 2)
     backend.stop()
+
+
+# nadawca sprawdza warunek i wiek klatki tuż przed wysłaniem, więc odwołana lub przeterminowana klatka nie wychodzi
+def test_image_and_response_gates_at_disclosure_point(tmp_path):
+    session = FakeSession()
+    backend, sink, _ = make_backend(tmp_path, FakeConnector([session]))
+    backend.start()
+    wait_for(lambda: backend.status is ApiStatus.CONNECTED)
+    backend.send_image(b"odwolana", allow=lambda: False)
+    backend.send_image(b"dozwolona", allow=lambda: True)
+    backend._post(("image", b"przeterminowana", backend.clock() - 10.0, None))
+    backend.respond_intent("x", "look_at_scene", {"result": "ok"}, allow=lambda: False)
+    backend.respond_intent("y", "look_at_scene", {"result": "ok"}, allow=lambda: True)
+    wait_for(lambda: session.tool_responses())
+    videos = [kw["video"].data for kind, kw in session.sent if kind == "realtime" and kw.get("video") is not None]
+    assert videos == [b"dozwolona"]
+    assert [r.id for r in session.tool_responses()] == ["y"]
+    assert backend.dropped_images == 2
+    backend.stop()

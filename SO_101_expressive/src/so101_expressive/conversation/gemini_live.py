@@ -27,6 +27,7 @@ from .prompt import SYSTEM_PROMPT_PL
 from .tools import function_declarations, response_scheduling, validate_call
 
 ConnectFn = Callable[[Any], Any]
+IMAGE_MAX_QUEUE_S = 2.0
 
 
 # klasyfikacja błędu decyduje, czy ponawiać połączenie i jaki komunikat pokazać, bez ujawniania klucza
@@ -94,6 +95,7 @@ class GeminiLiveBackend(ConversationBackend):
         self._last_activity = clock()
         self.reconnects = 0
         self.dropped_audio = 0
+        self.dropped_images = 0
         self.errors: deque[str] = deque(maxlen=50)
         self.sent: dict[str, int] = {"audio": 0, "audio_end": 0, "image": 0, "context": 0, "tool": 0}
 
@@ -162,19 +164,19 @@ class GeminiLiveBackend(ConversationBackend):
         if self._status is ApiStatus.CONNECTED:
             self._post(("audio_end",))
 
-    # rzadka klatka z kamery daje modelowi kontekst wizualny
-    def send_image(self, jpeg: bytes) -> None:
+    # klatka czeka w kolejce z czasem i warunkiem wysłania, żeby anulowanie lub zator sieci mogły ją jeszcze zatrzymać
+    def send_image(self, jpeg: bytes, allow: Callable[[], bool] | None = None) -> None:
         if self._status is ApiStatus.CONNECTED:
-            self._post(("image", jpeg))
+            self._post(("image", jpeg, self.clock(), allow))
 
     # informacja z czujników dopisywana do kontekstu bez kończenia tury rozmówcy
     def send_context(self, text: str) -> None:
         if self._status is ApiStatus.CONNECTED:
             self._post(("context", text))
 
-    # odpowiedź na wywołanie funkcji zawiera wynik planisty i sposób ogłoszenia go przez model
-    def respond_intent(self, call_id: str, name: str, result: dict) -> None:
-        self._post(("tool", call_id, name, result))
+    # odpowiedź na wywołanie funkcji zawiera wynik planisty, a warunek pozwala pominąć ją, gdy serwer anulował wywołanie
+    def respond_intent(self, call_id: str, name: str, result: dict, allow: Callable[[], bool] | None = None) -> None:
+        self._post(("tool", call_id, name, result, allow))
 
     # lokalne przerwanie odrzuca resztę bieżącej tury, gdy użytkownik wciśnie klawisz przerwania
     def interrupt_local(self) -> None:
@@ -341,7 +343,11 @@ class GeminiLiveBackend(ConversationBackend):
             elif kind == "audio_end":
                 await session.send_realtime_input(audio_stream_end=True)
             elif kind == "image":
-                await session.send_realtime_input(video=types.Blob(data=item[1], mime_type="image/jpeg"))
+                _, jpeg, queued_t, allow = item
+                if self.clock() - queued_t > IMAGE_MAX_QUEUE_S or (allow is not None and not allow()):
+                    self.dropped_images += 1
+                    continue
+                await session.send_realtime_input(video=types.Blob(data=jpeg, mime_type="image/jpeg"))
                 self.meter.add_image()
             elif kind == "context":
                 text = item[1]
@@ -350,7 +356,10 @@ class GeminiLiveBackend(ConversationBackend):
                 )
                 self.meter.add_text_in(len(text))
             elif kind == "tool":
-                _, call_id, name, result = item
+                _, call_id, name, result, *rest = item
+                allow = rest[0] if rest else None
+                if allow is not None and not allow():
+                    continue
                 accepted = result.get("result") == "ok"
                 scheduling = response_scheduling(name, accepted)
                 payload = {**result, "scheduling": scheduling}

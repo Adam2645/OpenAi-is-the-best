@@ -41,6 +41,7 @@ class AudioStatus:
     music: bool = False
     music_score: float = 0.0
     music_bpm: float = 0.0
+    utterance: int = 0
 
 
 # polecenia z klawiatury i testów idą tą samą kolejką co zdarzenia rozmowy, więc kolejność jest zachowana
@@ -117,6 +118,7 @@ class BodyRuntime:
         self._inbox: queue.Queue = queue.Queue()
         self._turn_open = False
         self._last_role = ""
+        self._text_turn = -1
         self._evidence: GripEvidence = sim.grasp_evidence(float(controller.q[GRIPPER]))
         self._snapshot = self.state.snapshot()
         self._snap_lock = threading.Lock()
@@ -212,18 +214,16 @@ class BodyRuntime:
                 self.playback.flush()
                 self.planner.on_interrupted(t)
             elif isinstance(item, Transcript):
-                if item.role != self._last_role:
-                    if item.role == "user":
-                        st.last_user_text = ""
-                        st.user_turn += 1
-                    else:
-                        st.last_robot_text = ""
-                    self._last_role = item.role
                 if item.role == "user":
+                    if self._last_role != "user" or self._text_turn != st.user_turn:
+                        st.last_user_text = ""
+                        self._text_turn = st.user_turn
                     st.last_user_text = (st.last_user_text + item.text)[-200:]
-                    st.user_text_t = t
                 else:
+                    if self._last_role != item.role:
+                        st.last_robot_text = ""
                     st.last_robot_text = (st.last_robot_text + item.text)[-200:]
+                self._last_role = item.role
             elif isinstance(item, IntentRequest):
                 self._intent(item, t)
             elif isinstance(item, IntentCancelled):
@@ -244,6 +244,7 @@ class BodyRuntime:
         st.music = aud.music
         st.music_score = aud.music_score
         st.music_bpm = aud.music_bpm
+        st.user_turn = aud.utterance
         muted = self.settings.mute_speech_while_holding and st.gripper_locked
         st.speech_muted = muted
         self.playback.set_muted(muted)
