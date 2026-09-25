@@ -58,7 +58,7 @@ class AudioPipeline:
         self._streaming = False
         self.sent_seconds = 0.0
         self.barge_ins = 0
-        self.last_user_speech_t = -1e9
+        self.last_vad_speech_t = -1e9
         self.on_barge_in: Callable[[float], None] | None = None
         self.stats = PipelineStats()
 
@@ -90,7 +90,7 @@ class AudioPipeline:
         ms = self.music.update(block, own_playback=own)
         user_speaking = vad.speech and gate.pass_audio
         if user_speaking:
-            self.last_user_speech_t = t
+            self.last_vad_speech_t = t
         want = gate.pass_audio and (self.mode == "continuous" or vad.speech)
         if want and self._backend_ready():
             data = np.concatenate(list(self._ring)) if not self._streaming else block

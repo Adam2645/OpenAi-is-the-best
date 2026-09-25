@@ -51,7 +51,10 @@ TOOL_SPECS: dict[str, dict] = {
         "blocking": True,
     },
     "look_at_scene": {
-        "description": "Take a fresh look through the laptop camera when the user asks what you see.",
+        "description": (
+            "Take one fresh look through the laptop camera, only right after the user explicitly asks you to look "
+            "or asks what you see. Without such a request the tool refuses."
+        ),
         "params": {},
         "required": [],
         "blocking": True,

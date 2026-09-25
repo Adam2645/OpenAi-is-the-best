@@ -97,7 +97,7 @@ class BodyRuntime:
         journal: StateJournal | None = None,
         budget_fn: Callable[[], object] | None = None,
         intent_responder: Callable[[IntentRequest, IntentResult], None] | None = None,
-        special_intents: dict[str, Callable[[IntentRequest, RobotState], IntentResult]] | None = None,
+        special_intents: dict[str, Callable[[IntentRequest, RobotState], IntentResult | None]] | None = None,
     ) -> None:
         self.settings = settings
         self.sim = sim
@@ -178,13 +178,15 @@ class BodyRuntime:
                 self.sim.reset_cube()
         self.command_log.append((t, cmd, result))
 
-    # prośby modelu są walidowane w jednym miejscu przed każdą obsługą, a wynik, także odmowa, zawsze wraca do rozmowy
+    # prośby modelu są walidowane w jednym miejscu, a wynik wraca od razu albo później, gdy obsługa specjalna odroczy decyzję
     def _intent(self, item: IntentRequest, t: float) -> None:
         ok, parsed = validate_call(item.name, item.args)
         if not ok:
             result = IntentResult(False, str(parsed))
         elif item.name in self.special_intents:
             result = self.special_intents[item.name](item, self.state.snapshot())
+            if result is None:
+                return
         else:
             result = self.planner.handle_intent(item.name, parsed, t, self.state, self.sim.joint_q(), item.call_id)
         self.intent_log.append((t, item, result))
@@ -213,11 +215,13 @@ class BodyRuntime:
                 if item.role != self._last_role:
                     if item.role == "user":
                         st.last_user_text = ""
+                        st.user_turn += 1
                     else:
                         st.last_robot_text = ""
                     self._last_role = item.role
                 if item.role == "user":
                     st.last_user_text = (st.last_user_text + item.text)[-200:]
+                    st.user_text_t = t
                 else:
                     st.last_robot_text = (st.last_robot_text + item.text)[-200:]
             elif isinstance(item, IntentRequest):
@@ -326,7 +330,7 @@ def create_body(
     audio: LatestValue[AudioStatus] | None = None,
     budget_fn: Callable[[], object] | None = None,
     intent_responder: Callable[[IntentRequest, IntentResult], None] | None = None,
-    special_intents: dict[str, Callable[[IntentRequest, RobotState], IntentResult]] | None = None,
+    special_intents: dict[str, Callable[[IntentRequest, RobotState], IntentResult | None]] | None = None,
 ) -> BodyRuntime:
     sim = MujocoSim(settings.resolve_path(settings.mjcf_path))
     kin = So101Kinematics(sim.model)

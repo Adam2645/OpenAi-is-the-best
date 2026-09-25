@@ -1,14 +1,21 @@
 from __future__ import annotations
 
+import re
 import sys
 import threading
 import time
+import unicodedata
 
 import numpy as np
 
 from ..behavior.tracking import PersonObservation
 from ..state import ApiStatus, PersonStatus
 from ..util import LatestValue
+
+LOOK_PATTERN = re.compile(
+    r"(?<!\w)(widzi\w*|widac|zobacz\w*|spojrz\w*|popatrz\w*|patrz\w*|pokaz\w*|kamer\w*|wyglad\w*|rozpozna\w*"
+    r"|co trzymam|see|look\w*|camera\w*|show\w*)"
+)
 
 
 # brak kamery lub uprawnień ma dać zrozumiały komunikat zamiast cichego braku obrazu
@@ -108,3 +115,71 @@ class VisionUplink:
         if self.interval_s <= 0 or person is not PersonStatus.TRACKED or t - self._last < self.interval_s:
             return False
         return self.send_now(backend, frame, t)
+
+
+# rozpoznany tekst porównujemy bez wielkich liter i polskich znaków, bo zapis transkrypcji mowy bywa niejednolity
+def _normalize(text: str) -> str:
+    text = text.lower().replace("ł", "l")
+    return "".join(ch for ch in unicodedata.normalize("NFKD", text) if not unicodedata.combining(ch))
+
+
+# wprost wyrażona prośba o spojrzenie wiąże wysłanie klatki z tym, co rozmówca faktycznie powiedział
+def asks_to_look(text: str) -> bool:
+    return bool(LOOK_PATTERN.search(_normalize(text)))
+
+
+# zgoda na klatkę pochodzi z rozpoznanej wypowiedzi rozmówcy, jest jednorazowa, a oczekiwanie na nią ma twardy termin
+class CameraConsent:
+    # okno świeżości wypowiedzi i krótki termin oczekiwania ograniczają, jak długo prośba modelu może czekać na zgodę
+    def __init__(self, window_s: float, grace_s: float = 3.0) -> None:
+        self.window_s = window_s
+        self.grace_s = grace_s
+        self._lock = threading.Lock()
+        self._pending: tuple[str, float, object] | None = None
+        self._used_turn: int | None = None
+
+    # ocena bieżącej wypowiedzi zwraca zgodę albo powód, dla którego klatka nie może zostać wysłana
+    def check(self, text: str, text_t: float, turn: int, t: float) -> tuple[bool, str]:
+        if t - text_t > self.window_s or not text.strip():
+            return False, "nie usłyszałem prośby o spojrzenie - powiedz np. „co widzisz?” albo „spójrz”"
+        if not asks_to_look(text):
+            return False, "obraz wysyłam tylko, gdy rozmówca wprost o to poprosi, np. „co widzisz?” albo „spójrz”"
+        with self._lock:
+            if self._used_turn == turn:
+                return False, "do tej prośby wysłałem już jedną klatkę - poproś ponownie, jeśli mam spojrzeć jeszcze raz"
+        return True, ""
+
+    # po wysłaniu klatki zgoda z tej wypowiedzi wygasa, więc kolejne prośby modelu nie wyślą następnych kadrów
+    def consume(self, turn: int) -> None:
+        with self._lock:
+            self._used_turn = turn
+
+    # oczekiwać może tylko jedna prośba naraz, z terminem liczonym od jej nadejścia
+    def begin(self, call_id: str, t: float, payload: object = None) -> bool:
+        with self._lock:
+            if self._pending is not None:
+                return False
+            self._pending = (call_id, t + self.grace_s, payload)
+            return True
+
+    # bieżąca oczekująca prośba z terminem i danymi wywołania albo brak
+    @property
+    def pending(self) -> tuple[str, float, object] | None:
+        with self._lock:
+            return self._pending
+
+    # przejęcie prośby przed decyzją chroni przed wysłaniem klatki dla wywołania anulowanego w międzyczasie
+    def finish(self, call_id: str) -> bool:
+        with self._lock:
+            if self._pending is None or self._pending[0] != call_id:
+                return False
+            self._pending = None
+            return True
+
+    # anulowanie przez serwer lub rozłączenie usuwa oczekującą prośbę bez wysyłania klatki
+    def cancel(self, ids: tuple[str, ...] | None = None) -> bool:
+        with self._lock:
+            if self._pending is None or (ids is not None and self._pending[0] not in ids):
+                return False
+            self._pending = None
+            return True

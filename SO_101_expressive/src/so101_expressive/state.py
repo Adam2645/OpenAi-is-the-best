@@ -136,6 +136,8 @@ class RobotState:
     suppressed: tuple[str, ...] = ()
     last_user_text: str = ""
     last_robot_text: str = ""
+    user_turn: int = 0
+    user_text_t: float = -1e9
 
     # komenda chwytu jest aktywna od wydania polecenia, zanim fizyka potwierdzi trzymanie
     @property
@@ -220,6 +222,8 @@ JOURNAL_FIELDS = tuple(
         "workspace_blocks",
         "last_user_text",
         "last_robot_text",
+        "user_turn",
+        "user_text_t",
         "music_bpm",
     }
 )

@@ -1,18 +1,20 @@
 from __future__ import annotations
 
 import numpy as np
+import pytest
 
-from so101_expressive.app import RobotApp
+from so101_expressive.app import LOOK_GRACE_S, RobotApp
 from so101_expressive.config import Settings
-from so101_expressive.conversation.base import IntentRequest
+from so101_expressive.conversation.base import IntentCancelled, IntentRequest, StatusChanged, Transcript
 from so101_expressive.conversation.gemini_live import GeminiLiveBackend
-from so101_expressive.inputs.camera import VisionUplink
+from so101_expressive.inputs.camera import VisionUplink, asks_to_look
 from so101_expressive.inputs.virtual import VirtualAudioRig
 from so101_expressive.state import ApiStatus, PersonStatus, RobotState
 
 from .test_scenarios import BabbleTTS
 
 FRAME = np.zeros((480, 640, 3), dtype=np.uint8)
+PAST_GRACE = int(LOOK_GRACE_S / 0.1) + 2
 
 
 # atrapa połączonego backendu zapisuje, co i w jakiej kolejności opuściło laptopa
@@ -49,17 +51,32 @@ class FakeCamera:
         return FRAME, self.t
 
 
-# aplikacja w trybie wirtualnym z podmienionym backendem pozwala badać ścieżkę wysyłania obrazu bez sieci
-def looking_app(settings) -> tuple[RobotApp, RecordingBackend]:
-    app = RobotApp(settings, virtual=True, backend="gemini", window=False)
-    sink = RecordingBackend()
-    app.backend = sink
-    return app, sink
+# zestaw prowadzi aplikację przez pętlę ciała i obsługę panelu dokładnie tak, jak w działającym programie
+class LookRig:
+    # rozmówca był słyszany lokalnie chwilę przed prośbą, a kamera domyślnie daje świeże klatki
+    def __init__(self, settings, t0: float = 100.0) -> None:
+        self.app = RobotApp(settings, virtual=True, backend="gemini", window=False)
+        self.sink = RecordingBackend()
+        self.app.backend = self.sink
+        self.app.pipeline.last_vad_speech_t = t0 - 1.0
+        self.frame_age: float | None = 0.05
+        self.t = t0
 
+    # rozpoznana wypowiedź rozmówcy albo robota dociera tą samą drogą co z backendu rozmowy
+    def say(self, text: str, role: str = "user") -> None:
+        self.app._on_event(Transcript(role, text))
 
-# prośba modelu o spojrzenie w chwili t, taka sama jak z backendu rozmowy
-def look(app: RobotApp, t: float):
-    return app._look(IntentRequest("c", "look_at_scene", {}), RobotState(t=t))
+    # prośba modelu o spojrzenie trafia do pętli ciała jak wywołanie funkcji z backendu
+    def request(self, call_id: str = "c") -> None:
+        self.app._on_event(IntentRequest(call_id, "look_at_scene", {}))
+
+    # krok czasu wykonuje pętlę ciała i obsługę panelu z klatką kamery w zadanym wieku
+    def tick(self, n: int = 1, dt: float = 0.1) -> None:
+        for _ in range(n):
+            self.t += dt
+            self.app.camera = None if self.frame_age is None else FakeCamera(self.t - self.frame_age)
+            self.app.body.step(self.t)
+            self.app._housekeeping(self.app.body.snapshot(), FRAME, self.t)
 
 
 # mowa z osi czasu dema działa także z backendem gemini, który nie ma metody say, więc demo nie przerywa się wyjątkiem
@@ -84,54 +101,118 @@ def test_periodic_uploads_are_opt_in(settings):
     assert not periodic.maybe_send(sink, FRAME, 100.0, PersonStatus.ABSENT)
 
 
-# prośba modelu wysyła klatkę tylko tuż po lokalnie usłyszanej wypowiedzi i tylko gdy obraz jest świeży
-def test_look_requires_recent_user_speech_and_fresh_frame(settings):
-    app, sink = looking_app(settings)
-    app.camera = FakeCamera(99.8)
-    assert not look(app, 100.0).accepted
-    app.pipeline.last_user_speech_t = 75.0
-    assert not look(app, 100.0).accepted
-    app.pipeline.last_user_speech_t = 97.0
-    app.camera = FakeCamera(95.0)
-    assert not look(app, 100.0).accepted
-    app.camera = None
-    assert not look(app, 100.0).accepted
-    assert sink.frames == []
-    app.camera = FakeCamera(99.8)
-    result = look(app, 100.0)
-    assert result.accepted and len(sink.frames) == 1 and app.uplink.sent == 1
+# prośba o spojrzenie jest rozpoznawana z polskimi znakami i bez nich, a zwykła rozmowa czy tekst piosenki jej nie zawiera
+@pytest.mark.parametrize(
+    "text,expected",
+    [
+        ("Robo, co widzisz na stole?", True),
+        ("spojrz na to", True),
+        ("Popatrz, co trzymam!", True),
+        ("pokażę ci coś ciekawego", True),
+        ("Użyj kamery", True),
+        ("Jak wyglądam?", True),
+        ("what do you see", True),
+        ("Opowiedz mi o pogodzie", False),
+        ("la la la kocham cię", False),
+        ("", False),
+    ],
+)
+def test_asks_to_look(text, expected):
+    assert asks_to_look(text) is expected
 
 
-# odmowa nie zostawia oczekującego żądania, więc późniejsza klatka nie zostanie wysłana bez nowej prośby
-def test_refused_look_leaves_no_pending_upload(settings):
-    app, sink = looking_app(settings)
-    app.pipeline.last_user_speech_t = 99.0
-    assert not look(app, 100.0).accepted
-    for k in range(50):
-        app._housekeeping(RobotState(t=100.0 + k, person=PersonStatus.TRACKED), FRAME, 100.0 + k)
-    assert sink.frames == []
+# sama energia dźwięku, np. muzyka lub hałas, bez rozpoznanej prośby rozmówcy nigdy nie wysyła klatki
+@pytest.mark.parametrize("heard", [None, "la la la kocham cię, la la la"])
+def test_music_or_noise_alone_never_sends_a_frame(settings, heard):
+    rig = LookRig(settings)
+    if heard is not None:
+        rig.say(heard)
+    rig.request()
+    rig.tick(3)
+    assert rig.sink.sent == []
+    rig.tick(PAST_GRACE)
+    assert rig.sink.frames == [] and rig.sink.sent == ["odpowiedź:odrzucono"]
+    assert rig.app.consent.pending is None
 
 
-# klatka trafia do modelu przed odpowiedzią funkcji, więc model nie opisuje sceny, zanim ją zobaczy
-def test_frame_is_sent_before_tool_response(settings):
-    app, sink = looking_app(settings)
-    app.pipeline.last_user_speech_t = 0.5
-    app.camera = FakeCamera(0.9)
-    app.body.post(IntentRequest("c1", "look_at_scene", {}))
-    app.body.step(1.0)
-    assert sink.sent == ["klatka", "odpowiedź:ok"]
+# rozpoznana prośba rozmówcy odblokowuje dokładnie jedną klatkę, wysłaną przed odpowiedzią funkcji
+def test_recognized_request_sends_one_frame_before_response(settings):
+    rig = LookRig(settings)
+    rig.say("Robo, co widzisz na stole?")
+    rig.request("c1")
+    rig.tick()
+    assert rig.sink.sent == ["klatka", "odpowiedź:ok"] and rig.app.uplink.sent == 1
+    rig.request("c2")
+    rig.tick(PAST_GRACE)
+    assert len(rig.sink.frames) == 1 and rig.sink.sent[-1] == "odpowiedź:odrzucono"
 
 
-# przełącznik camera_cloud=off blokuje zarówno prośby modelu, jak i ustawioną wysyłkę cykliczną
-def test_camera_cloud_off_blocks_all_uploads(tmp_path):
-    settings = Settings.from_env({
-        "LEDGER_PATH": str(tmp_path / "l.json"), "LOG_DIR": str(tmp_path / "logs"),
-        "CAMERA_CLOUD": "off", "VISION_UPLINK_INTERVAL_S": "5",
-    })
-    app, sink = looking_app(settings)
-    app.pipeline.last_user_speech_t = 99.0
-    app.camera = FakeCamera(99.9)
-    assert not look(app, 100.0).accepted
+# transkrypcja przychodzi bez gwarancji kolejności, więc prośba modelu krótko czeka na rozpoznaną wypowiedź
+def test_transcript_arriving_after_tool_call_is_awaited(settings):
+    rig = LookRig(settings)
+    rig.request()
+    rig.tick(2)
+    assert rig.sink.sent == []
+    rig.say("spójrz na to")
+    rig.tick()
+    assert rig.sink.sent == ["klatka", "odpowiedź:ok"]
+
+
+# nowa wypowiedź z prośbą po odpowiedzi robota daje nową, znów jednorazową zgodę
+def test_new_utterance_allows_another_frame(settings):
+    rig = LookRig(settings)
+    rig.say("co widzisz?")
+    rig.request("c1")
+    rig.tick()
+    turn = rig.app.body.state.user_turn
+    rig.say("Widzę pomarańczową kostkę.", role="robot")
+    rig.tick()
+    rig.say("a teraz popatrz jeszcze raz")
+    rig.request("c2")
+    rig.tick()
+    assert rig.app.body.state.user_turn == turn + 1
+    assert len(rig.sink.frames) == 2 and rig.sink.sent.count("odpowiedź:ok") == 2
+
+
+# anulowanie przez serwer albo rozłączenie usuwa oczekującą prośbę, więc późniejsza wypowiedź niczego nie wysyła
+@pytest.mark.parametrize("event", [IntentCancelled(("c",)), StatusChanged(ApiStatus.OFFLINE, "test")])
+def test_cancelled_or_disconnected_look_sends_nothing(settings, event):
+    rig = LookRig(settings)
+    rig.request("c")
+    rig.tick()
+    rig.app._on_event(event)
+    rig.say("co widzisz?")
+    rig.tick(PAST_GRACE)
+    assert rig.sink.frames == [] and rig.sink.sent == []
+
+
+# brak lokalnie usłyszanej mowy albo świeżej klatki kończy się odmową, która nie zostawia niczego do wysłania później
+def test_refusals_send_nothing_and_leave_nothing_pending(settings):
+    quiet = LookRig(settings)
+    quiet.app.pipeline.last_vad_speech_t = 50.0
+    quiet.say("co widzisz?")
+    quiet.request()
+    quiet.tick()
+    assert quiet.sink.sent == ["odpowiedź:odrzucono"] and quiet.app.consent.pending is None
+    stale = LookRig(settings)
+    stale.frame_age = 5.0
+    stale.say("spójrz")
+    stale.request()
+    stale.tick()
+    assert stale.sink.sent == ["odpowiedź:odrzucono"]
+    stale.frame_age = 0.05
+    stale.tick(PAST_GRACE)
+    assert stale.sink.frames == []
+
+
+# wyłącznik camera_cloud=off i wyłączona transkrypcja blokują wysyłanie obrazu niezależnie od próśb modelu
+@pytest.mark.parametrize("env", [{"CAMERA_CLOUD": "off", "VISION_UPLINK_INTERVAL_S": "5"}, {"LIVE_TRANSCRIPTS": "nie"}])
+def test_camera_off_or_no_transcripts_blocks_uploads(tmp_path, env):
+    settings = Settings.from_env({"LEDGER_PATH": str(tmp_path / "l.json"), "LOG_DIR": str(tmp_path / "logs"), **env})
+    rig = LookRig(settings)
+    rig.say("co widzisz?")
+    rig.request()
+    rig.tick()
     for k in range(30):
-        app._housekeeping(RobotState(t=100.0 + k, person=PersonStatus.TRACKED), FRAME, 100.0 + k)
-    assert sink.frames == []
+        rig.app._housekeeping(RobotState(t=rig.t + k, person=PersonStatus.TRACKED), FRAME, rig.t + k)
+    assert rig.sink.frames == [] and rig.sink.sent == ["odpowiedź:odrzucono"]

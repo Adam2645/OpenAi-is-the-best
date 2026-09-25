@@ -15,11 +15,11 @@ import numpy as np
 from .behavior.planner import IntentResult
 from .budget import CostMeter
 from .config import Settings
-from .conversation.base import AudioChunk, ConversationBackend, IntentRequest, Interrupted
+from .conversation.base import AudioChunk, ConversationBackend, IntentCancelled, IntentRequest, Interrupted, StatusChanged
 from .conversation.gemini_live import GeminiLiveBackend
 from .conversation.scripted import LocalTTS, ScriptedBackend, speech_events
 from .inputs.audio_pipeline import AudioPipeline
-from .inputs.camera import VisionUplink, synthetic_frame
+from .inputs.camera import CameraConsent, VisionUplink, synthetic_frame
 from .inputs.face import ScriptedPerson
 from .inputs.playback import PlaybackBuffer
 from .inputs.virtual import VirtualAudioRig, clip_source
@@ -31,6 +31,7 @@ from .util import LatestValue
 log = logging.getLogger("so101")
 GESTURE_CYCLE = ("nod", "wave", "shrug", "think", "happy", "curious", "shake_head", "surprised", "bow", "look_around")
 FRAME_MAX_AGE_S = 1.0
+LOOK_GRACE_S = 3.0
 
 
 # przeglądarki i komunikatory nie odtwarzają kodeka mp4v z opencv, więc przy dostępnym ffmpeg nagranie jest kodowane do h.264
@@ -141,6 +142,7 @@ class RobotApp:
         self.pipeline = AudioPipeline(settings, self.playback, self.audio, self.backend)
         periodic_s = settings.vision_uplink_interval_s if settings.camera_cloud != "off" else 0.0
         self.uplink = VisionUplink(periodic_s, settings.vision_uplink_width)
+        self.consent = CameraConsent(settings.camera_request_window_s, LOOK_GRACE_S)
         self.camera = None
         self.narrator = SensorNarrator()
         self.state_log = StateLogWriter(settings.resolve_path(settings.log_dir))
@@ -178,6 +180,10 @@ class RobotApp:
             return
         if isinstance(event, Interrupted):
             self.playback.flush()
+        elif isinstance(event, IntentCancelled):
+            self.consent.cancel(event.ids)
+        elif isinstance(event, StatusChanged) and event.status is not ApiStatus.CONNECTED:
+            self.consent.cancel()
         self.body.post(event)
 
     # wynik planisty wraca do modelu jako odpowiedź funkcji
@@ -186,20 +192,46 @@ class RobotApp:
             self.backend.respond_intent(intent.call_id, intent.name, result.as_response())
         self.message = f"{intent.name}: {result.message}"
 
-    # prośba modelu o obraz jest spełniana od razu jedną świeżą klatką i tylko tuż po wypowiedzi rozmówcy usłyszanej lokalnie
-    def _look(self, intent: IntentRequest, state: RobotState) -> IntentResult:
+    # prośba modelu o obraz po wstępnych warunkach czeka krótko na rozpoznaną prośbę rozmówcy, a decyzja zapada w obsłudze panelu
+    def _look(self, intent: IntentRequest, state: RobotState) -> IntentResult | None:
         if self.settings.camera_cloud == "off":
             return IntentResult(False, "wysyłanie obrazu do chmury jest wyłączone (CAMERA_CLOUD=off)")
+        if not self.settings.live_transcripts:
+            return IntentResult(False, "obraz wysyłam tylko po rozpoznanej prośbie rozmówcy, a transkrypcja mowy jest wyłączona (LIVE_TRANSCRIPTS)")
         if self.backend is None or self.backend.status is not ApiStatus.CONNECTED:
             return IntentResult(False, "brak połączenia z chmurą - nie mogę pokazać obrazu")
-        if state.t - self.pipeline.last_user_speech_t > self.settings.camera_request_window_s:
+        if state.t - self.pipeline.last_vad_speech_t > self.settings.camera_request_window_s:
             return IntentResult(False, "obraz wysyłam tylko tuż po pytaniu rozmówcy - nikt nie mówił do mnie przed chwilą")
+        if not self.consent.begin(intent.call_id, state.t, intent):
+            return IntentResult(False, "poprzednia prośba o obraz jeszcze czeka na potwierdzenie")
+        return None
+
+    # oczekująca prośba o obraz kończy się jedną klatką po rozpoznanej prośbie rozmówcy albo odmową po terminie
+    def _resolve_look(self, state: RobotState, now: float) -> None:
+        pending = self.consent.pending
+        if pending is None:
+            return
+        call_id, deadline, intent = pending
+        ok, reason = self.consent.check(state.last_user_text, state.user_text_t, state.user_turn, now)
+        if not ok and now < deadline:
+            return
+        if not self.consent.finish(call_id):
+            return
+        result = self._send_look_frame(state.user_turn, now) if ok else IntentResult(False, reason)
+        self.body.intent_log.append((now, intent, result))
+        self._respond(intent, result)
+
+    # klatka po zgodzie musi być świeża i trafia do modelu przed odpowiedzią funkcji, a zgoda z tej wypowiedzi wygasa
+    def _send_look_frame(self, turn: int, now: float) -> IntentResult:
+        if self.backend is None or self.backend.status is not ApiStatus.CONNECTED:
+            return IntentResult(False, "brak połączenia z chmurą - nie mogę pokazać obrazu")
         item = self.camera.latest() if self.camera is not None else None
-        if item is None or state.t - item[1] > FRAME_MAX_AGE_S:
+        if item is None or now - item[1] > FRAME_MAX_AGE_S:
             return IntentResult(False, "brak aktualnego obrazu z kamery")
-        if not self.uplink.send_now(self.backend, item[0], state.t):
+        if not self.uplink.send_now(self.backend, item[0], now):
             return IntentResult(False, "nie udało się wysłać klatki z kamery")
-        log.info("wysłano klatkę kamery do chmury na prośbę modelu (łącznie %d)", self.uplink.sent)
+        self.consent.consume(turn)
+        log.info("wysłano klatkę kamery do chmury po prośbie rozmówcy (łącznie %d)", self.uplink.sent)
         return IntentResult(True, "wysłałem jedną aktualną klatkę z kamery")
 
     # dodatkowe pola panelu pochodzą z potoku audio i ostatniej decyzji arbitra
@@ -248,6 +280,7 @@ class RobotApp:
     # zadania okresowe: klatki dla chmury, podtrzymanie sesji, komunikaty czujników i zapis dziennika
     def _housekeeping(self, state: RobotState, frame: np.ndarray | None, now: float) -> None:
         if self.backend is not None:
+            self._resolve_look(state, now)
             self.uplink.maybe_send(self.backend, frame, now, state.person)
             if state.person is PersonStatus.TRACKED:
                 if hasattr(self.backend, "note_activity"):
