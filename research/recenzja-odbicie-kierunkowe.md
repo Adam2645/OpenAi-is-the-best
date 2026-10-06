@@ -714,3 +714,36 @@ J+ to jeden obiekt; liczba odrzuconych 9, nie 8; 12 iteracji dla 13 mechanizmów
 **Następne pytanie:** model C2 z rzeczywistym laminatem (indeksy i grubości z kart
 materiałowych) i skokiem warstw z marginesem ponad 10 µm, z mocą w stożku < 1°
 dla skończonej wiązki — czy R_stożek ≥ 0,1 i kroki z_gd ≥ 10 µm utrzymują się?
+
+## Iteracja 13 — drugi audyt zewnętrzny
+
+**Wynik:** werdykty bez zmian (9 ODRZUCONE, 4 NIEROZSTRZYGNIĘTE); zmienia się
+precyzja twierdzeń. Rachunki: `research/tmm_audyt2_c2.py`.
+
+**Nowe liczby dla C2 (stos ciągły L = 10 µm):**
+- Osiowa odpowiedź impulsowa w paśmie ±10 nm (okno Hanna): centroidy μ_k
+  5,3 / 14,7 / 24,5 / 34,6 / 44,4 µm, kroki 9,4 / 9,9 / 10,1 / 9,9 µm,
+  FWHM 8,1–9,1 µm, nakładanie C = 0,12–0,17.
+- z_gd: kroki 8,62 / 9,52 / 10,35 / 8,78 µm, stabilne do 0,01 µm przy 16 vs 32
+  podwarstwach i Δλ 0,005 vs 0,05 nm. Metryki różnią się o ≤ 1,5 µm → brak marginesu.
+- H_ij: przekątna 0,196–0,263, poza przekątną ≤ 0,0043, udział warstwy k 96,8–98,7%.
+- Maks. R poza kanałami 0,0202 / 0,2164 = 9,3%.
+- Scenariusz laminatu (51 µm, n = 1,48 założone): kroki μ 58–59 µm, FWHM 8,2–8,9 µm,
+  C = 0,012–0,014.
+
+**E:** P ≤ N·ħω·Γ/8 = 344 × 1,21 pW = 0,42 nW w 4π; przy OD = 1 odstęp √σ₀ = 0,54 µm
+= 0,69 λ, więc reżim kolektywny i tylko szacunek.
+
+**Źródła sprawdzone w pełnych tekstach:**
+- Bajcsy, Zibrov, Lukin (arXiv quant-ph/0311092), rys. 2B, krzywa (ii), pomiar CW:
+  „The peak reflection intensity is a substantial fraction (up to ∼80%) of the input
+  signal beam”; sonda 250 µW; mechanizm: „periodic modulation of the absorptive rather
+  than dispersive properties lays at the origin of the observed Bragg reflection”.
+- Blanche, Mahamat, Buoye, Materials 13, 5498 (2020): Δn = 0,03 „per the manufacturer’s
+  specifications” [Covestro, Bayfol HX200 Description and Application Information 2018;
+  Technical Data Sheet 2020]; samych kart nie pobrano.
+
+**Zmiany redakcyjne:** definicja „odbicia od materii w z” jako wybór definicji problemu;
+T1 bez mnożnika Γ_kol; T9 — dwie wiązki mogą dać stereoskopię; H — brak pomiaru odbicia
+wstecz; przesłuch ≤ 5% jako dodatkowe kryterium jakości; laminat jako scenariusz;
+usunięte zdanie o „przełomie”; opis metody z ujawnieniem wsparcia AI.
