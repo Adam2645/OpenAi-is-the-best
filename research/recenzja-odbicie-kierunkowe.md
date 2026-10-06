@@ -1018,3 +1018,33 @@ kompensowalny kątem wejścia.
 
 **Następne pytanie:** jak oko widzi obraz z woksli skolimowanych w x: rozdzielczość w x przy ogniskowaniu na płytę
 (w/D ≈ 2,2 mrad ≈ 7,6′ dla 0,66 mm) i zanik struktury x przy ogniskowaniu na ∞ — PSF siatkówkowe wiązki anamorficznej.
+
+## Iteracja 21 — obraz woksla na siatkówce, faza cylindryczna, SNR warunku 3 (`research/iteracja21.py`)
+
+Model: wiązka gaussowska z taliami w₀x, w₀y w warstwie, oglądana z 300 mm; oko zredukowane f = 17 mm, źrenica 3,5 mm;
+pole na siatkówce = transformata Fouriera pola w źrenicy z fazą akomodacji (FFT 2D). Filtr Bragga: amplituda √η(θ)
+z Kogelnika 3D (faza odbicia pominięta). Commity tej iteracji tylko lokalnie (polecenie użytkownika).
+
+- Wiązka w źrenicy: x, w₀ = 150 µm: R(300 mm) = 359 mm (2,79 D), średnica 0,74 mm; x, w₀ = 330 µm: 1679 mm (0,60 D);
+  y, w₀ = 25 µm: 300 mm (3,33 D), średnica 4,06 mm (wypełnia źrenicę). Teza audytu „R ≈ 500 mm dla 0,3 mm” — błędna.
+- **Siatkówka, woksel 300 × 50 µm:** akomodacja na warstwę (3,33 D): FWHM x = 2,03′ (10,1 µm), y = 0,52′ (2,6 µm);
+  kontrast sąsiednich woksli (skok 2w₀) x = 0,56, y = 0,08. Akomodacja na ∞: x = 4,23′, y = 22′, kontrast 0 i 0.
+  Woksel 660 × 50 µm: na warstwę x = 4,43′, y = 0,52′; na ∞ kontrast 0. **„Kreska Sturma zamazująca x”: ODRZUCONE** —
+  oko zogniskowane na warstwie odwzorowuje talię (elipsa 2′ × 0,5′, proporcja jak woksel); przy ∞ znika cały obraz
+  (oba kierunki), bo położenie woksla nie zmienia kierunku wiązki. Skok 50 µm w y (0,57′) jest poniżej rozdzielczości
+  źrenicy 1,22λ/p = 0,64′ (kontrast 0,08): rozróżnialny skok w y ≈ 1′ ≈ 90 µm → ~15 × 75 ≈ 1,1 tys. woksli na warstwę na oko.
+- **Faza cylindryczna na wejściu: ODRZUCONE jako naprawa.** Talia 0,3 mm w warstwie: η = 0,581, wergencja x przy oku
+  2,47 D, obraz x 2,51′. Propozycja (1 mm, f = −300 mm w warstwie): η = 0,491 (< 0,50), wergencja x 1,67 D (źródło pozorne
+  600 mm od oka, nie 300 mm), obraz x 4,63′. f = −150 mm: η = 0,311, 2,18 D, 2,34′. Wergencja 3,33 D wymaga źródła
+  pozornego w warstwie, czyli talii w warstwie, a jej rozmiar ogranicza akceptacja Bragga (w₀·θ ≥ λ/π).
+- **Warunek 3 (sonda 0,50 mW, sygnał 0,30 mW = 8,0·10¹⁴ fotonów/s):** Si, wydajność kwantowa 0,70 (0,30 A/W), 1 cm²,
+  filtr 10 nm, 1 s: SNR śrutowy 2,4·10⁷ (ciemnia), 2,3·10⁷ (500 lx, tło 6,7 µW), 2,0·10⁷ (10 klx, tło 133 µW);
+  z niestabilnością lasera 0,1% / 1% rms: ~10³ / ~10². Spełnia w modelu; brak pomiaru.
+- Jasność: 0,18 lm w stożku; luminancja woksla ~4·10¹¹ cd/m² chwilowo, ~1,7·10⁸ cd/m² średnio po polu 4,5 × 7,6 mm —
+  nie „kilkanaście tysięcy nitów”. Wyświetlacz potrzebuje mocy o kilka rzędów mniejszej.
+
+**Werdykt iteracji: NIEROZSTRZYGNIĘTE.** Obraz na siatkówce przy akomodacji na warstwę: woksel 2′ × 0,5′, x rozdzielone
+przy skoku 0,3 mm; teza o astygmatycznej kresce i naprawa fazą cylindryczną odrzucone; warunek 3 spełniony w modelu.
+
+**Następne pytanie:** czy oko faktycznie akomoduje na warstwę (3,33 D), gdy bodziec niesie tylko oś y — czyli czy
+astygmatyczny bodziec akomodacji jest skuteczny (pomiar optometryczny), i czy przy jego braku obraz nie znika (∞ → kontrast 0)?
