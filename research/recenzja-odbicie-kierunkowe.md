@@ -358,3 +358,68 @@ zmierzyć R(P_sondy) dla P_sondy = 0,25 → 1 mW przy P_c = 40 mW na wiązkę.
 Czy R ≥ 0,1 przy 1 mW?
 
 ---
+
+## Iteracja 6 — H (nowy). Siatka zapisana laserem w samym powietrzu
+
+_W toku: agent zbiera pomiary siatek gazowych i plazmowych._
+
+---
+
+## Iteracja 7 — J (nowy). Pojedyncza cząstka w pułapce fotoforetycznej
+
+**Równanie rządzące:** Rozpraszanie Mie na kuli o średnicy d ≫ λ.
+Q_ext → 2. Płat dyfrakcyjny do przodu ma pierwsze zero przy 1,22λ/d.
+Reszta rozpraszania rozkłada się szeroko kątowo. Cząstka jest materią
+w z, w powietrzu, przesuwaną mechanicznie (ruch soczewki pułapki).
+Nie jest to hologram, tylko wolumetryczny wyświetlacz punktowy.
+
+**Liczby:**
+- λ = 532 nm, d = 10 µm, w₀ sondy = 10 µm.
+- Ułamek przechwycony 1 − e^(−d²/2w₀²) = 0,39. Stożek 1° = 2,39·10⁻⁴ sr.
+- Ułamek mocy w stożku (rozpraszanie ~izotropowe) = 7,5·10⁻⁶.
+  Z ilorazem lidarowym 18,8 sr wychodzi ~1·10⁻⁵.
+- Płat dyfrakcyjny zmieści się w półkącie 0,5° dopiero dla d ≥ 74 µm.
+  Idealny retroreflektor 10 µm daje najwyżej 2,5% sondy w stożku.
+- Rozdzielczość adresowania ~16 µm (1600 dpi; rachunek z objętości
+  i liczby punktów).
+- N, A, OD w sensie atomowym nie dotyczą (jedna cząstka).
+
+**Dowód:**
+- Smalley i in., Nature 553, 486 (2018), doi:10.1038/nature25176:
+  - „1,600 dots per inch”, „16,700 points per second”;
+  - „minimum hold power recorded was less than 24 mW (for 405-nm
+    light)”;
+  - „average hold time of 1.1 h”.
+- Rogers, Laney, Peatross, Smalley, Appl. Opt. 58, G363 (2019),
+  doi:10.1364/AO.58.00G363:
+  - „The scattered optical power is estimated of the order of
+    nanowatts”;
+  - rozpraszanie jest „strongly diverging”;
+  - „many trap attempts fail to hold even a few seconds”.
+- Kuttler i in., JoVE 177, e63113 (2021): skuteczność złapania 1–14%
+  na próbę.
+
+**Test zabójczy: warunek 1.** Do stożka < 1° trafia ~10⁻⁵ mocy sondy
+wobec wymaganych 10⁻¹, czyli 10⁴ razy za mało. Nawet idealna cząstka
+10 µm nie przekracza 2,5% z samej dyfrakcji.
+
+**Werdykt: ODRZUCONE.** Powód liczbowo: warunek 1, 7,5·10⁻⁶ (lub 10⁻⁵)
+wobec 0,1. Inne warunki przy 1 mW:
+- Warunek 2 POTWIERDZONY warunkowo: adresowanie ~16 µm, barwa stała,
+  ale drgań osiowych nikt nie zmierzył.
+- Warunek 3 POTWIERDZONY: 35 nW na 1 cm² w 30 cm, SNR ~3·10⁴ wobec
+  szumu 1 pW (rachunek). Zgadza się z rzędem „nanowatts” u Rogersa 2019.
+- Warunek 4 POTWIERDZONY warunkowo: pułapka ma własną wiązkę ≥ 24 mW,
+  średni czas trzymania 1,1 h, ale wiele prób trwa tylko sekundy.
+- Warunek 5 spełniony.
+
+To jedyny jak dotąd mechanizm, który daje materię w z **w powietrzu**
+i przesuwa ją o ≥ 10 µm. Pada wyłącznie na kierunkowości.
+
+**Następne pytanie:** Czy w pułapce fotoforetycznej (lub innej pułapce
+w powietrzu) da się utrzymać płaski odbijający płatek o średnicy
+≥ 74 µm ze stabilnością orientacji ≤ 0,25°? Tyle wymaga skierowania
+odbicia wstecz w stożek 1°. (Do rozstrzygnięcia pomiarem albo
+cytatem z literatury pułapek optycznych i akustycznych.)
+
+---

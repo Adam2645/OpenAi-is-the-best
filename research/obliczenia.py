@@ -95,3 +95,14 @@ for L in (2e-6, 8e-6, 10e-6, 100e-6):
 # szerokość kątowa przy θ=30°: Δθ ≈ λ/(2nL sinθ)
 for L in (8e-6,):
     print(f"L={L * 1e6:.0f} µm, θ=30°: Δθ(pierwsze zero) ≈ {m.degrees(lam / (2 * n * L * 0.5)):.2f}°")
+
+sekcja("T7. Cząstka w pułapce fotoforetycznej (J): dyfrakcja i ułamek w stożku")
+d, lam = 10e-6, 532e-9
+print(f"pierwsze zero płata dyfrakcyjnego 1.22λ/d = {m.degrees(1.22 * lam / d):.2f}°")
+print(f"d potrzebne, by płat zmieścił się w półkącie 0.5°: {1.22 * lam / m.radians(0.5) * 1e6:.0f} µm")
+w0 = 10e-6
+frac_int = 1 - m.exp(-2 * (d / 2) ** 2 / w0**2)
+cone = 2 * m.pi * (1 - m.cos(m.radians(0.5)))
+print(f"ułamek przechwycony (w0=10 µm): {frac_int:.3f}; stożek 1° = {cone:.3e} sr")
+print(f"izotropowo do stożka: {frac_int * cone / (4 * m.pi):.1e} mocy sondy (wymagane 0.1)")
+print(f"detektor 1 cm² w 30 cm, izotropowo: {frac_int * 1e-3 * 1e-4 / (4 * m.pi * 0.3**2) * 1e9:.1f} nW")
