@@ -934,3 +934,39 @@ cieniowanie RCWA, rozstrojenie Bragga). C2 ze skośnymi siatkami pozostaje NIERO
 **Następne pytanie:** siatki grubsze (L ~ 1 mm, n₁ ~ 2·10⁻⁴) mają port węższy ~10× (akceptacja ∝ 1/L) —
 ile warstw zmieści się w wachlarzu 0,48° i czy wiązka woksela wypełniająca źrenicę (≥ 0,67°, potrzebna
 do akomodacji) nie zostanie wycięta przez porty warstw wyżej?
+
+## Iteracja 19 — siatki skośne 1 mm w jednej źrenicy; kompensacja translacyjna (`research/iteracja19.py`)
+
+**Tor 1: L = 1 mm, n₁ = 2·10⁻⁴** (n₁·L jak przy 100 µm), n₀ = 1,5, λ₀ = 532 nm, pol. p, wejście 20° wewn.
+Kogelnik 3D sprawdzony RCWA (32 plastry/okres, ~175 tys. plastrów, 11 s/rozwiązanie): wejście +0,05°
+0,4540 vs 0,4552; λ₀ + 0,06 nm 0,3479 vs 0,3491; port 0,12° 0,9428 vs 0,9427; port 0° 0,3351 vs 0,3341.
+- η szczyt 0,665; akceptacja kątowa wejścia FWHM 0,122° w powietrzu (0,075° wewn.); widmo FWHM 0,122 nm.
+  Tolerancje dla η ≥ 90% szczytu: ±0,030 nm i ±0,030° (pow.).
+- Źródło gaussowskie 0,01 / 0,05 / 0,11 / 0,15 / 1,5 nm: η = 100 / 95 / 75 / 63 / 8% szczytu.
+- Port (wiązka z warstwy niżej): T = 0,334 / 0,630 / 0,982 / 0,943 / 0,981 / 0,997 przy odchyleniu
+  0 / 0,05 / 0,10 / 0,12 / 0,15 / 0,24° — 0,12° trafia w listek boczny (minimum T 0,943); 0,10° i 0,15° dają 0,98.
+- **RCWA stosu 5 warstw** (wejścia 20–28° co 2°, wyjścia −0,24 / −0,12 / 0 / +0,12 / +0,24°): moc w stożku
+  0,623 / 0,586 / 0,586 / 0,596 / 0,603 przy λ₀; 0,40–0,43 przy λ₀ ± 0,05 nm. Obce światło w stożkach ±0,5°: 0
+  (najbliższy obcy rząd 2,19° od wyjść, 6,6·10⁻⁵ mocy sondy). Plamki w 30 cm: −1,26 … +1,26 mm; wiązka 1 mm
+  w źrenicy 3,5 mm w 99,3–100%. **Pierwszy model, w którym 5 warstw trafia w jedno nieruchome oko z ≥ 10%.**
+- Stożek woksela: wyjście = wejście przesunięte w kx, więc w osi x stożek ≤ akceptacja 0,12° ≪ 0,67°
+  (wypełnienie źrenicy). W osi y akceptacja wejścia ±1,26°; stożek y ±0,33° przechodzi przez porty 4 warstw
+  wyżej w 98%. Bodziec akomodacji możliwy tylko w jednym południku — czy oko na niego reaguje, nie sprawdzono.
+- Prążki przy przekładkach 1 mm (OPD 2,96 mm, okres 0,096 nm): V = 0,96 / 0,38 / 0,009 przy 0,01 / 0,05 / 0,11 nm.
+  Tło koherentne ≤ R₁R₂: bez AR (R = 4%) ≤ 1,6·10⁻³ sygnału, zafalowanie ≤ ±8%; z AR (R = 0,25%) ≤ ±0,5%.
+- Pole widzenia jednego oka przy stożku 1°: ≤ p/D + 1° = 1,67° (≈ 8,7 mm płyty w 30 cm); przy stożku x 0,12°
+  w osi x ≈ 0,79°. To skutek samego warunku 1.
+
+**Tor 2, kompensacja translacyjna: ODRZUCONE.** Start w x = −D·tanθ (−5,2 / −7,9 / −10,5 mm dla 1 / 1,5 / 2°)
+kieruje wiązki w źrenicę, ale kierunek widzenia warstwy = kierunek jej wiązki, więc warstwy widać przesunięte
+o Δθ. Łatka jednej warstwy ma ±0,43° (wiązki skolimowane), więc łatki nakładają się tylko przy Δθ < 0,86°.
+Walk-off 4,1 mm w przekładce dotyczy wiązki sondy (gdzie wchodzi), nie kierunku wyjścia.
+
+**Werdykt iteracji: NIEROZSTRZYGNIĘTE.** W modelu RCWA stos 5 warstw skośnych 1 mm spełnia warunek 1
+(0,59–0,62 w stożku) i warunek 2 (warstwy co ≥ 1 mm, przełączanie kątem wejścia przy stałej λ) dla jednego
+nieruchomego oka, bez przesłuchu w stożku. Brak pomiaru; warunki 3–4 i adresowanie x–y niewykazane;
+bodziec głębi tylko w jednym południku.
+
+**Następne pytanie:** pomiar dwóch skośnych siatek odbiciowych 1 mm (np. PTR) w szeregu przy 532 nm,
+jednoczęstotliwościowym źródle i odchyleniu wyjść 0,10°: moc z każdej warstwy w aperturze 3,5 mm w 30 cm
+(model: 0,62 i ~0,61) oraz przepuszczalność portu górnej siatki (model: 0,98).
