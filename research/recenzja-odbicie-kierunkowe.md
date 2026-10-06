@@ -2,7 +2,7 @@
 
 Dziennik iteracji. Każda iteracja kończy się jednym werdyktem:
 POTWIERDZONE, ODRZUCONE albo NIEROZSTRZYGNIĘTE. Liczby, które nie są cytatami,
-pochodzą z `research/obliczenia.py` (sekcje T0–T5). „Odczyt z wykresu” oznacza
+pochodzą z `research/obliczenia.py` (sekcje T0–T8). „Odczyt z wykresu” oznacza
 liczbę odczytaną z rysunku w pracy, a nie podaną w tekście. Takie liczby są
 słabsze niż wartości z tekstu.
 
@@ -14,6 +14,18 @@ słabsze niż wartości z tekstu.
 3. Przy sondzie 1 mW detektor w odległości 30 cm mierzy sygnał z podanym SNR.
 4. Ośrodek przeżywa 1 s pracy (bez wygrzania atomów i bez wybielenia polimeru).
 5. Cytat do pomiaru albo jawne równanie z podstawionymi liczbami.
+
+**Odczyt warunku 2 (korekta recenzenta po iteracji 6).** Warunek mówi
+o przesunięciu **płaszczyzny odbicia**, czyli miejsca, w którym materia
+odbija, o **co najmniej** 10 µm. Nie wymaga woksla o głębokości 10 µm.
+Dlatego:
+- **(a)** przesunięcie warstwy o grubości L o krok ≥ max(10 µm, L)
+  spełnia warunek 2;
+- **(b)** ognisko w pustym powietrzu nie jest płaszczyzną odbicia.
+
+W iteracjach 1–2 pierwotnie użyłem ostrzejszego odczytu („rozróżnialny
+krok 10 µm”). Poprawiłem to poniżej. Werdykty C1 i D się nie zmieniają,
+ale zmienia się ich uzasadnienie.
 
 ---
 
@@ -99,9 +111,10 @@ Rozważono dwa warianty:
 **Test zabójczy:**
 - **C1, warunek 2.** Każda siatka we wspólnej objętości zajmuje całą
   grubość. Silna siatka odbija głównie z przedniej ćwiartki (Ott 2013),
-  więc głębokości nie da się wybrać. „Głębokość” można zakodować tylko
-  w fazie (holograficzna soczewka z ogniskiem w z). Wtedy obowiązuje T2:
-  przy stożku < 1° DOF ≥ 3,5 mm, czyli 350× więcej niż 10 µm.
+  więc płaszczyzna odbicia się nie przesuwa przy zmianie kanału.
+  „Głębokość” można zakodować tylko w fazie (holograficzna soczewka
+  z ogniskiem w z). Ognisko nie jest jednak płaszczyzną odbicia (zob.
+  iteracja 2), a T2 daje mu przy stożku < 1° głębokość ≥ 3,5 mm.
 - **C2, warunek 2.** Nie pada na papierze: ~14 płaszczyzn co 10 µm przy
   Δn ≥ 5,5·10⁻³, co mieści się w zasięgu fotopolimerów (Δn ~ 0,03).
   Nie ma jednak pomiaru takiego stosu przy jednej λ z adresowaniem
@@ -114,7 +127,8 @@ Rozważono dwa warianty:
   M ≤ 3,16·M/#, maksymalnie ~133 siatki (M/# = 42, 1 mm). Prawo
   POTWIERDZONE pomiarem (Mok 1996, Dhar 1999). Siatki te nie odbijają
   jednak z różnych głębokości, więc **C1 jako selektor głębokości jest
-  ODRZUCONE** (warunek 2: DOF ≥ 3,5 mm wobec 10 µm, T2).
+  ODRZUCONE**. Warunek 2: płaszczyzna odbicia jest ta sama dla każdego
+  kanału, czyli Δz = 0.
 - C2 spełnia na papierze warunki 1, 3, 4 i 5:
   - kierunkowość jak lustro, stożek = rozbieżność wiązki;
   - 0,1 mW odbite daje SNR ≫ 10³;
@@ -155,22 +169,24 @@ N, A, OD nie dotyczą tego mechanizmu, bo nie ma atomów rozpraszających w z.
   „Clipping restricts … all technologies in which the light scattering
   surface and the image point are physically separate.”
 
-**Test zabójczy (T2): warunek 1 wyklucza się z warunkiem 2.**
-Dla każdego obrazu tworzonego przez ognisko:
-- Stożek o półkącie < 1° wymusza NA ≤ 0,0175, czyli DOF ≥ 3,5 mm.
-  Przy pełnym kącie < 1° DOF ≥ 14 mm.
-- Rozróżnialny krok 10 µm wymaga DOF ≤ 10 µm, czyli NA ≥ 0,326,
-  czyli półkąta 19°.
-- Przesunięcie ogniska o 10 µm jest technicznie trywialne
-  (Δf/f = 3,3·10⁻⁵ przy demonstrowanych > 60 D). Zmienia ono jednak
-  natężenie na osi tylko o ~1,6% i nie tworzy nowego, adresowalnego woksla.
-- Do tego w z nie ma materii, więc nie spełnia to CELU „odbicia od materii
-  w z”. Obraz jest widoczny tylko z wnętrza stożka (Smalley 2018, „clipping”).
+**Test zabójczy: warunek 2 z definicji.** Płaszczyzną odbicia jest
+metapowierzchnia i ona się nie przesuwa (Δz = 0). Przesuwa się ognisko,
+w którym nie ma materii, więc nie jest to „odbicie od materii w z”.
+Obraz jest widoczny tylko z wnętrza stożka (Smalley 2018, „clipping”).
 
-**Werdykt: ODRZUCONE** jako odbicie od materii w z. Warunek 2 w sensie
-adresowalnym pada liczbowo: DOF 3,5–14 mm wobec wymaganych 10 µm.
+**Ograniczenie T2 (nie zabójcze dla warunku 2, ale dla obrazu 3D):**
+Dla każdego woksla tworzonego przez ognisko:
+- Stożek o półkącie < 1° wymusza NA ≤ 0,0175, czyli głębokość woksla
+  DOF ≥ 3,5 mm. Przy pełnym kącie < 1° DOF ≥ 14 mm.
+- Woksel o głębokości 10 µm wymaga NA ≥ 0,326, czyli półkąta 19°.
+- Kroki ogniska rzędu ≥ DOF (np. 4 mm, Δf/f ≈ 1,3%) są osiągalne
+  przestrajaniem (> 60 D zademonstrowane przy 915 nm). Obraz 3D
+  z ogniska przy stożku < 1° ma więc woksle o głębokości milimetrowej.
+
+**Werdykt: ODRZUCONE** jako odbicie od materii w z (warunek 2: Δz
+płaszczyzny odbicia = 0).
 Częściowo POTWIERDZONE, tylko jako rzeczywisty obraz lotniczy
-(nie hologram, nie odbicie w z):
+(nie hologram, nie odbicie w z, woksel ≥ 3,5 mm głęboki):
 - warunek 1 przy półkącie 0,955° i sprawności 40–86%;
 - warunek 3: ≥ 0,4 mW w ognisku, czyli ~10¹⁵ fotonów/s. Shot-noise SNR
   ~3·10⁷ w 1 s to górna granica, a obserwator musi być w stożku;
@@ -178,13 +194,14 @@ Częściowo POTWIERDZONE, tylko jako rzeczywisty obraz lotniczy
   (Jung i in., Adv. Opt. Mater. 2025). Progu CW nie znaleziono;
 - warunek 5.
 
-**Wniosek ogólny (T2):** Jedyną drogą do spełnienia 1 i 2 naraz jest
-materia fizycznie zlokalizowana w z. Rozdzielczość osiową daje wtedy
-grubość warstwy L, a kąt stożka zależy od rozmiaru poprzecznego wiązki.
+**Wniosek ogólny (T2):** Warunek 2 wymaga materii odbijającej w z.
+Dla takiej materii głębokość woksla to grubość warstwy L, a kąt stożka
+zależy od rozmiaru poprzecznego wiązki. Te dwie wielkości są od siebie
+niezależne, w przeciwieństwie do ogniska.
 
 **Następne pytanie:** Jaka jest minimalna modulacja współczynnika
-załamania Δn, przy której warstwa grubości L ≤ 10 µm odbija R ≥ 0,1?
-(Rozstrzygnięcie rachunkiem: T3.)
+załamania Δn, przy której warstwa grubości L odbija R ≥ 0,1,
+i ile wynosi L dla samego powietrza? (Rozstrzygnięcie rachunkiem: T3.)
 
 **Odpowiedź (T3):** R = tanh²(πΔnL/λ) ≥ 0,1 wymaga Δn·L ≥ 0,1042·λ.
 Przy 532 nm to 55,5 nm, czyli dla L = 10 µm Δn ≥ 5,5·10⁻³.
@@ -350,8 +367,8 @@ wiązki sprzęgające.
 - POTWIERDZONE warunki 4 i 5 oraz kierunkowość (odbicie odtwarza mod
   sondy, rozbieżność 0,014° przy przewężeniu 1 mm).
 - Warunek 1 nie jest zmierzony przy 1 mW.
-- Warunek 2 nie jest zademonstrowany, a jego realna rozdzielczość to
-  ~1 mm, nie 10 µm.
+- Warunek 2 nie jest zademonstrowany. Krok musiałby wynosić ≥ L ≈ 1 mm.
+  To jest zgodne z odczytem (a), ale nikt tego nie zmierzył.
 
 **Następne pytanie (do pomiaru):** W układzie Bajcsy (komórka Rb, 90 °C)
 zmierzyć R(P_sondy) dla P_sondy = 0,25 → 1 mW przy P_c = 40 mW na wiązkę.
@@ -361,7 +378,64 @@ Czy R ≥ 0,1 przy 1 mW?
 
 ## Iteracja 6 — H (nowy). Siatka zapisana laserem w samym powietrzu
 
-_W toku: agent zbiera pomiary siatek gazowych i plazmowych._
+**Równanie rządzące:** Interferujące impulsy UV fotolizują ozon i tworzą
+modulację gęstości gazu (siatka gazowa). Alternatywnie siatkę tworzy
+plazma z interferujących filamentów fs albo efekt Kerra, Δn = n₂I.
+Siatka istnieje tylko w obszarze nakładania wiązek zapisujących,
+więc z wybiera się kierowaniem wiązek. Sonda jest odchylana zgodnie
+z η = sin²(πΔnL/λ) (siatka transmisyjna).
+
+**Liczby:**
+- λ_sondy = 532 nm; okres siatki Λ ≈ 40 µm (Michine) lub 9–32 µm (Ou).
+- Kąt Bragga ~0,5°, wiązki rozdzielone o ~1°.
+- Δn z danych: 2,3·10⁻⁵ (η = 0,96 na 10 mm). Ou 2026 podaje
+  Δn = 10⁻⁵–10⁻⁴.
+- L(η = 0,1) = 2,4 mm (T8). Zmierzone siatki mają L = 3,3–10 mm.
+- Wypełnienie czasowe: okno ~10 ns przy 10 Hz daje 10⁻⁷.
+- Kerr: n₂(powietrze) ≈ 7,9·10⁻²⁰ cm²/W, więc Δn = 10⁻⁶ wymaga
+  1,3·10¹³ W/cm². Powyżej tego zaczyna się filamentacja i jonizacja.
+- N, σ, OD w sensie atomowym nie dotyczą (ośrodek nierezonansowy).
+
+**Dowód:**
+- Michine & Yoneda, Commun. Phys. 3, 24 (2020),
+  doi:10.1038/s42005-020-0286-6. Warunki:
+  - ozon 1–10% w O₂ w rurze przepływowej, nie powietrze otoczenia;
+  - zapis KrF 248 nm, 50–200 mJ, „5 to 20 Hz”;
+  - wynik: „96% at 63 mJ/cm2 of the UV writing beam”, okno wysokiej
+    sprawności „about 10 ns”.
+- Ou i in., arXiv:2601.09963 (2026, **preprint, nierecenzowany**):
+  „95.7% ± 3.6%” przez 7737 strzałów przy 10 Hz.
+- Wahlstrand, Cheng, Milchberg, PRA 85, 043820 (2012): n₂(N₂) = 7,4·10⁻²⁰ cm²/W.
+- Shi i in., PRL 107, 095004 (2011): siatka plazmowa w powietrzu,
+  „~19%” (wartość z cytatu wtórnego, oryginału nie przeczytano).
+- Schrödel i in., Nat. Photon. 18, 54 (2024): siatka ultradźwiękowa
+  w powietrzu, Δn „only 10^-7”, > 50% po 7 przejściach, impulsy ~1 ms
+  przy 5 Hz.
+
+**Test zabójczy: warunek 1 (średnia czasowa) i T3 (powietrze).**
+- Szczytowo 96% jest kierunkowe, ale dla sondy CW 1 mW średnia to
+  0,1 nW (okno 10 ns, 10 Hz). W wariancie hojnym (500 ns, η = 0,5)
+  wychodzi 2,5 nW, czyli 2,5·10⁻⁶ mocy sondy. Brakuje czynnika ≥ 4·10⁴.
+- Ciągłe podtrzymanie wymagałoby ~5 MW mocy zapisu (50 mJ co 10 ns)
+  i wymiany ozonu w ~0,5 µs, czyli przepływu ~2 km/s.
+- W powietrzu otoczenia ozonu jest ≤ 70 ppb wobec 1–6% w doświadczeniach,
+  czyli 10⁵–10⁶ razy mniej absorbentu.
+- T3: warstwa 10 µm wymagałaby Δn = 5,5·10⁻³, więcej niż całe
+  n − 1 powietrza (2,8·10⁻⁴). Warstwa w powietrzu ma zawsze ≥ 0,2 mm,
+  realnie milimetry. To nie łamie warunku 2 w odczycie (a),
+  ale przesunięcia siatki nikt nie zmierzył.
+
+**Werdykt: ODRZUCONE.** Powód liczbowo: warunek 1, średnio ≤ 2,5·10⁻⁶
+mocy sondy wobec 0,1. Warunek 4: impulsowa praca jest POTWIERDZONA
+(> 2 h przy 10 Hz, preprint), ale praca ciągła wymaga ~MW. To jedyny
+mechanizm odbijający od samego gazu w z. Pozostaje mechanizmem
+impulsowym dla laserów dużej mocy (do tego go zaprojektowano), a nie
+wyświetlaczem.
+
+**Następne pytanie:** Czy jakikolwiek ośrodek w powietrzu ma Δn ≥ 10⁻³
+podtrzymywane w sposób ciągły przy poborze < 1 W, czyli 10⁴ razy mniej
+niż siatka gazowa? (Rachunek budżetu energii; kandydaci to aerozol
+i warstwy cząstek. Patrz iteracja 9: płatek w pułapce.)
 
 ---
 

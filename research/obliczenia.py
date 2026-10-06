@@ -106,3 +106,12 @@ cone = 2 * m.pi * (1 - m.cos(m.radians(0.5)))
 print(f"ułamek przechwycony (w0=10 µm): {frac_int:.3f}; stożek 1° = {cone:.3e} sr")
 print(f"izotropowo do stożka: {frac_int * cone / (4 * m.pi):.1e} mocy sondy (wymagane 0.1)")
 print(f"detektor 1 cm² w 30 cm, izotropowo: {frac_int * 1e-3 * 1e-4 / (4 * m.pi * 0.3**2) * 1e9:.1f} nW")
+
+sekcja("T8. Siatka gazowa w powietrzu (H): średnia czasowa i koszt podtrzymania")
+lam = 532e-9
+dn_gas = 2.3e-5  # z η=0.96 na 10 mm (Michine & Yoneda 2020)
+print(f"κL dla η=0.96: asin(√0.96)={m.asin(m.sqrt(0.96)):.3f}; Δn={m.asin(m.sqrt(0.96)) * lam / (m.pi * 10e-3):.2e}")
+for tau, f, eta, lab in ((10e-9, 10, 0.96, "okno 10 ns, 10 Hz"), (500e-9, 10, 0.5, "500 ns, 10 Hz, η=0.5")):
+    print(f"{lab}: wypełnienie {tau * f:.0e} → średnio {1e-3 * eta * tau * f * 1e9:.2f} nW z 1 mW")
+print(f"L(η=0.1) dla Δn={dn_gas:.1e}: {m.asin(m.sqrt(0.1)) * lam / (m.pi * dn_gas) * 1e3:.2f} mm")
+print(f"ciągłe podtrzymanie: 50 mJ × 1/(10 ns) = {50e-3 / 10e-9 / 1e6:.0f} MW")
