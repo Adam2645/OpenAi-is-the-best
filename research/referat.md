@@ -289,7 +289,7 @@ Pięć zadań rozstrzygnie werdykty, które dziś są otwarte. Każde ma próg s
 - [ ] **G, zwierciadło EIT w parze Rb.** W układzie Bajcsy i in. zmierzyć R przy sondzie 0,25 → 1 mW i sprzężeniu 40 mW na wiązkę. Sukces: R ≥ 0,1 przy 1 mW.
 - [ ] **N, stos przełączalny.** Dla dwóch warstw cholesterycznych zmierzyć stożek odbicia oraz tło odbite od elektrod i warstw wyłączonych. Sukces: ≥ 10% mocy w stożku < 1° i tło ≤ 1% sygnału.
 
-## Aneks C2-Laminat: hipotezy wdrożeniowe (iteracje 15–18)
+## Aneks C2-Laminat: hipotezy wdrożeniowe (iteracje 15–19)
 
 Aneks rozwija C2 w stronę wyświetlacza. Wszystkie wyniki to modele (macierz przejścia, teoria Kogelnika, RCWA) bez pomiaru, więc werdykty z sekcji Wyniki się nie zmieniają. Najważniejszy wniosek: z siatkami niesłantowanymi każda warstwa świeci w innym kierunku. Siatki skośne kierują warstwy do jednego widza, ale górna warstwa odbija wyjście dolnej, jeśli oba wychodzą w tym samym kierunku (iteracja 17). Odchylenie usuwające to cieniowanie (≥ 0,75° na warstwę) przekracza kąt źrenicy widzianej z 30 cm (0,67°), więc przy L = 100 µm jedno oko widzi najwyżej trzy warstwy po ≥ 10% (iteracja 18).
 
@@ -451,6 +451,39 @@ Werdykty iteracji 18:
 - **C2 ze skośnymi siatkami: NIEROZSTRZYGNIĘTE**, z limitem trzech warstw na oko przy L = 100 µm.
 
 Następne pytanie: siatki grubsze (L \~ 1 mm, n₁ \~ 2·10⁻⁴) mają port około 10× węższy. Ile warstw zmieści się w wachlarzu 0,48° i czy wiązka woksela wypełniająca źrenicę (≥ 0,67°, potrzebna do akomodacji) nie zostanie wycięta przez porty warstw wyżej?
+
+### Iteracja 19: siatki skośne 1 mm w jednej źrenicy
+
+Iteracja 18 pokazała, że przy L = 100 µm odchylenie usuwające cieniowanie (≥ 0,75°) nie mieści się w kącie źrenicy z 30 cm (0,67°). Akceptacja kątowa skaluje się jak 1/L, więc tu warstwy mają L = 1 mm przy n₁ = 2·10⁻⁴ (ten sam iloczyn n₁·L). Model Kogelnika 3D sprawdzono punktowo RCWA (około 175 tysięcy plastrów na rozwiązanie); różnice nie przekraczają 0,0012 (skrypt iteracja19.py).
+
+**Pojedyncza siatka.** Sprawność szczytowa 0,665, akceptacja kątowa wejścia 0,122° w powietrzu (FWHM), szerokość widma 0,122 nm. Sprawność ≥ 90% szczytu wymaga utrzymania długości fali w ±0,030 nm i kąta wiązki w ±0,030°. Źródło gaussowskie 0,01 / 0,05 / 0,11 / 1,5 nm daje 100 / 95 / 75 / 8% szczytu. Port przepuszcza 0,982 / 0,943 / 0,981 przy odchyleniu 0,10 / 0,12 / 0,15°; 0,12° trafia w listek boczny, więc lepszy jest krok 0,10 albo 0,15°.
+
+**Stos pięciu warstw** (wejścia 20–28° co 2°, wyjścia −0,24 / −0,12 / 0 / +0,12 / +0,24°, RCWA):
+
+| Długość fali | Moc w stożku 1°, kanały od góry | Przepuszczalność portów |
+| --- | --- | --- |
+| λ₀ | 0,623 / 0,586 / 0,586 / 0,596 / 0,603 | 1 / 0,943 / 0,946 / 0,967 / 0,983 |
+| λ₀ − 0,05 nm | 0,425 / 0,407 / 0,416 / 0,404 / 0,396 | 1 / 0,959 / 0,982 / 0,953 / 0,939 |
+| λ₀ + 0,05 nm | 0,425 / 0,423 / 0,419 / 0,415 / 0,412 | 1 / 0,997 / 0,989 / 0,980 / 0,976 |
+
+Obce światło w stożkach ±0,5° wynosi 0; najbliższy obcy rząd leży 2,19° od wyjść i niesie 6,6·10⁻⁵ mocy sondy. Plamki w 30 cm leżą w −1,26 … +1,26 mm, a wiązka 1 mm mieści się w źrenicy 3,5 mm w 99,3–100%. To pierwszy model, w którym pięć warstw trafia w jedno nieruchome oko, każda z ≥ 10% mocy.
+
+**Stożek woksela i akomodacja.** Wyjście jest wejściem przesuniętym w kx, więc w osi x stożek woksela nie może przekroczyć akceptacji 0,12°, a wypełnienie źrenicy wymaga 0,67°. W osi y akceptacja wejścia wynosi ±1,26°, a stożek ±0,33° przechodzi przez porty czterech warstw wyżej w 98%. Bodziec akomodacji jest więc możliwy tylko w jednym południku; czy oko na taki bodziec reaguje, nie sprawdzono.
+
+**Prążki.** Przy przekładkach 1 mm różnica dróg to 2,96 mm, a okres prążków w długości fali 0,096 nm. Źródło 0,01 nm daje widoczność 0,96, więc prążki zostają. Ich amplitudę ogranicza tło z dwóch odbić Fresnela, ≤ R₁R₂: bez powłok (R = 4%) zafalowanie ≤ ±8%, z powłokami AR (R = 0,25%) ≤ ±0,5%.
+
+**Pole widzenia.** Przy stożku 1° jedno oko w 30 cm widzi najwyżej p/D + 1° = 1,67°, czyli około 8,7 mm płyty; w osi x, gdzie stożek ma 0,12°, około 0,79°. To skutek samego warunku 1, niezależny od rodzaju siatki.
+
+**Materiał.** Odbiciowe siatki objętościowe w szkle fototermorefrakcyjnym (PTR) mają zmierzone L = 5,5 mm, Δn = 230 ppm, R > 99% i szerokość widma 215 pm przy 1064 nm. W wersji multipleksowanej jest to L = 6,5 mm i Δn = 130 ppm na siatkę, ze sprawnością > 98% (Ott i in. 2013, Opt. Express 21, 29620). Mhibik i in. 2016 (Light Sci. Appl. 5, e16026) podają L = 8,3 mm, Δn = 63 ppm, 35 pm przy 633 nm i 98 ± 1%. Maksymalne Δn w PTR to około 10⁻³, więc n₁ = 2·10⁻⁴ jest wartością typową. Cztery odbiciowe siatki w szeregu po około 99,7% przeniosły łącznie ponad 750 W CW (Sevian i in. 2008, Opt. Lett. 33, 384), a siatka multipleksowana 420 W przy kilku kW/cm² (Ott 2013). Warunek 4 przy 1 mW ma więc zapas wielu rzędów wielkości, ale zmierzono to przy 1064 nm, nie przy 532 nm. Odbiciowej siatki PTR przy 532 nm z podanymi L i Δn w recenzowanej literaturze nie znaleziono. Blok PQ:PMMA osiąga Δn do 1,16·10⁻⁴ przy skurczu 0,09–0,4% (Hu i in. 2022, ACS Appl. Mater. Interfaces 14, 21544); skurcz przesuwa długość fali Bragga o 0,5–2 nm, 16–70 razy poza tolerancją ±0,03 nm. Liczby z Ott 2013, Mhibik 2016, Sevian 2008 i Hu 2022 sprawdzono w pełnych tekstach.
+
+**Kompensacja translacyjna** (wyjścia 1–2°, start wiązki przesunięty o −D·tan θ, czyli −5,2 / −10,5 mm dla 1 / 2°). Wiązki trafiają wtedy w źrenicę, ale kierunek widzenia warstwy jest kierunkiem jej wiązki, więc warstwy widać przesunięte o Δθ. Łatka widoczna z jednej warstwy ma ±0,43°, więc łatki różnych warstw nakładają się tylko przy Δθ < 0,86°. Przesunięcie 4,1 mm w przekładce dotyczy wiązki sondy, nie kierunku wyjścia.
+
+Werdykty iteracji 19:
+
+- **Stos pięciu warstw skośnych 1 mm w jednej źrenicy: NIEROZSTRZYGNIĘTE.** W modelu spełnia warunek 1 (0,59–0,62) i warunek 2 (warstwy co ≥ 1 mm, przełączanie kątem przy stałej λ) bez przesłuchu w stożku. Brak pomiaru, warunki 3–4 i adresowanie x–y niewykazane, bodziec głębi tylko w jednym południku.
+- **Kompensacja translacyjna: ODRZUCONE.** Przesunięcie kierunku widzenia równe Δθ ≥ 1° przekracza 0,86°, więc warstwy nie nakładają się w polu widzenia.
+
+Następne pytanie: pomiar dwóch skośnych siatek odbiciowych 1 mm w szeregu przy 532 nm, ze źródłem jednoczęstotliwościowym i odchyleniem wyjść 0,10°. Model przewiduje moc 0,62 i około 0,61 w aperturze 3,5 mm w 30 cm oraz przepuszczalność portu górnej siatki 0,98.
 
 ## Źródła
 
