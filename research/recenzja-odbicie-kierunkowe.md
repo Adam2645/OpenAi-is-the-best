@@ -497,3 +497,182 @@ odbicia wstecz w stożek 1°. (Do rozstrzygnięcia pomiarem albo
 cytatem z literatury pułapek optycznych i akustycznych.)
 
 ---
+
+## Iteracja 8 — C2 w literaturze: warstwowe siatki odbiciowe i mikrohologramy
+
+**Mechanizm:** Siatki odbiciowe zlokalizowane na różnych głębokościach
+jednego bloku, przy jednej λ. Pytanie z iteracji 1 brzmiało: czy
+istnieje pomiar z adresowaniem kątowym?
+
+**Liczby:**
+- Mikrohologramy wielowarstwowe:
+  - McLeod: 12 warstw w 125 µm (skok ~10 µm), 532 nm;
+  - Orlic: 39 warstw w 300 µm (skok < 8 µm);
+  - GE: odbiciowość ≤ ~1% na mikrohologram (komunikat prasowy),
+    0,03–0,26% (patent), NA odczytu 0,16.
+- Laminat dwóch warstw Bayfol HX: warstwy 15,3 µm, przekładka 51,2 µm,
+  n₁ = 2,1·10⁻², czyli skok płaszczyzn ~66 µm.
+
+**Dowód:**
+- McLeod, Daiber, McDonald, Robertson, Slagle, Sochava, Hesselink,
+  Appl. Opt. 44, 3197 (2005), doi:10.1364/AO.44.003197:
+  - zapis „at the focus of a high-numerical-aperture beam and its
+    retroreflection”;
+  - „12 layers of microholograms in a 125-µm photopolymer disk”.
+- Ostroverkhov, Lawrence, Shi, Boden, Erben, Jpn. J. Appl. Phys. 48,
+  03A035 (2009), doi:10.1143/JJAP.48.03A035: materiał progowy,
+  stabilność odczytu CW 1000× lepsza niż w materiale liniowym.
+- US 6,020,985 (patent McLeod i in.): w materiale liniowym „the maximum
+  index change in each layer varies as 1/N, while the diffraction
+  efficiency … varies as 1/N²”. Dotyczy zapisu przez pozostałe warstwy
+  jednego bloku. Nie dotyczy warstw nagranych osobno i zlaminowanych.
+- Shams Lahijani i in., Proc. SPIE 12574, 1257403 (2023) (arXiv:2304.03059):
+  dwie warstwy Bayfol HX z przekładką, siatki transmisyjne. Warstwy
+  interferują ze sobą („rapid oscillations” w odpowiedzi kątowej).
+- **Korekta raportu agenta:** Zhou, Li, Liu, Su, Opt. Express 26, 22866
+  (2018) to „Compact design for optical-see-through holographic displays
+  employing holographic optical elements”. Dwa HOE pełnią tam różne
+  funkcje (ekspander wiązki, okular i combiner). Nie są to dwie
+  płaszczyzny głębokości adresowane kątem, więc praca **nie** jest
+  dowodem dla C2.
+
+**Test zabójczy:**
+- Mikrohologramy adresowane ogniskiem padają na warunku 1:
+  - R ≤ 0,01 wobec wymaganych 0,1;
+  - odbicie wraca w stożek NA odczytu: NA 0,16 to półkąt 9,2° wobec 0,5°.
+- Adresowanie kątowe w jednym bloku: zero pomiarów.
+
+**Werdykt:**
+- Mikrohologramy adresowane ogniskiem: **ODRZUCONE**
+  (warunek 1: R ≤ 0,01; stożek 9,2°).
+- C2 z adresowaniem kątowym pozostaje NIEROZSTRZYGNIĘTE z braku pomiaru.
+
+**Następne pytanie:** Czy jawny rachunek (macierz przejścia, bez
+przybliżenia fal sprzężonych) potwierdza C2 przy zmierzonym limicie
+n₁ dla Bayfol HX w odbiciu? (Iteracja 9.)
+
+---
+
+## Iteracja 9 — C2 rachunkiem: stos 5 warstw, macierz przejścia
+
+**Mechanizm:** Stos N = 5 niesłantowanych siatek odbiciowych w bloku
+n₀ = 1,5. Każda warstwa ma grubość L = 10 µm i okres
+Λ_k = λ/(2n₀cosθ_k). Wybór głębokości odbywa się przez kąt padania
+przy stałej λ = 532 nm. Rachunek: `research/tmm_stos_siatek.py`
+(pełna macierz przejścia, polaryzacja s, 16 podwarstw na okres).
+
+**Liczby:**
+- n₁ = 0,008 to zmierzona górna granica dla Bayfol HX w odbiciu,
+  0,0078–0,0090 (Bruder, Fäcke, Rölle, Polymers 9, 472 (2017), tab. 3).
+- Λ_k = 181, 189, 197, 206, 216 nm. Kąty wewnętrzne θ_k = 11,7–34,8°,
+  zewnętrzne 17,7–58,9°.
+- Wyniki TMM:
+
+  | kanał | θ_wewn | R stosu | R bez warstwy k | z₅₀ (płaszczyzna odbicia) | warstwa k |
+  |---|---|---|---|---|---|
+  | 0 | 11,69° | 0,216 | 0,0017 | 7,2 µm | 0–10 µm |
+  | 1 | 20,03° | 0,259 | 0,0098 | 16,9 µm | 10–20 µm |
+  | 2 | 25,51° | 0,248 | 0,0048 | 27,0 µm | 20–30 µm |
+  | 3 | 30,60° | 0,292 | 0,0120 | 37,6 µm | 30–40 µm |
+  | 4 | 34,81° | 0,286 | 0,0020 | 47,0 µm | 40–50 µm |
+
+- Maksymalne R poza głównymi listkami: 0,020.
+- Kontrola: teoria fal sprzężonych tanh²(πn₁L/(λcosθ_k)) = 0,20–0,27.
+  TMM dla pojedynczej warstwy daje 0,196–0,263, więc oba rachunki
+  są zgodne.
+
+**Dowód:** Jawne równanie: macierz charakterystyczna warstw (Born & Wolf,
+rozdz. 1.6) z podstawionymi liczbami oraz kod powyżej. Limit n₁ to
+pomiar (Bruder 2017). Pomiaru całego stosu nie ma (iteracja 8).
+
+**Test zabójczy:**
+- **Warunek 1:** R = 0,22–0,29 ≥ 0,1. Odbicie jest spekularne, a stożek
+  równa się rozbieżności wiązki: 0,014° przy przewężeniu 1 mm.
+- **Warunek 2:** płaszczyzna odbicia przeskakuje o 9,7–10,6 µm przy
+  zmianie kąta, przy stałej λ.
+- **Warunek 3:** ~0,2 mW odbite, ~5·10¹⁴ fotonów/s, SNR (szum śrutowy)
+  ~2·10⁷ w 1 s. Detektor musi stać w kierunku zwierciadlanym dla θ_k.
+- **Warunek 4:** dawka 0,127 J/cm² w 1 s (1 mW na Ø 1 mm) wobec
+  1080 J/cm² bez degradacji dla utrwalonego DuPont (Curtis & Psaltis
+  1994, 100 h przy 3 mW/cm²). Dla wybielonego Bayfol HX brak liczby.
+- **Ograniczenia modelu:**
+  - 1D, idealna sinusoida, bez absorpcji, rozpraszania i błędów
+    laminacji;
+  - zewnętrzny Fresnel powietrze/blok (~4%) leży na stałym z i musi
+    być pokryty AR, bo inaczej daje kierunkowe tło;
+  - realny laminat z podłożami daje skok ~66 µm (Shams Lahijani 2023),
+    nie 10 µm. To nadal spełnia warunek 2.
+
+**Werdykt: POTWIERDZONE rachunkiem** dla warunków 1, 2, 3 i 5. Warunek 4
+POTWIERDZONY dla utrwalonego polimeru typu DuPont (dawka 10⁴ razy
+poniżej przetestowanej), a NIEROZSTRZYGNIĘTY dla Bayfol HX.
+- Zakres: **wyłącznie w bloku stałym**. Płaszczyzny odbicia leżą
+  wewnątrz polimeru, nie w powietrzu.
+- Nie jest to wynalazek ani nowe zjawisko. To znana fizyka siatek
+  objętościowych (Kogelnik 1969) w znanym układzie warstwowym.
+- Nie jest to też „obraz 3D w powietrzu”: T9 daje plamkę 5,2 mm w 30 cm,
+  więc woksel widzi jedno oko.
+
+**Następne pytanie (do pomiaru):** Laminat 2–5 osobno nagranych warstw
+Bayfol HX (lub DuPont) z okresami z tabeli, odczyt 532 nm, 1 mW,
+powłoka AR. Zmierzyć:
+- R(θ) każdego kanału, czy jest ≥ 0,1;
+- położenie płaszczyzny odbicia, interferometrią niskokoherencyjną
+  albo OCT.
+
+---
+
+## Iteracja 10 — J+ (nowy). Płaskie lustro lewitowane w powietrzu
+
+**Mechanizm:** Zamiast kulki (iteracja 7) płaski reflektor w pułapce
+w powietrzu (akustycznej, fotoforetycznej, diamagnetycznej). Odbicie
+spekularne, więc kierunkowe, jeśli płat dyfrakcyjny i drgania kąta
+mieszczą się w stożku.
+
+**Liczby (wymagania):**
+- d ≥ 150 µm, bo płat 1,22λ/d ≈ 0,25° przy 532 nm.
+- Drgania przechyłu ≤ 0,15°, bo wiązka odchyla się o 2× przechył.
+- Czas ≥ 1 s, przesuw w z ≥ 10 µm.
+- Moment od sondy 1 mW na krawędzi płatka 150 µm to 5·10⁻¹⁶ N·m,
+  więc potrzebna sztywność kątowa ≥ 1,9·10⁻¹³ N·m/rad (T9).
+  W gazie silniejsze od ciśnienia promieniowania są siły fotoforetyczne
+  z absorpcji (Pahi i in., arXiv:2512.09401, preprint).
+
+**Dowód:**
+- Liu, Huo, He, Ma, Opt. Express 34, 19811 (2026), doi:10.1364/OE.592104,
+  sprawdzone w Crossref:
+  - lusterko aluminiowe lewitowane ultradźwiękami w powietrzu;
+  - „Five discrete and repeatable steering states spanning approximately
+    ±8° optical deflection… settling times on the order of tens of
+    milliseconds”;
+  - wymiary lustra 6 mm × 0,2 mm, 40 kHz (Liu, Yang, Ma, Micromachines
+    17, 879 (2026), symulacja).
+- Winstone i in., PRL 129, 053604 (2022): płytki 2,5–5 µm, przechył rms
+  0,27–0,97° (z ekwipartycji, nie pomiar bezpośredni).
+- Perdriat i in., PRL 128, 117203 (2022): diament ~15 µm w pułapce
+  Paula, błąd kąta „about 1 degree”.
+- Koller i in., arXiv:2609.17787 (2026, **preprint**): mikrolustro
+  lewitowane nadprzewodząco w 3,2 K w próżni. Sonda tylko „several
+  nanowatts”, więc przy 1 mW odpada.
+
+**Test zabójczy:** Liczba rozstrzygająca to drgania przechyłu lustra
+z Liu 2026. **Nikt jej nie podał.**
+- Dla tego lustra: R(Al) ≈ 0,9, płat dyfrakcyjny 0,006°, a siła sondy
+  to 4·10⁻⁸ ciężaru lustra. Warunki 1, 3, 4 przechodzą, jeśli drgania
+  ≤ 0,15°.
+- Przesuwu w z o ≥ 10 µm nie raportowano.
+- Najlepsze zmierzone kąty (0,27–1°) dotyczą obiektów µm i są powyżej
+  0,15°.
+
+**Werdykt: NIEROZSTRZYGNIĘTE.**
+- To jedyny kandydat z materią **w powietrzu**, który nie pada na
+  liczbie, tylko na braku liczby.
+- Ograniczenie T9: lustro kierunkowe widzi jedno oko. Jedno lustro
+  to jeden woksel, nie obraz.
+
+**Następne pytanie (do pomiaru):** W układzie Liu 2026 zmierzyć dźwignią
+optyczną (lustro → ekran 1 m) rms przechyłu w 1 s. Czy jest ≤ 0,15°?
+Czy przesunięcie lustra w z o ≥ 10 µm (zmiana faz przetworników)
+zachowuje ten przechył?
+
+---

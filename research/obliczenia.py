@@ -115,3 +115,17 @@ for tau, f, eta, lab in ((10e-9, 10, 0.96, "okno 10 ns, 10 Hz"), (500e-9, 10, 0.
     print(f"{lab}: wypełnienie {tau * f:.0e} → średnio {1e-3 * eta * tau * f * 1e9:.2f} nW z 1 mW")
 print(f"L(η=0.1) dla Δn={dn_gas:.1e}: {m.asin(m.sqrt(0.1)) * lam / (m.pi * dn_gas) * 1e3:.2f} mm")
 print(f"ciągłe podtrzymanie: 50 mJ × 1/(10 ns) = {50e-3 / 10e-9 / 1e6:.0f} MW")
+
+sekcja("T9. Stożek < 1° kontra widzenie obuoczne")
+D = 0.30
+spot = 2 * D * m.tan(m.radians(0.5))
+print(f"plamka stożka 1° (pełny) w odległości 30 cm: {spot * 1e3:.1f} mm; rozstaw oczu ~63 mm "
+      f"→ potrzebny kąt pełny {m.degrees(2 * m.atan(0.0315 / D)):.1f}°")
+th_int = [11.69, 20.03, 25.51, 30.60, 34.81]
+print("kąty zewnętrzne (z powietrza) dla kanałów TMM:",
+      [round(m.degrees(m.asin(1.5 * m.sin(m.radians(t)))), 1) for t in th_int])
+I_probe = 1e-3 / (m.pi * 0.05**2)  # 1 mW na kole o średnicy 1 mm, W/cm²
+print(f"1 mW na Ø1 mm: {I_probe * 1e3:.0f} mW/cm², dawka w 1 s {I_probe:.3f} J/cm² "
+      f"wobec 3 mW/cm²·100 h = {3e-3 * 3.6e5:.0f} J/cm² (Curtis & Psaltis 1994)")
+print(f"moment od sondy na krawędzi płatka 150 µm: {2e-3 / c * 75e-6:.1e} N·m; "
+      f"sztywność dla 0,15°: {2e-3 / c * 75e-6 / m.radians(0.15):.1e} N·m/rad")
