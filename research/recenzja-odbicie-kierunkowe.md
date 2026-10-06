@@ -779,3 +779,34 @@ DOF ≥ 14 mm (pierwsze wydania: 3,5 mm dla półkąta 1°).
 Michine & Yoneda (PDF): „96% at 63 mJ/cm2 of the UV writing beam”, okno „about 10 ns”,
 ozon 1–10%. Schilke 2011 nie znaleziono na arXiv — liczby oznaczone jako niesprawdzone
 powtórnie.
+
+## Iteracja 15 — hipotezy wdrożeniowe po audytach (`research/iteracja15.py`)
+
+**H1. Rezygnacja z „materii w z” (woksel ogniskowy, VHOE/SLM).** Przy stożku pełnym 1°:
+NA = 0,0087, woksel 1,22λ/NA = 74 µm szerokości i 2λ/NA² = 14 mm głębokości. Przy 12°
+(dwoje oczu w 30 cm): 6,2 µm i 0,097 mm. Étendue: obraz 1 cm przy 12° wymaga ~3930²
+≈ 1,5·10⁷ pikseli o skoku ≤ 2,54 µm w płaszczyźnie obrazu. Wiążącym ograniczeniem jest
+warunek 1, nie definicja materii. NIEROZSTRZYGNIĘTE — decyzja definicyjna należy do autora.
+
+**H2. C2: laminat + polaryzacja p + SLM.** Centrowanie na Brewsterze nie jest potrzebne:
+przy pierwotnych kątach i pol. p R_p ≤ 3,5% (17,7–58,9°), ale sprzężenie maleje jak
+|cos 2θ|, więc trzeba n₁ ≈ 0,02. Kandydat modelowy (laminat 51 µm, n = 1,48 zał., pol. p,
+n₁ = 0,02): sygnał 0,24–0,67, tło z powierzchni 0,4–5,3% sygnału, kroki μ 59–60 µm,
+FWHM 7,7–9,2 µm, C = 0,009–0,012, moc innych warstw 1,2–8,1% sygnału. Wachlarz
+Brewstera o skoku 0,03 w cosθ: kanały się zlewają (poza kanałami 62–103%); o skoku 0,04
+(4 kanały): sygnał 0,15–0,49, tło 0–11,5%, poza kanałami 21%.
+Tolerancja kątowa (SLM): rozbieżność 1/e² 0,25° / 0,5° / 1° → sprawność Bragga 99–100% /
+96–99% / 89–96% szczytu i ułamek mocy w stożku 0,5° = ~100% / 86,5% / 39,3%. Szczegół
+na warstwie ≥ λ/(2 sin 0,5°) = 30,5 µm; ~1,1·10⁵ woksli na 1 cm².
+NIEROZSTRZYGNIĘTE (model): brak pomiaru, warunki 3–4, wykonalność laminatu.
+
+**H3. F z subradiacją.** Γ_kol/Γ ≈ (3/4π)(λ/a)²: 0,51 (a = 532 nm), 0,91 (400 nm),
+2,05 (266 nm). Jeśli bilans skaluje się z Γ_kol, subradiacja go pogarsza (N ≈ 1,6·10⁸),
+a gęstsza sieć poprawia ~2× (N ≈ 4·10⁷). Kierunek proponowanej dźwigni jest odwrotny.
+NIEROZSTRZYGNIĘTE (szacunek).
+
+**H4. Plazma w powietrzu.** n_c(532 nm) = 3,9·10²¹ cm⁻³. R ≥ 0,1 przy L = 100 µm wymaga
+n_e = 4,4·10¹⁸ cm⁻³ (17,5% cząsteczek), przy L = 10 µm 175% (wielokrotna jonizacja).
+Siatka wsteczna Λ = 266 nm: czas życia ~0,2–1,8 ps przy D_a = 10–100 cm²/s (założenie)
+albo ~21 fs przy skalowaniu zmierzonych 68 ps (Λ = 15,3 µm) jak Λ². T3 da się przekroczyć,
+ale warunki 1 (średnia czasowa) i 4 padają o rzędy wielkości. NIEROZSTRZYGNIĘTE (szacunek).
