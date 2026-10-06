@@ -981,3 +981,40 @@ bodziec głębi tylko w jednym południku.
 **Następne pytanie:** pomiar dwóch skośnych siatek odbiciowych 1 mm (np. PTR) w szeregu przy 532 nm,
 jednoczęstotliwościowym źródle i odchyleniu wyjść 0,10°: moc z każdej warstwy w aperturze 3,5 mm w 30 cm
 (model: 0,62 i ~0,61) oraz przepuszczalność portu górnej siatki (model: 0,98).
+
+## Iteracja 20 — woksel anamorficzny, bezpieczeństwo oka, kompensacja błędu okresu (`research/iteracja20.py`)
+
+Rachunek kątowy przez rozkład wiązki na fale płaskie: η_śr = ∫ η(θ)·I(θ) dθ, η(θ) z Kogelnika 3D (zgodny z RCWA,
+iteracja 19); wiązka gaussowska, półkąt 1/e² θ₀ = λ/(π w₀).
+
+- **H1 woksel anamorficzny: NIEROZSTRZYGNIĘTE (model).** Oś x: η = 0,31 / 0,49 / 0,58 / 0,64 / 0,65 / 0,66 przy
+  w₀x = 50 / 100 / 150 / 250 / 330 / 500 µm (2w₀ = 0,3 mm daje 87% fali płaskiej). Oś y przy w₀x = 330 µm:
+  2w₀y = 15 µm daje stożek 2,59° i tylko 56% mocy w ±0,5°; warunek 1 (θ₀ ≤ 0,5°) wymaga 2w₀y ≥ 39 µm,
+  wypełnienie źrenicy (≥ 0,67°) 2w₀y ≤ 58 µm, η = 0,648–0,650 w tym oknie. Pole widzenia jednego oka
+  0,86° × 1,67° (4,5 × 8,7 mm), nie 8,7 × 8,7 mm, bo stożek w x ma ~0,1°. Woksli na warstwę na oko:
+  ~8,7 tys. dla 300 × 15 µm (propozycja), ~2,3 tys. dla 300 × 50 µm, ~1 tys. dla 660 × 50 µm.
+  Rzędy modulatora SLM (≥ 1,5° przy skoku ≤ 20 µm) nie są odbijane (strata), chyba że m·λ/p = Δkx = 0,0489
+  (p = 10,9·m µm) — wtedy trafiają w kanał sąsiedniej warstwy; potrzebny filtr w płaszczyźnie Fouriera.
+- **H2 bezpieczeństwo oka** (ICNIRP 2013, Health Phys. 105(3):271–295, Tabela 5, apertura 7 mm, tekst pierwotny
+  przeczytany przez podagenta): kryterium 1 — impuls 33 µs (N = 100) ma 20 nJ wobec 307 nJ (zapas 15×),
+  3,3 µs (N = 1000) 2 nJ wobec 77 nJ (39×); kryterium 3 — Cp = 1 (α ≤ 5 mrad, impuls > T_i = 5 µs) albo 0,2
+  (impulsy ≤ T_i, ekspozycja zamierzona, 6·10⁵ impulsów na jedno miejsce) → zapas 7,7×; **kryterium 2
+  (średnia w T2 = 10 s)**: skanowanie nie zmniejsza mocy średniej wchodzącej do źrenicy. Przy oku
+  zogniskowanym na ∞ wiązki skolimowane jednej warstwy trafiają w jedno miejsce siatkówki: treść w jednej
+  warstwie → 0,60 mW wobec 0,39 mW = 1,54 AEL; treść równo w 5 warstwach → 0,31 AEL; źródło pozorne liniowe
+  (α = 6,6 mrad) → 0,36 AEL. Teza „skanowanie daje Klasę 1 z zapasem przy 1 mW”: ODRZUCONE (kontrprzykład).
+  Przy sondzie ≤ 0,65 mW wszystkie trzy kryteria spełnione. Wartości IEC 60825-1:2014 tylko wtórnie
+  (zgodne z kolumną W/J ICNIRP).
+- **H3 kompensacja błędu okresu kątem wejścia: NIEROZSTRZYGNIĘTE (w modelu tak dla |δΛ/Λ| ≤ 1·10⁻⁴).**
+  δΛ/Λ = 1·10⁻⁴: bez korekty η = 0,42; korekta wejścia 0,054° → η = 0,666 (RCWA 0,6652). Zakres ±0,5° deflektora
+  pokrywa |δΛ/Λ| do ~1·10⁻³ (0,53°), ale wyjście przesuwa się o ~0,9 × korekta: 0,049° / 0,15° / 0,48° dla
+  1·10⁻⁴ / 3·10⁻⁴ / 1·10⁻³ (0,26 / 0,77 / 2,5 mm w 30 cm). Port przy kroku 0,12° i przesunięciu ±0,05°:
+  T = 0,90–1,0 (0,898 przy 0,07°). Błąd skosu ±0,01° / ±0,05°: korekta 0,016° / 0,082°, wyjście 0,015° / 0,075°.
+  Praktyczna tolerancja: |δΛ/Λ| ≲ 1·10⁻⁴, skos ≲ 0,03°.
+
+**Werdykt iteracji: NIEROZSTRZYGNIĘTE.** Woksel 2w₀ ≈ (0,3–0,66 mm) × (39–58 µm) zachowuje η ≥ 0,58 i stożek < 1°;
+bezpieczeństwo oka przy 1 mW zależy od treści (do 1,54 AEL), przy ≤ 0,65 mW spełnione; błąd okresu ≤ 1·10⁻⁴
+kompensowalny kątem wejścia.
+
+**Następne pytanie:** jak oko widzi obraz z woksli skolimowanych w x: rozdzielczość w x przy ogniskowaniu na płytę
+(w/D ≈ 2,2 mrad ≈ 7,6′ dla 0,66 mm) i zanik struktury x przy ogniskowaniu na ∞ — PSF siatkówkowe wiązki anamorficznej.
