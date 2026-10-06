@@ -957,6 +957,17 @@ Kogelnik 3D sprawdzony RCWA (32 plastry/okres, ~175 tys. plastrów, 11 s/rozwią
 - Pole widzenia jednego oka przy stożku 1°: ≤ p/D + 1° = 1,67° (≈ 8,7 mm płyty w 30 cm); przy stożku x 0,12°
   w osi x ≈ 0,79°. To skutek samego warunku 1.
 
+**Materiał (podagent, pełne teksty [FT] lub abstrakty [Abs]):** odbiciowe VBG w szkle PTR mają zmierzone
+L = 5,5 mm, Δn = 230 ppm, R > 99%, FWHM 215 pm przy 1064 nm, a w wersji multipleksowanej L = 6,5 mm,
+Δn = 130 ppm na siatkę, > 98% (Ott i in. 2013, Opt. Express 21, 29620 [FT]); L = 8,3 mm, Δn = 63 ppm,
+FWHM 35 pm przy 633 nm, 98 ± 1% (Mhibik i in. 2016, Light Sci. Appl. 5, e16026 [FT]); maks. Δn ~10⁻³ [FT].
+Δn = 2·10⁻⁴ jest więc typowe. Cztery odbiciowe VBG w szeregu po ~99,7%, łącznie > 750 W CW (Sevian i in. 2008,
+Opt. Lett. 33, 384 [FT]); 420 W przy kilku kW/cm² (Ott 2013 [FT]) — warunek 4 przy 1 mW ma zapas rzędów
+wielkości, ale zmierzono to przy 1064 nm, nie 532 nm. Odbiciowej VBG w PTR przy 532 nm z podanym L i Δn
+w recenzowanej literaturze nie znaleziono (tylko karta producenta, słabe źródło). PQ:PMMA w bloku:
+Δn do 1,16·10⁻⁴, skurcz 0,09–0,4% (Hu i in. 2022, ACS AMI 14, 21544 [FT]); skurcz przesuwa λ Bragga
+o 0,5–2 nm, czyli 16–70 × poza tolerancją ±0,03 nm.
+
 **Tor 2, kompensacja translacyjna: ODRZUCONE.** Start w x = −D·tanθ (−5,2 / −7,9 / −10,5 mm dla 1 / 1,5 / 2°)
 kieruje wiązki w źrenicę, ale kierunek widzenia warstwy = kierunek jej wiązki, więc warstwy widać przesunięte
 o Δθ. Łatka jednej warstwy ma ±0,43° (wiązki skolimowane), więc łatki nakładają się tylko przy Δθ < 0,86°.
