@@ -64,6 +64,43 @@ if __name__ == "__main__":
     print(f"rzędy SLM: kanały wejścia co Δkx = {dkx:.4f}; rząd m modulatora o skoku p trafia w sąsiedni kanał, "
           f"gdy m·λ/p = Δkx, czyli p = m·{lam0 / dkx * 1e6:.1f} µm (wymagany filtr w płaszczyźnie Fouriera)")
 
+    print("\n== 2. Bezpieczeństwo oka: trzy kryteria ICNIRP 2013 (Tabela 5, apertura 7 mm, 400–700 nm) ==")
+    P_eye = 0.60e-3  # moc kanału w źrenicy przy sondzie 1 mW (iteracja 19: 0,586–0,623 mW)
+
+    def el_single(t, CE=1.0):
+        """EL dla pojedynczego impulsu [J] (siatkówka, termicznie)."""
+        if t < 5e-6:
+            return 7.7e-8 * CE
+        return 7e-4 * CE * t**0.75
+
+    def el_cw(alpha_mrad):
+        """EL dla ekspozycji ≥ T2 [W]: 0,39 mW dla α ≤ 1,5 mrad, inaczej 7e-4·C_E·T2^−0,25."""
+        if alpha_mrad <= 1.5:
+            return 3.9e-4
+        CE = alpha_mrad / 1.5
+        T2 = 10 * 10 ** ((alpha_mrad - 1.5) / 98.5)
+        return 7e-4 * CE * T2**-0.25
+
+    print(f"moc w źrenicy (kanał, sonda 1 mW): {P_eye * 1e3:.2f} mW; ramka 60 Hz, 5 warstw sekwencyjnie")
+    for N in (100, 1000):
+        t = 1 / (60 * 5 * N)
+        E = P_eye * t
+        print(f"  N = {N} woksli/warstwę: impuls {t * 1e6:.2f} µs (T_i = 5 µs), energia {E * 1e9:.1f} nJ; "
+              f"kryterium 1: EL = {el_single(t) * 1e9:.0f} nJ → zapas {el_single(t) / E:.0f}×")
+        n_spot = 60 * N * 10  # oko ogniskuje na ∞: wszystkie woksle warstwy w jednym miejscu siatkówki
+        Cp = max(0.2, 5 * n_spot**-0.25) if t <= 5e-6 else 1.0
+        print(f"    kryterium 3 (oko na ∞, {n_spot:.0e} impulsów w T2 = 10 s na jedno miejsce): Cp = {Cp:.2f} "
+              f"→ EL·Cp = {el_single(t) * Cp * 1e9:.0f} nJ, zapas {el_single(t) * Cp / E:.1f}×")
+    for share, label in ((1.0, "cała treść w jednej warstwie"), (0.2, "treść równo w 5 warstwach")):
+        P = P_eye * share
+        print(f"  kryterium 2 (średnia w T2 = 10 s na jedno miejsce siatkówki, α ≤ 1,5 mrad), {label}: "
+              f"{P * 1e3:.2f} mW wobec {el_cw(1.0) * 1e3:.2f} mW → {P / el_cw(1.0):.2f} AEL")
+    a_line = (1.5 + PUPIL / D_EYE * 1e3) / 2
+    print(f"  ten sam rachunek dla źródła pozornego w kształcie linii (stożek y w źrenicy, α = (1,5 + "
+          f"{PUPIL / D_EYE * 1e3:.1f})/2 = {a_line:.1f} mrad): EL = {el_cw(a_line) * 1e3:.2f} mW → "
+          f"{P_eye / el_cw(a_line):.2f} AEL")
+    print(f"  sonda, przy której kanał w źrenicy = 0,39 mW: {3.9e-4 / P_eye:.2f} mW")
+
     print("\n== 3. Kompensacja błędu okresu (δΛ/Λ) i skosu kątem wejścia ==")
     t = np.radians(20.0)
     psi = np.degrees(np.arctan2(np.sin(t), 1 + np.cos(t)))
