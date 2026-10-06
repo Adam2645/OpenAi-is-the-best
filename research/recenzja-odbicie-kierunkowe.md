@@ -890,3 +890,47 @@ L = 100 µm w skośnej geometrii pozostają niezmierzone.
 **Następne pytanie:** jak liczba kanałów skaluje się z odchyleniem wyjść (każdy kanał zużywa
 ≥ 1° pola wyjścia i ~2° pola wejścia) — ile warstw mieści się w polu wejścia, zanim przesłuch
 w stożku przekroczy 1%?
+
+## Iteracja 18 — źrenica widza kontra odchylone wyjścia (`research/iteracja18.py`)
+
+**Korekta iteracji 17:** „okno 1–2° na warstwę” usuwa cieniowanie, ale w 30 cm wiązki z jednego
+punktu płyty rozchodzą się o 300·tan(1,5°) = 7,9 mm na warstwę, a źrenica ma ~3,5 mm. Nieruchome
+oko widzi jedną warstwę na pozycję (5 warstw 0/1,5/3/4,5/6°: plamki 0/7,9/15,7/23,6/31,5 mm,
+w źrenicy 1 z 5). Wniosek iteracji 17 o trzech kanałach dotyczył mocy w stożku, nie wspólnej źrenicy.
+
+- **H1 soczewka polowa f = 300 mm: ODRZUCONE.** W płaszczyźnie ogniskowej x_p = f·tanα — te same
+  7,9 mm na 1,5°. Ogólnie (paraksjalnie) x_p = A·x + B·α, więc wszystkie warstwy z pola W w źrenicy
+  p wymagają |A|·W + |B|·Θ ≤ p, czyli pozorna odległość obrazu D_app ≤ p/Θ: 33 mm dla Θ = 6°,
+  401 mm dla 0,5°. Przy D_app = 300 mm: Θ ≤ 0,67° (0,48° z wiązką 1 mm). Soczewka leży poza stosem,
+  więc RCWA się nie zmienia; stożek po soczewce w/f = 0,19° < 1°, ale to nie pomaga.
+- **RCWA 5 warstw z polecenia** (wejścia 20–28° co 2°, linia wąska / źródło 0,15 nm):
+  wyjścia +1,5°: 0,623 / 0,607 / 0,605 / 0,582 / 0,584 (0,15 nm: 0,580–0,620); przesłuch w stożku
+  innego kanału 0,72% mocy sondy (1,2% sygnału; rząd z A 0,2° od wyjścia kanału 3).
+  Wyjścia −1,5°: 0,597–0,624, przesłuch 0,99% mocy sondy. Wszystkie wyjścia 0°: 0,623 / 0,206 /
+  0,071 / 0,024 / 0,008 (cieniowanie).
+- **Stosy mieszczące się w źrenicy** (wachlarz 0,45°, plamki w 30 cm ≤ 2,36 mm, wiązki 1 mm w źrenicy):
+  2 warstwy 0 / 0,45°: 0,623 / 0,356; 3 warstwy co 0,225°: 0,623 / 0,239 / 0,146;
+  4 warstwy co 0,15°: 0,623 / 0,221 / 0,099 / 0,063. Obce światło w stożku: 0.
+  Przy L = 100 µm jedno oko w 30 cm widzi najwyżej 3 warstwy po ≥ 10%.
+- **H2 16 warstw: ODRZUCONE.** Wejście 8–38° wewn = 12,0–67,4° w powietrzu (od strony powietrza nie
+  ma TIR, granicę daje Fresnel i czynnik p cosθ). Bez odchylenia: dolny kanał ~0,62·0,335¹⁵ = 5·10⁻⁸;
+  z odchyleniem ≥ 0,75°/warstwę wachlarz 11° ≫ 0,67°. Przekładki 1 mm: OPD = 2,96 mm, V = 0,86 /
+  0,38 / 0,009 / 1,6·10⁻⁴ przy Δλ = 0,02 / 0,05 / 0,11 / 0,15 nm — źródło 0,02–0,05 nm nie gasi
+  prążków; 0,15 nm gasi przy η = 99,5% szczytu. Głębia 16 mm w 30 cm to Δ(1/z) = 0,169 D
+  (rozmycie 2,0′ przy źrenicy 3,5 mm) i ≈ 1 głębia ostrości woksela w stożku 1° (T2: 14 mm);
+  wiązka skolimowana nie daje bodźca akomodacji (najostrzejszy obraz przy ogniskowaniu na ∞).
+- **H3 multipleksowanie azymutalne: ODRZUCONE.** Kogelnik 3D zgodny z RCWA dla odchylenia w płaszczyźnie
+  siatki (T = 0,334 / 0,401 / 0,643 / 0,960 / 0,974 wobec 0,335 / 0,402 / 0,644 / 0,962 / 0,973).
+  Odchylenie prostopadłe (y): T = 0,30 / 0,31 / 0,38 / 0,62 / 0,98 przy 1 / 2 / 3 / 4 / 5° — rozstrojenie
+  Bragga jest tu drugiego rzędu, więc potrzeba ≥ 5° zamiast 0,75°. Warstwa obrócona o 90° z wyjściem
+  na normalnej: jej pol. p jest dla górnej warstwy pol. s → T = 0,296 (gorzej niż 0,335).
+  Dwa kierunki we wspólnym oknie 0,67° są zawsze bliżej niż 0,75°, więc żaden układ 2D nie daje
+  T ≥ 0,96 przy L = 100 µm.
+
+**Werdykt iteracji: ODRZUCONE** (H1, H2, H3 — każde na podstawie górnego ograniczenia: Lagrange,
+cieniowanie RCWA, rozstrojenie Bragga). C2 ze skośnymi siatkami pozostaje NIEROZSTRZYGNIĘTE z limitem
+3 warstw na jedno oko przy L = 100 µm.
+
+**Następne pytanie:** siatki grubsze (L ~ 1 mm, n₁ ~ 2·10⁻⁴) mają port węższy ~10× (akceptacja ∝ 1/L) —
+ile warstw zmieści się w wachlarzu 0,48° i czy wiązka woksela wypełniająca źrenicę (≥ 0,67°, potrzebna
+do akomodacji) nie zostanie wycięta przez porty warstw wyżej?
