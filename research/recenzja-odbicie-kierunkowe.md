@@ -835,3 +835,58 @@ w powietrzu, rozrzut 41,8°), więc widz w stożku 1° widzi jedną warstwę —
 
 **Następne pytanie:** RCWA dla dwóch skośnych warstw ~100 µm (n₁ ≈ 0,002) z przekładką ~1 cm —
 czy oba kanały wychodzą wzdłuż normalnej z ≥ 10% mocy w stożku 1° i przesłuchem ≤ 1%?
+
+## Iteracja 17 — RCWA dwóch skośnych warstw (`research/rcwa.py`, `rcwa_walidacja.py`, `iteracja17.py`, `iteracja17b.py`)
+
+**Metoda:** własny solver RCWA (Moharam i in., JOSA A 12, 1068, 1995; „enhanced transmittance”,
+TM z regułą odwrotności Li). Walidacja: profil zależny tylko od z = TMM (s 0,21502; p 0,13444);
+siatka skośna 20° → normalna zgodna z Kogelnikiem (p: 0,6654 vs 0,6659); R + T = 1,000000;
+wynik niezależny od M = 3/5/7; 32 plastry na okres z (zbieżność 2. rzędu, błąd ~0,1%).
+Parametry: L = 100 µm, n₁ = 0,002, n₀ = 1,5, λ₀ = 532 nm, pol. p; A: 20° wewn. (30,87° pow.),
+B: 22° wewn. (34,19° pow.); warstwy łączone niekoherentnie (przekładka 10 mm, różnica dróg
+2·1,48·10 mm ≈ 29,6 mm ≫ L_c).
+
+- η do zadanego wyjścia: A 0,6650, B 0,6603; wszystkie wyższe rzędy ≤ 3·10⁻⁷ (jeden uwięziony TIR).
+- **Cieniowanie (nowe):** z wzajemności górna siatka jest dopasowana Bragga do wiązki biegnącej w górę
+  wzdłuż normalnej — odbija w dół 66,5% wyjścia B. Akceptacja tego portu: T = 0,34 / 0,40 / 0,64 /
+  0,96 / 0,97 przy odchyleniu 0 / 0,25 / 0,5 / 0,75 / 1,0° (pow.). Przy N warstwach z wyjściem
+  na normalnej dolny kanał dostaje ~0,62·0,335^(N−1): N = 3 → 0,07 < 10%.
+- Bilans w stożku 1° (Fresnel pol. p na wejściu, 4% na wyjściu; linia wąska / źródło gaussowskie 1,5 nm):
+
+  | stos (wyjścia w powietrzu) | kanał 1 | kanał 2 | kanał 3 | obce światło w stożku ±0,5° |
+  |---|---|---|---|---|
+  | 0° / 0° (polecenie) | 0,623 / 0,391 | 0,206 / 0,172 | — | 0 (najbliższe 2,8°, 0,96%) |
+  | 0° / 1° | 0,623 / 0,391 | 0,597 / 0,359 | — | 0 (najbliższe 1,7–1,8°) |
+  | 0° / 2° | 0,623 / 0,391 | 0,599 / 0,381 | — | 0 (najbliższe 0,7–0,8°) |
+  | 0° / 3° | 0,623 / 0,391 | 0,608 / 0,381 | — | 0,39–0,72% mocy sondy (rząd z A 0,1–0,2° od wyjścia B) |
+  | 0° / 2° / 4° | 0,623 / 0,391 | 0,599 / 0,381 | 0,602 / 0,376 | 0 (najbliższe 0,68–0,76°) |
+  | 0° / 3° / 6° | 0,623 / 0,391 | 0,608 / 0,381 | 0,594 / 0,374 | 0,59–0,72% mocy sondy (jak 0°/3°) |
+
+- Widmo A: FWHM 1,20 nm (oszacowanie λ²/(2nL) = 0,94 nm). Źródło gaussowskie 0,5/1,0/1,5/2,0 nm:
+  η = 0,630/0,524/0,417/0,340 (95/79/63/51% szczytu). Argument „L < L_c ⇒ brak strat” jest
+  błędny: o stratach decyduje szerokość widma siatki (1,2 nm), nie L wobec L_c.
+- Prążki przekładki: widoczność V = exp(−(π·OPD·Δλ/λ²)²/(4 ln 2)) przy OPD = 29,6 mm:
+  0,02 (Δλ = 0,01 nm), 2·10⁻⁷ (0,02 nm), ~0 (1,5 nm). Do zgaszenia prążków wystarcza
+  0,02–0,05 nm; 1,5 nm gasi je, ale kosztuje 37% η. W geometrii skośnej wiązki kanałów są
+  rozdzielone kątowo (≥ 0,7°) i bocznie (walk-off 10 mm·tan 22,3° = 4,1 mm), więc prążki
+  przekładki w stożku sygnału wymagają ścieżek z dwoma odbiciami Fresnela (górna i dolna
+  powierzchnia, 4% każda): ≲ 2·10⁻⁴ sygnału bez AR, czyli zafalowanie ≤ 3% przy pełnej
+  koherencji i ~0 przy Δλ ≥ 0,02 nm.
+- Śledzenie źrenicy zmianą kąta wejścia: η = 0,62 / 0,45 / 0,0002 / 0,004 / 0,002 przy
+  +0,25 / 0,5 / 1 / 2 / 5° (pow.); użyteczne ±0,5° → plamka ±2,2 mm w 30 cm, nie „kilka cm”.
+- Bezpieczeństwo oka: wyjście skolimowane (C6 = 1), więc cała moc kanału (0,39–0,62 mW przy
+  sondzie 1 mW) może wejść w źrenicę 7 mm. AEL klasy 1 dla 532 nm przy T2 = 10 s z wzoru
+  7·10⁻⁴·C6·T2^(−0,25) W = 0,39 mW (wzór z pamięci, tekstu normy IEC 60825-1:2014 nie
+  zweryfikowano — płatny). Margines 6× wymaga, by sonda oświetlała woksele widoczne z jednej
+  źrenicy ≤ 10–17% czasu; dla obrazu statycznego w polu ~9 mm jest 1,0–1,6× ponad AEL.
+
+**Werdykt iteracji: NIEROZSTRZYGNIĘTE.** W modelu RCWA dwa (i trzy) kanały skośne dają
+≥ 0,36 mocy sondy w stożku 1° przy źródle 1,5 nm, bez obcego światła w stożku, pod warunkiem
+odchylenia wyjść o 1–2° między kolejnymi warstwami (wyjścia na wspólnej normalnej: drugi
+kanał 0,17; trzeci z oszacowania ~0,07–0,08 < 0,10).
+To rachunek, nie pomiar; warunek 4 (trwałość materiału) i realna modulacja n₁ = 0,002 przy
+L = 100 µm w skośnej geometrii pozostają niezmierzone.
+
+**Następne pytanie:** jak liczba kanałów skaluje się z odchyleniem wyjść (każdy kanał zużywa
+≥ 1° pola wyjścia i ~2° pola wejścia) — ile warstw mieści się w polu wejścia, zanim przesłuch
+w stożku przekroczy 1%?
