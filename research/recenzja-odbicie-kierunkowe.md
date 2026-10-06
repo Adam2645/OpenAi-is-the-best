@@ -747,3 +747,35 @@ precyzja twierdzeń. Rachunki: `research/tmm_audyt2_c2.py`.
 T1 bez mnożnika Γ_kol; T9 — dwie wiązki mogą dać stereoskopię; H — brak pomiaru odbicia
 wstecz; przesłuch ≤ 5% jako dodatkowe kryterium jakości; laminat jako scenariusz;
 usunięte zdanie o „przełomie”; opis metody z ujawnieniem wsparcia AI.
+
+## Iteracja 14 — trzeci audyt zewnętrzny
+
+**Zmiana werdyktów:** ODRZUCONE pozostaje tylko tam, gdzie jest górne ograniczenie
+(strukturalne, z definicji albo ze zmierzonej mocy całkowitej): B, C1, D, J, K.
+A, E, F, H przechodzą do NIEROZSTRZYGNIĘTE (szacunek albo brak pomiaru).
+Stan: 5 ODRZUCONE, 8 NIEROZSTRZYGNIĘTE, 0 POTWIERDZONE.
+
+**Ujawnione założenie:** dosłownie zapisane warunki 1–5 spełnia lustro na stoliku piezo;
+wykluczamy mechaniczny przesuw stałego reflektora, dopuszczamy przesuw materii polami.
+
+**Spójność kąta:** wszędzie pełny kąt wierzchołkowy 1° (półkąt 0,5°). T2: NA ≤ 0,0087,
+DOF ≥ 14 mm (pierwsze wydania: 3,5 mm dla półkąta 1°).
+
+**Rachunki (`research/tmm_audyt3_c2.py`, wektoryzacja po kątach, ~40 s):**
+- Zbieżność 8/16/32/64 podwarstw: R 0,209→0,219 (kanał 0), między 32 a 64 ≤ 0,5%;
+  kroki μ, FWHM, z_gd, udziały H stałe do ≤ 0,05 µm.
+- Przemiatanie n₁ = 0,004 / 0,008 / 0,012 / 0,02 / 0,03: R = 0,06–0,09 / 0,22–0,29 /
+  0,41–0,52 / 0,72–0,83 / 0,91–0,96; kroki μ zawsze 9,3–10,1 µm; maks. R poza kanałami
+  / najsłabszy kanał = 9,0 / 9,4 / 9,7 / 19,1 / 49,3%.
+- Geometria: warstwy po 55/53/51/48/46 okresów, grubości 9,90–10,05 µm, kroki środków
+  9,97 / 10,02 / 9,97 / 9,92 µm — materia też leży na progu 10 µm.
+- Interfejsy (pol. s, bez AR): R_s = 0,045 / 0,059 / 0,078 / 0,111 / 0,167 przy
+  17,7–58,9°; sygnał (1−R_s)²R = 0,20–0,23; tło z powierzchni / sygnał = 23–84%;
+  koherentnie dla swobodnej warstwy 50 µm R = 0,19–0,40.
+
+**Źródła sprawdzone w pełnych tekstach w tej iteracji:** Rui i in. (arXiv 2001.00795):
+„R = 0.58(3)”, „η≃0.92 per lattice site on ≃200 lattice sites”, poszerzenie „beyond
+70 photons per lattice site”, reflektancja liczona w kącie zbierania obiektywu.
+Michine & Yoneda (PDF): „96% at 63 mJ/cm2 of the UV writing beam”, okno „about 10 ns”,
+ozon 1–10%. Schilke 2011 nie znaleziono na arXiv — liczby oznaczone jako niesprawdzone
+powtórnie.
