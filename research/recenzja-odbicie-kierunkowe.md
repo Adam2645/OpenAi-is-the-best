@@ -810,3 +810,28 @@ n_e = 4,4·10¹⁸ cm⁻³ (17,5% cząsteczek), przy L = 10 µm 175% (wielokrotn
 Siatka wsteczna Λ = 266 nm: czas życia ~0,2–1,8 ps przy D_a = 10–100 cm²/s (założenie)
 albo ~21 fs przy skalowaniu zmierzonych 68 ps (Λ = 15,3 µm) jak Λ². T3 da się przekroczyć,
 ale warunki 1 (średnia czasowa) i 4 padają o rzędy wielkości. NIEROZSTRZYGNIĘTE (szacunek).
+
+## Iteracja 16 — przekładki, kierunek wyjścia, siatki skośne, podwójna źrenica (`research/iteracja16.py`)
+
+**Kluczowe:** siatki niesłantowane odbijają każdą warstwę pod innym kątem (−17,4 … −59,2°
+w powietrzu, rozrzut 41,8°), więc widz w stożku 1° widzi jedną warstwę — C2 w tej geometrii
+(także kandydat z iteracji 15) nie jest wyświetlaczem 3D.
+
+- Przekładki 51/200/500/1000 µm (pol. p, n₁ = 0,02): R średnie po λ 0,21–0,71; zafalowanie
+  przy stałej λ 36–64% (51 µm) i 42–62% (1 mm) — niezależne od grubości, zmienia się tylko
+  okres prążków (2,1 nm → 0,11 nm); moc innych warstw 1–8% sygnału; brak modów falowodowych
+  (TIR 1,5→1,48 dopiero > 80,6°). Winietowanie przy 1 mm: przesunięcie 5,6 mm, 44% pola 10 mm.
+- Siatki skośne (Kogelnik, wyjście wzdłuż normalnej): η = 0,62–0,68 (p, n₁ = 0,02), czynnik
+  |cosθ| = 0,82–0,98; światło z sąsiedniej siatki wychodzi pod 5,3–12,3°; akceptacja kątowa
+  10,6° / 3,5° / 1,0° (powietrze) dla L = 10 / 30 / 100 µm przy stałym n₁·L.
+- Podwójna źrenica ±6°: Δn 0,03 → 2 × 0,015: łącznie 0,70 (10 µm) / 0,92 (16 µm), na oko
+  0,35 / 0,46 (pol. p); pole głowy: dwie plamki 5,2 mm w 30 cm.
+- Bilans AOD 0,8 × SLM 0,6 × R 0,4 / 5 warstw: 38,4 µW/warstwę, 33,2 µW w stożku, SNR śrutowy
+  ~10⁷ w 1 s; ograniczają tempo SLM (300 wzorów/s), étendue AOD, bezpieczeństwo oka.
+- Przekaźnik 4f: M_z = 500 → półkąt 0,022°, plamka 0,23 mm ≪ źrenica → brak akomodacji;
+  przy stożku 1° i źrenicy ~3,5 mm akomodacja przetrwa M_z ≲ 2. ODRZUCONE (Lagrange).
+- Superradiacja: Rui i in. zmierzyli Γ = 4,04 MHz < Γ₀ = 6,06 MHz (lustro subradiacyjne);
+  superradiacja w warstwie wymaga a < 0,49λ ≈ 381 nm, zysk ~2× przy a = 266 nm.
+
+**Następne pytanie:** RCWA dla dwóch skośnych warstw ~100 µm (n₁ ≈ 0,002) z przekładką ~1 cm —
+czy oba kanały wychodzą wzdłuż normalnej z ≥ 10% mocy w stożku 1° i przesłuchem ≤ 1%?
