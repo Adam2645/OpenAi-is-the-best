@@ -1,6 +1,6 @@
 # Prompt przekazania: kontynuacja recenzji „kierunkowe odbicie światła w wybranej odległości z”
 
-Przejmujesz projekt recenzji naukowej prowadzony dotąd przez innego agenta (19 iteracji, trzy audyty
+Przejmujesz projekt recenzji naukowej prowadzony dotąd przez innego agenta (21 iteracji, trzy audyty
 zewnętrzne). Masz go kontynuować w tym samym trybie i z tym samym rygorem. Poniżej: (1) oryginalne
 polecenie użytkownika, słowo w słowo, (2) zasady doprecyzowane później, (3) gdzie leży dorobek,
 (4) stan wyników z liczbami, (5) błędy, których nie wolno powtórzyć, (6) narzędzia, (7) zadanie na teraz.
@@ -104,7 +104,7 @@ Tryb pracy:
   literatury i niezależnych rachunków używaj podagentów równolegle, jeśli je masz.
 - Wyniki prowadź jako **referat naukowy** („zrób taki referat naukowy, czego dowiodłeś”): co wykazano,
   czego nie, z liczbami i źródłami. Każdą iterację dopisuj do referatu jako nową sekcję
-  (dotąd: „Aneks C2-Laminat: hipotezy wdrożeniowe (iteracje 15–19)”) i do dziennika.
+  (dotąd: „Aneks C2-Laminat: hipotezy wdrożeniowe (iteracje 15–21)”) i do dziennika.
 - Użytkownik przysyła audyty i propozycje hipotez. Każdy punkt audytu najpierw sprawdź (rachunkiem albo
   w pełnym tekście źródła), dopiero potem przyjmij albo odrzuć z liczbą. Propozycje użytkownika
   traktuj jak hipotezy, nie jak fakty; w it. 18 soczewka polowa, 16 warstw i multipleksowanie azymutalne
@@ -134,14 +134,15 @@ Rygor (z trzech audytów):
 
 - Repozytorium: `https://github.com/Adam2645/OpenAi-is-the-best`, gałąź `claude/charming-galileo-wk6m37`,
   katalog `research/`.
-  - `referat.md` — pełny referat (eksport z dokumentu Claude Docs, stan po iteracji 19; jest też `referat.pdf` w paczce zip). Oryginał
+  - `referat.md` — pełny referat (eksport z dokumentu Claude Docs, stan po iteracji 21; jest też `referat.pdf` w paczce zip). Oryginał
     w Claude Docs jest prywatny; jeśli nie masz do niego dostępu, prowadź dalej `referat.md`.
-  - `recenzja-odbicie-kierunkowe.md` — dziennik wszystkich iteracji 0–19 z liczbami.
+  - `recenzja-odbicie-kierunkowe.md` — dziennik wszystkich iteracji 0–21 z liczbami.
   - `obliczenia.py` (T0–T9), `tmm_stos_siatek.py`, `tmm_audyt*_c2.py` (macierz przejścia, metryki osiowe),
     `iteracja15.py`, `iteracja16.py` (Kogelnik, przekładki), `rcwa.py` + `rcwa_walidacja.py` (RCWA),
     `iteracja17.py`, `iteracja17b.py`, `iteracja18.py`.
-- Commituj każdą iterację z opisowym komunikatem. Użytkownik zgodził się na push na tę gałąź.
-  Nie zakładaj pull requesta bez prośby.
+- Commituj każdą iterację z opisowym komunikatem. Push na tę gałąź tylko wtedy, gdy użytkownik na to
+  pozwala: dla iteracji 21 polecił zostawić commity lokalnie. W razie wątpliwości pytaj. Nie zakładaj
+  pull requesta bez prośby.
 
 ## 4. Stan wyników
 
@@ -172,7 +173,7 @@ Ograniczenia z zakresem (pełne równania w `referat.md`):
 - T9: stożek 1° daje w 30 cm plamkę 5,2 mm; oczy dzieli ~63 mm, więc stereo wymaga dwóch wiązek.
 - 532 nm: 1 mW = 0,60 lm; 780 nm: 1,0·10⁻⁵ lm, więc linie Rb są dla oka praktycznie ciemne.
 
-### Linia C2 → wyświetlacz (iteracje 15–19, wszystko to modele)
+### Linia C2 → wyświetlacz (iteracje 15–21, wszystko to modele)
 
 - It. 15: polaryzacja p usuwa tło z powierzchni (R_p ≤ 3,5% dla 17,7–58,9°), ale wymaga n₁ ≈ 0,02.
   Laminat (przekładki 51 µm, pol. p): sygnał 0,24–0,67, kroki głębokości 59–60 µm. Szczegół ≥ 30,5 µm
@@ -219,6 +220,25 @@ Ograniczenia z zakresem (pełne równania w `referat.md`):
   VBG w PTR przy 532 nm z L i Δn w recenzowanej literaturze nie znaleziono. PQ:PMMA: Δn ≤ 1,16·10⁻⁴, skurcz
   0,09–0,4% (Hu 2022, ACS AMI 14, 21544) — 16–70× poza tolerancją λ Bragga.
 
+- It. 20 (`iteracja20.py`, η uśredniona po widmie kątowym wiązki): oś x — η = 0,31 / 0,49 / 0,58 / 0,64 / 0,66 przy
+  w₀x = 50 / 100 / 150 / 250 / 500 µm; oś y — 2w₀y ≥ 39 µm (stożek < 1°) i ≤ 58 µm (wypełnienie źrenicy).
+  Pole widzenia jednego oka 0,86° × 1,67° (4,5 × 8,7 mm). Rzędy SLM trafiają w sąsiedni kanał przy skoku
+  p = 10,9·m µm (potrzebny filtr Fouriera). **Bezpieczeństwo oka (ICNIRP 2013, Health Phys. 105(3):271–295,
+  Tabela 5, tekst pierwotny):** pojedynczy impuls — zapas 15× (N = 100) / 39× (N = 1000); ciąg impulsów —
+  Cp = 0,2, zapas 7,7×; **moc średnia w 10 s** — skanowanie jej nie zmniejsza; oko na ∞ skupia wiązki warstwy
+  w jednym miejscu: treść w jednej warstwie → 0,60 mW = 1,54 granicy 0,39 mW („skanowanie daje Klasę 1
+  przy 1 mW”: ODRZUCONE). Sonda ≤ 0,65 mW spełnia wszystkie kryteria. Błąd okresu δΛ/Λ = 1·10⁻⁴: korekta
+  wejścia 0,054° przywraca η = 0,666 (RCWA 0,665), ale wyjście przesuwa się o ~0,9 × korekta; tolerancja
+  praktyczna |δΛ/Λ| ≲ 1·10⁻⁴, skos ≲ 0,03°.
+- It. 21 (`iteracja21.py`, oko zredukowane f = 17 mm, źrenica 3,5 mm, FFT pola w źrenicy): wiązka x
+  (2w₀ = 0,3 mm) ma w 300 mm R = 359 mm (2,79 D), y (50 µm) 300 mm (3,33 D). Przy akomodacji na warstwę obraz
+  woksla 300 × 50 µm: 2,03′ × 0,52′, kontrast sąsiednich woksli x 0,56, y 0,08 (skok 50 µm poniżej rozdzielczości
+  0,64′; rozróżnialny ~90 µm → ~1,1 tys. woksli na warstwę na oko). **Przy akomodacji na ∞ obraz znika**
+  (kontrast 0 w obu osiach). „Astygmatyczna kreska Sturma”: ODRZUCONE. Faza cylindryczna na wejściu
+  (1 mm, f = −300 mm): η = 0,491, wergencja x 1,67 D zamiast 3,33 D — ODRZUCONE (w₀·θ ≥ λ/π). Warunek 3 przy
+  sondzie 0,50 mW: SNR śrutowy 2·10⁷, z niestabilnością lasera 0,1% / 1% ≈ 10³ / 10² (model). Luminancja
+  ~1,7·10⁸ cd/m² średnio po polu — wyświetlacz potrzebuje mocy o rzędy mniejszej.
+
 ## 5. Błędy już popełnione — nie powtarzaj
 
 - Mieszanie półkąta i pełnego kąta stożka (T2 liczone najpierw dla półkąta 1°).
@@ -243,30 +263,30 @@ Ograniczenia z zakresem (pełne równania w `referat.md`):
   z Fresnelem, transmisją w dół i portami w górę), `crosstalk(stack, lam)`.
 - `iteracja18.py`: `kogelnik3d(rho_hat, K, pol_factor)` — szybki model 3D zwalidowany wobec RCWA;
   `pupil_capture(outs)`.
+- `iteracja20.py`: `gauss_avg(f, θ0)` — średnia po widmie kątowym wiązki gaussowskiej; trzy kryteria ICNIRP.
+- `iteracja21.py`: `retina(Ex, Ey, A, x0, y0)` — natężenie na siatkówce dla pola w źrenicy i akomodacji A.
 - `iteracja19.py`: `grating(theta_in, out_air, L, n1, flip)`, `channel((stack, k, lam, L, n1))`, `stray(...)`,
   `kog(rho_hat, G, lam, L, n1)` — Kogelnik 3D z długością fali i grubością jako parametrami.
 - Koszt: jedno rozwiązanie RCWA dla L = 100 µm (~17,5 tys. plastrów) to ~1 s; czas rośnie liniowo z L.
   Dla grubych siatek licz Kogelnikiem 3D i sprawdzaj wybrane punkty RCWA. Wymagany tylko numpy.
 
-## 7. Zadanie na teraz: Iteracja 20
+## 7. Zadanie na teraz: Iteracja 22
 
-Po it. 19 model stosu 5 warstw 1 mm spełnia warunki 1 i 2 dla jednego oka. Otwarte, rozstrzygalne rachunkiem
-lub literaturą (wybierz jedno na iterację):
-1. **Adresowanie x–y przy grubej siatce:** tolerancja kąta ±0,03° wymusza wiązkę sondy szerszą w osi x
-   (talia ≳ λ/(π·5·10⁻⁴) ≈ 0,3 mm). Jaki jest najmniejszy woksel w x i y, ile woksli mieści pole widzenia
-   ~8,7 mm i czy modulator (SLM/AOD) da taką wiązkę z ≥ 10% w stożku.
-2. **Tolerancja wykonania:** λ Bragga każdej warstwy musi zgadzać się z λ źródła w ±0,03 nm (5,6·10⁻⁵).
-   Czy niedopasowanie da się skompensować kątem wejścia każdego kanału (degeneracja kąt–λ) bez wyjścia
-   wiązek poza wachlarz 0,48°? Przelicz RCWA dla rozrzutu λ Bragga ±0,1 nm.
-3. **Bodziec głębi w jednym południku:** znajdź pomiar (psychofizyka, optometria), czy akomodacja reaguje
-   na bodziec astygmatyczny (stożek ±0,33° tylko w osi y). Bez pomiaru — NIEROZSTRZYGNIĘTE.
-4. **Warunek 3 i bezpieczeństwo oka:** do źrenicy trafia 0,59–0,62 mW przy sondzie 1 mW; AEL klasy 1
-   dla 532 nm (7·10⁻⁴·C6·T2^(−0,25) W = 0,39 mW przy T2 = 10 s) — wzoru nie zweryfikowano w tekście normy.
-   Policz SNR na zdefiniowanym detektorze i warunek ekspozycji przy multipleksowaniu w czasie.
+Stan po it. 21: model stosu 5 skośnych warstw 1 mm (PTR) spełnia warunki 1 i 2 dla jednego oka, warunek 3
+w modelu; obraz na siatkówce istnieje tylko przy akomodacji na warstwę. Otwarte (jedno na iterację):
+1. **Akomodacja na bodziec jednoosiowy:** wiązka y wypełnia źrenicę (3,33 D), wiązka x jest wąska (0,74 mm).
+   Znajdź pomiar (optometria, psychofizyka), czy akomodacja podąża za bodźcem astygmatycznym / wąskim
+   w jednej osi. Bez akomodacji na 3,33 D obraz znika (it. 21). Bez pomiaru — NIEROZSTRZYGNIĘTE.
+2. **Głębia między warstwami:** czy oko rozróżnia warstwy co 1–2 mm z 30 cm (Δ(1/z) ≈ 0,01–0,02 D) przy
+   głębi ostrości oka; jaki odstęp warstw daje rozróżnialne płaszczyzny (rachunek + literatura).
+3. **Tolerancja wykonania:** RCWA stosu 5 warstw z losowym rozrzutem λ Bragga ±0,1 nm i korektą kąta
+   wejścia na kanał; czy wszystkie kanały zostają ≥ 10% i w źrenicy.
+4. **Warunek 4 przy 532 nm:** pomiar absorpcji / stabilności odbiciowej VBG w szkle PTR w zakresie zielonym
+   (dotąd tylko 1064 i 633 nm w recenzowanej literaturze).
 
-Pytanie pomiarowe (do laboratorium, nie do rachunku): dwie skośne siatki odbiciowe 1 mm (np. PTR) w szeregu
-przy 532 nm, źródło jednoczęstotliwościowe, odchylenie wyjść 0,10°; model: moc 0,62 i ~0,61 w aperturze
-3,5 mm w 30 cm, przepuszczalność portu górnej siatki 0,98.
+Pytania pomiarowe (do laboratorium): dwie skośne VBG 1 mm w szeregu przy 532 nm, odchylenie wyjść 0,10°
+(model: 0,62 i ~0,61 w aperturze 3,5 mm w 30 cm, port 0,98); obraz woksla w ognisku soczewki f = 17 mm
+z aperturą 3,5 mm w 300 mm (model: 10 × 2,6 µm przy ogniskowaniu na warstwę, kontrast 0 na ∞).
 
 Kolejka otwartych pytań z referatu (sekcja „Otwarte pytania”): pomiar rzeczywistego laminatu C2;
 adresowanie x–y w C2 (dwa woksle naraz); przechył lusterka J+ (≤ 0,15° rms w 1 s); zwierciadło EIT G przy

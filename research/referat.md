@@ -289,7 +289,7 @@ Pięć zadań rozstrzygnie werdykty, które dziś są otwarte. Każde ma próg s
 - [ ] **G, zwierciadło EIT w parze Rb.** W układzie Bajcsy i in. zmierzyć R przy sondzie 0,25 → 1 mW i sprzężeniu 40 mW na wiązkę. Sukces: R ≥ 0,1 przy 1 mW.
 - [ ] **N, stos przełączalny.** Dla dwóch warstw cholesterycznych zmierzyć stożek odbicia oraz tło odbite od elektrod i warstw wyłączonych. Sukces: ≥ 10% mocy w stożku < 1° i tło ≤ 1% sygnału.
 
-## Aneks C2-Laminat: hipotezy wdrożeniowe (iteracje 15–19)
+## Aneks C2-Laminat: hipotezy wdrożeniowe (iteracje 15–21)
 
 Aneks rozwija C2 w stronę wyświetlacza. Wszystkie wyniki to modele (macierz przejścia, teoria Kogelnika, RCWA) bez pomiaru, więc werdykty z sekcji Wyniki się nie zmieniają. Najważniejszy wniosek: z siatkami niesłantowanymi każda warstwa świeci w innym kierunku. Siatki skośne kierują warstwy do jednego widza, ale górna warstwa odbija wyjście dolnej, jeśli oba wychodzą w tym samym kierunku (iteracja 17). Odchylenie usuwające to cieniowanie (≥ 0,75° na warstwę) przekracza kąt źrenicy widzianej z 30 cm (0,67°), więc przy L = 100 µm jedno oko widzi najwyżej trzy warstwy po ≥ 10% (iteracja 18).
 
@@ -484,6 +484,61 @@ Werdykty iteracji 19:
 - **Kompensacja translacyjna: ODRZUCONE.** Przesunięcie kierunku widzenia równe Δθ ≥ 1° przekracza 0,86°, więc warstwy nie nakładają się w polu widzenia.
 
 Następne pytanie: pomiar dwóch skośnych siatek odbiciowych 1 mm w szeregu przy 532 nm, ze źródłem jednoczęstotliwościowym i odchyleniem wyjść 0,10°. Model przewiduje moc 0,62 i około 0,61 w aperturze 3,5 mm w 30 cm oraz przepuszczalność portu górnej siatki 0,98.
+
+### Iteracja 20: woksel, bezpieczeństwo oka i tolerancja wykonania
+
+Wiązkę sondy rozkładamy na fale płaskie i uśredniamy sprawność po jej widmie kątowym: η\_śr = ∫ η(θ)·I(θ) dθ, z η(θ) z modelu Kogelnika 3D sprawdzonego RCWA w iteracji 19. Półkąt wiązki gaussowskiej to θ₀ = λ/(πw₀) (skrypt iteracja20.py).
+
+**Woksel anamorficzny.** W osi x (płaszczyzna padania) sprawność wynosi 0,31 / 0,49 / 0,58 / 0,64 / 0,66 przy talii w₀x = 50 / 100 / 150 / 250 / 500 µm; wiązka o średnicy 0,3 mm zachowuje 87% sprawności fali płaskiej. W osi y średnica 15 µm daje stożek 2,59° i tylko 56% mocy w ±0,5°. Warunek 1 wymaga średnicy ≥ 39 µm, a wypełnienie źrenicy (potrzebne do akomodacji) ≤ 58 µm; w tym oknie η = 0,648–0,650. Jedno oko widzi pole 0,86° × 1,67° (4,5 × 8,7 mm), bo stożek w osi x ma tylko około 0,1°. Daje to około 2,3 tysiąca woksli na warstwę dla 300 × 50 µm i około 1 tysiąc dla 660 × 50 µm. Rzędy modulatora SLM leżą ≥ 1,5° od osi i nie są odbijane (strata), chyba że m·λ/p trafi w odstęp kanałów Δkx = 0,0489 (skok p = 10,9·m µm); wtedy oświetlają sąsiednią warstwę i trzeba je odfiltrować w płaszczyźnie Fouriera.
+
+**Bezpieczeństwo oka.** Granice wzięto z wytycznych ICNIRP 2013 (Health Phys. 105(3):271–295, Tabela 5, apertura 7 mm); IEC 60825-1:2014 sprawdzono tylko wtórnie, jej wartości zgadzają się z kolumną W/J ICNIRP. Moc kanału w źrenicy przy sondzie 1 mW to 0,60 mW, ramka 60 Hz, pięć warstw kolejno.
+
+| Kryterium | Wartość | Granica | Wynik |
+| --- | --- | --- | --- |
+| 1, pojedynczy impuls, N = 100 (33 µs) | 20 nJ | 307 nJ | zapas 15× |
+| 1, pojedynczy impuls, N = 1000 (3,3 µs) | 2 nJ | 77 nJ | zapas 39× |
+| 3, ciąg impulsów, N = 1000, Cp = 0,2 | 2 nJ | 15 nJ | zapas 7,7× |
+| 2, średnia w 10 s, treść w jednej warstwie | 0,60 mW | 0,39 mW | 1,54 granicy |
+| 2, średnia w 10 s, treść równo w 5 warstwach | 0,12 mW | 0,39 mW | 0,31 granicy |
+
+Skanowanie nie zmniejsza mocy średniej wchodzącej do źrenicy. Gdy oko ogniskuje na nieskończoność, wiązki skolimowane jednej warstwy trafiają w jedno miejsce siatkówki. Klasa 1 przy sondzie 1 mW zależy więc od treści obrazu, a przy sondzie ≤ 0,65 mW jest spełniona we wszystkich trzech kryteriach.
+
+**Tolerancja wykonania.** Błąd okresu δΛ/Λ = 1·10⁻⁴ obniża sprawność do 0,42, a zmiana kąta wejścia o 0,054° przywraca 0,666 (RCWA: 0,665). Zakres deflektora ±0,5° pokrywa błędy do około 1·10⁻³, ale wyjście przesuwa się o około 0,9 korekty: 0,049° / 0,15° / 0,48° dla 1·10⁻⁴ / 3·10⁻⁴ / 1·10⁻³. Przy kroku wyjść 0,12° przesunięcie ±0,05° obniża przepuszczalność portu najwyżej do 0,90. Praktyczna tolerancja to |δΛ/Λ| ≲ 1·10⁻⁴ i błąd skosu ≲ 0,03°.
+
+Werdykty iteracji 20:
+
+- **Woksel anamorficzny: NIEROZSTRZYGNIĘTE (model).** Średnica 0,3–0,66 mm × 39–58 µm zachowuje η ≥ 0,58 i stożek < 1°; proponowane 15 µm w osi y wyrzuca 44% mocy poza stożek.
+- **„Skanowanie daje Klasę 1 z zapasem przy 1 mW”: ODRZUCONE.** Kontrprzykład: treść w jednej warstwie i oko zogniskowane na nieskończoność dają 1,54 granicy w kryterium mocy średniej.
+- **Kompensacja błędu okresu kątem wejścia: NIEROZSTRZYGNIĘTE**; w modelu działa dla |δΛ/Λ| ≤ 1·10⁻⁴.
+
+Następne pytanie: jak oko widzi obraz z woksli skolimowanych w osi x? Przy ogniskowaniu na płytę rozdzielczość w x to około w/D = 2,2 mrad (7,6′ dla 0,66 mm), a przy ogniskowaniu na nieskończoność struktura w x znika. Trzeba policzyć rozkład światła na siatkówce dla wiązki anamorficznej.
+
+### Iteracja 21: obraz woksla na siatkówce i warunek 3
+
+Woksel to wiązka gaussowska z taliami w₀x i w₀y w warstwie, oglądana z 300 mm. Oko modelujemy jako cienką soczewkę f = 17 mm ze źrenicą 3,5 mm; rozkład na siatkówce to transformata Fouriera pola w źrenicy z fazą akomodacji (skrypt iteracja21.py).
+
+**Wiązka w źrenicy.** W osi x przy w₀ = 150 µm czoło fali ma promień 359 mm (2,79 D), a przy w₀ = 330 µm 1679 mm (0,60 D); w osi y przy w₀ = 25 µm 300 mm (3,33 D). Wiązka y ma w źrenicy 4,06 mm i ją wypełnia, wiązka x tylko 0,74 mm.
+
+| Woksel, akomodacja | FWHM x | FWHM y | Kontrast sąsiednich woksli x / y |
+| --- | --- | --- | --- |
+| 300 × 50 µm, na warstwę (3,33 D) | 2,03′ (10,1 µm) | 0,52′ (2,6 µm) | 0,56 / 0,08 |
+| 300 × 50 µm, na nieskończoność | 4,23′ | 22′ | 0 / 0 |
+| 660 × 50 µm, na warstwę | 4,43′ | 0,52′ | 0,57 / 0,09 |
+| 660 × 50 µm, na nieskończoność | 2,08′ | 26′ | 0 / 0 |
+
+Oko zogniskowane na warstwie odwzorowuje talię wiązki, więc punkt daje elipsę o proporcjach woksla, a nie kreskę. Przy ogniskowaniu na nieskończoność znika cały obraz, bo położenie woksla nie zmienia kierunku jego wiązki. Skok 50 µm w osi y (0,57′) leży poniżej rozdzielczości źrenicy (0,64′), więc rozróżnialny skok to około 90 µm; daje to około 1,1 tysiąca rozróżnialnych woksli na warstwę dla jednego oka.
+
+**Faza cylindryczna na wejściu.** Wiązkę o średnicy 1 mm z fazą soczewki f = −300 mm przepuszczono przez filtr Bragga (amplituda √η(θ), faza odbicia pominięta). Sprawność spada do 0,491, czoło fali x ma przy oku 1,67 D zamiast 3,33 D (źródło pozorne leży 600 mm od oka), a obraz x poszerza się do 4,63′. Dla porównania talia 0,3 mm w warstwie daje η = 0,581, 2,47 D i 2,51′. Wergencja 3,33 D wymaga źródła pozornego w warstwie, czyli talii w warstwie, a jej rozmiar ogranicza akceptacja Bragga (w₀·θ ≥ λ/π).
+
+**Warunek 3.** Przy sondzie 0,50 mW do detektora trafia 0,30 mW, czyli 8,0·10¹⁴ fotonów/s. Detektor krzemowy 1 cm² (wydajność kwantowa 0,70) z filtrem 10 nm i czasem 1 s daje SNR ograniczony szumem śrutowym 2,4·10⁷ w ciemni i 2,0·10⁷ przy 10 tysiącach luksów. Niestabilność lasera 0,1% lub 1% obniża SNR do około 10³ lub 10². Jasność jest ogromna: 0,18 lm w stożku to luminancja około 1,7·10⁸ cd/m² średnio po polu widzenia, więc wyświetlacz potrzebuje mocy o kilka rzędów mniejszej.
+
+Werdykty iteracji 21:
+
+- **„Astygmatyczna kreska zamazująca detal x”: ODRZUCONE.** Przy akomodacji na warstwę obraz woksla to 2,03′ × 0,52′, a sąsiednie woksle w osi x (skok 0,3 mm) są rozdzielone z kontrastem 0,56.
+- **Faza cylindryczna jako naprawa: ODRZUCONE.** Daje 1,67 D zamiast 3,33 D, η = 0,49 i gorszy obraz; ograniczenie w₀·θ ≥ λ/π.
+- **Warunek 3: NIEROZSTRZYGNIĘTE (spełniony w modelu).** SNR od 10² do 2·10⁷ zależnie od stabilności lasera; brak pomiaru.
+
+Następne pytanie: czy oko faktycznie akomoduje na warstwę, gdy bodziec niesie tylko oś y? Bez akomodacji na 3,33 D obraz znika, więc potrzebny jest pomiar optometryczny reakcji na bodziec astygmatyczny.
 
 ## Źródła
 
