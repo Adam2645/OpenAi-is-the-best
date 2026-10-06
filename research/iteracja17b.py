@@ -92,12 +92,12 @@ def crosstalk(stack, lam=lam0, cone_half=0.5):
             ok = np.abs(kx) < 1
             if j != m:
                 wrong_depth = max(wrong_depth, DEr[ok & (np.abs(ang - out_m) < cone_half)].sum())
+            else:  # sygnał własny kanału nie jest przesłuchem
+                ok = ok & (np.abs(kx - np.sin(np.radians(out_m))) >= 0.01)
             for k, (_, out_k) in enumerate(stack):
                 if abs(out_k - out_m) > 1e-9:
                     other_cone = max(other_cone, DEr[ok & (np.abs(ang - out_k) < cone_half)].sum())
                 for i in np.flatnonzero(ok & (DEr > 1e-6)):
-                    if j == m and abs(kx[i] - np.sin(np.radians(out_m))) < 0.01:
-                        continue  # sygnał własny kanału
                     if abs(ang[i] - out_k) < nearest[0]:
                         nearest = (abs(ang[i] - out_k), DEr[i])
     return wrong_depth, other_cone, nearest
