@@ -603,7 +603,7 @@ pomiar (Bruder 2017). Pomiaru całego stosu nie ma (iteracja 8).
   - realny laminat z podłożami daje skok ~66 µm (Shams Lahijani 2023),
     nie 10 µm. To nadal spełnia warunek 2.
 
-**Werdykt: POTWIERDZONE rachunkiem** dla warunków 1, 2, 3 i 5. Warunek 4
+**Werdykt (pierwotny, wycofany po audycie — patrz iteracja 12): POTWIERDZONE rachunkiem** dla warunków 1, 2, 3 i 5. Warunek 4
 POTWIERDZONY dla utrwalonego polimeru typu DuPont (dawka 10⁴ razy
 poniżej przetestowanej), a NIEROZSTRZYGNIĘTY dla Bayfol HX.
 - Zakres: **wyłącznie w bloku stałym**. Płaszczyzny odbicia leżą
@@ -676,3 +676,41 @@ Czy przesunięcie lustra w z o ≥ 10 µm (zmiana faz przetworników)
 zachowuje ten przechył?
 
 ---
+
+## Iteracja 12 — audyt zewnętrzny pierwszego wydania referatu
+
+**Wynik:** C2 zmienia werdykt z POTWIERDZONE na **NIEROZSTRZYGNIĘTE (tylko model)**.
+Żaden mechanizm nie został wykazany jako spełniający pięć warunków naraz.
+
+**Zarzuty potwierdzone w pełnych tekstach źródeł:**
+- Curtis & Psaltis, Appl. Opt. 33, 5396 (1994): „HRF-150 is designed by DuPont as
+  a transmission film, and … it does not record reflection holograms effectively”;
+  w 100-godzinnym odczycie „The initial increase … is caused by the bleaching of
+  the material with light exposure”. Nie potwierdza warunku 4.
+- Bruder, Fäcke, Rölle, Polymers 9, 472 (2017), tab. 3: Δn₁ 0,0065–0,0090 to
+  „maximum refractive index modulation as obtained in holography recording” dla
+  wariantów boranowego fotoinicjatora w żywicy, nie granica Bayfol HX w odbiciu.
+
+**Zarzuty potwierdzone rachunkiem (`research/tmm_audyt_c2.py`):**
+- Kroki z₅₀: 9,7 / 10,1 / 10,6 / 9,4 µm (pierwotny zakres „9,7–10,6” był błędny);
+  przy innym próbkowaniu 9,7 / 9,7 / 10,4 / 9,4 µm.
+- Rozkład dR/dz: centroidy co 5–6 µm, nakładanie 0,32–0,43, 30–63% ujemnej masy.
+- Głębokość z opóźnienia grupowego (OCT): 5,7 / 14,3 / 23,8 / 34,2 / 42,9 µm,
+  kroki 8,6 / 9,5 / 10,3 / 8,8 µm — warunek 2 pada w 3 z 4 przejść.
+  Pojedyncza warstwa daje z_gd w swoim środku (4,6 … 44,4 µm): metryka poprawna.
+- Przesłuch: moc z innych warstw 0,7–5,0% sygnału; interferencja zmienia R o
+  9–22%; maks. R poza kanałami 0,020 = 9,4% najsłabszego kanału.
+- Laminat (przekładki 51 µm, n = 1,48 założone): R = 0,25–0,31, kroki z_gd
+  51–60 µm, przesłuch 0,8–4,4%, interferencja 14–27%. Nowa hipoteza modelowa.
+
+**Zarzuty przyjęte bez zmiany werdyktu:** warunek 3 tylko jako limit szumu
+śrutowego; R całkowite ≠ moc w stożku; brak adresowania x–y; T1/T2/T3 mają zakres
+(T1: atomy niezależne, skala Γ_kol/Γ ≈ 0,5–0,7; T2: woksle ogniskowe; T3: obojętny
+gaz bez rezonansu, nie plazma); E — pole 1 mm² pochodzi z punktu startowego,
+argument przeniesiony na budżet mocy przy 1 mW (piksel 10×10 µm: ~340 atomów,
+≤ 0,4 nW); F — 1500 atomów to stan techniki; H to dyfrakcja w transmisji;
+J+ to jeden obiekt; liczba odrzuconych 9, nie 8; 12 iteracji dla 13 mechanizmów.
+
+**Następne pytanie:** model C2 z rzeczywistym laminatem (indeksy i grubości z kart
+materiałowych) i skokiem warstw z marginesem ponad 10 µm, z mocą w stożku < 1°
+dla skończonej wiązki — czy R_stożek ≥ 0,1 i kroki z_gd ≥ 10 µm utrzymują się?
