@@ -289,7 +289,7 @@ Pięć zadań rozstrzygnie werdykty, które dziś są otwarte. Każde ma próg s
 - [ ] **G, zwierciadło EIT w parze Rb.** W układzie Bajcsy i in. zmierzyć R przy sondzie 0,25 → 1 mW i sprzężeniu 40 mW na wiązkę. Sukces: R ≥ 0,1 przy 1 mW.
 - [ ] **N, stos przełączalny.** Dla dwóch warstw cholesterycznych zmierzyć stożek odbicia oraz tło odbite od elektrod i warstw wyłączonych. Sukces: ≥ 10% mocy w stożku < 1° i tło ≤ 1% sygnału.
 
-## Aneks C2-Laminat: hipotezy wdrożeniowe (iteracje 15–24)
+## Aneks C2-Laminat: hipotezy wdrożeniowe (iteracje 15–25)
 
 Aneks rozwija C2 w stronę wyświetlacza. Wszystkie wyniki to modele (macierz przejścia, teoria Kogelnika, RCWA) bez pomiaru, więc werdykty z sekcji Wyniki się nie zmieniają. Najważniejszy wniosek: z siatkami niesłantowanymi każda warstwa świeci w innym kierunku. Siatki skośne kierują warstwy do jednego widza, ale górna warstwa odbija wyjście dolnej, jeśli oba wychodzą w tym samym kierunku (iteracja 17). Odchylenie usuwające to cieniowanie (≥ 0,75° na warstwę) przekracza kąt źrenicy widzianej z 30 cm (0,67°), więc przy L = 100 µm jedno oko widzi najwyżej trzy warstwy po ≥ 10% (iteracja 18).
 
@@ -639,6 +639,141 @@ Werdykty iteracji 24:
 - **Grubość optymalna: NIEROZSTRZYGNIĘTE (model).** L\_opt = 0,85 mm przy tolerancji wyjścia ±0,02°; bez tolerancji optimum leży na krańcu badanego przedziału.
 
 Następne pytanie: czy zapis siatek PTR osiąga błąd okresu ≤ 4·10⁻⁵ i dokładność skosu ≤ 0,013° (pomiar w literaturze)? Jeśli nie, ile warstw zostaje przy realnym rozrzucie?
+
+### Iteracja 25 — audyt iteracji 19–24
+
+Audyt sprawdza tezę o pięciu warstwach i „optymalnej” grubości 0,85 mm we własnym modelu, bez nowego mechanizmu. Zmiany modelu:
+
+- każda siatka ma pełną odpowiedź zespoloną r i t (Kogelnik 3D jako macierz exp(M·d) 2×2);
+- pole liczone jest jako widmo kątowe 2D (κx, κy), z poprawnym przeliczeniem kx na kąt;
+- liczone są wszystkie pięć warstw (wejścia 20–28°) i jedno położenie oka.
+
+Stos jak w iteracji 24: L = 0,85 mm, krok wyjść 0,110°, przekładki 1 mm, w₀x = 150 µm, w₀y = 25 µm, D = 300 mm, źrenica 3,5 mm. Kod: research/iteracja25.py i research/kogelnik\_zesp.py. Dane wyjściowe: research/wyniki\_it25.
+
+**Odpowiedź zespolona.** Kogelnik zespolony zgadza się z RCWA w 18 punktach (L = 0,85 mm):
+
+- |r|² różni się o ≤ 0,0012;
+- faza r o ≤ 0,002 rad;
+- faza t portu o ≤ 0,0011 rad.
+
+Faza odbicia jest prawie nieparzysta w kącie: ±1,04 rad przy ±0,05° i ±3,07 rad przy ±0,12°.
+
+Audyt znalazł błąd w iteracjach 20–24: częstość przestrzenną w płaszczyźnie warstwy przeliczano na kąt bez czynnika 1/cos(kąta wejścia). Widmo kątowe woksla było przez to zaniżone o czynnik 0,86 w warstwie 0 i 0,71 w warstwie 4. Warstwy 4 wcześniej nie liczono.
+
+Trzy warianty mają to samo pole wejściowe i moc sondy 1:
+
+- A — tylko filtr |r|, czyli model iteracji 21–24;
+- B — zespolone r jednej siatki;
+- C — pełny stos: zespolone przejścia wejścia i portów oraz propagacja.
+
+Kontrast to kontrast Michelsona pary woksli na siatkówce, liczony w położeniach nominalnych.
+
+| warstwa, wariant | η przy powierzchni | FWHM w warstwie | przesunięcie | kontrast 300 / 400 µm | skok dla kontrastu 0,5 |
+| --- | --- | --- | --- | --- | --- |
+| 0 (20°), A | 0,584 | 218 µm | 0 | 0,30 / 0,70 | 348 µm |
+| 0, B = C | 0,584 | 223 µm | +120 µm | 0,28 / 0,69 | 353 µm |
+| 2 (24°), C | 0,504 | 264 µm | +161 µm | 0,11 / 0,48 | 408 µm |
+| 4 (28°), A | 0,481 | 257 µm | 0 | 0,12 / 0,42 | 430 µm |
+| 4, B | 0,481 | 304 µm | +171 µm | 0,00 / 0,29 | 457 µm |
+| 4, C | 0,456 | 303 µm | +185 µm | 0,00 / 0,30 | 457 µm |
+
+Co robi faza:
+
+- daje stałe przesunięcie boczne (kompensowane adresowaniem);
+- poszerza woksel o 2–18%;
+- podnosi najmniejszy skok najgłębszej warstwy z 430 do 457 µm;
+- nie zmienia ogniskowania.
+
+Para woksli zapalonych w fazie przy skoku 300 µm ma kontrast 0 we wszystkich warstwach. Kolumny naprzemienne i przerwa jednej kolumny przy skoku 400 µm mają kontrast ≥ 0,98.
+
+**Najgłębszy woksel i wspólna źrenica.** Moce dla warstwy 4 przy sondzie 1 to różne wielkości i nie wolno ich utożsamiać:
+
+| etap | moc |
+| --- | --- |
+| odbita przez siatkę | 0,480 |
+| przy powierzchni | 0,456 |
+| w stożku o pełnym kącie 1° | 0,433 |
+| w źrenicy (oko na osi wiązki) | 0,397 |
+| w komórce woksla na siatkówce | 0,321 |
+
+Wszystkie woksle jednej warstwy świecą w tym samym kierunku. Dlatego łatki widoczności kolejnych warstw są przesunięte przy oku o D·tan o\_k, czyli o 0,58 mm na krok. Przedział położeń oka dla jednej warstwy (moc ≥ 50% maksimum i kontrast ≥ 0,5 przy skoku 500 µm) ma 2,3–2,7 mm w x i 3,7 mm w y.
+
+Wspólny obszar widziany z jednego położenia oka, przy skoku 500 µm:
+
+| liczba warstw N | woksli razem |
+| --- | --- |
+| 1 | 208 |
+| 2 | 328 |
+| 3 | 306 |
+| 4 | 248 |
+| 5 | 150 |
+
+Dla N = 5 jest to obszar 0,22 × 2,75 mm, czyli jedna kolumna i 30 wierszy. Przy progu mocy 80% zostaje 55 woksli. Iteracja 24 podawała 6240 woksli, bo sumowała pola widziane z różnych położeń oka.
+
+&#91;image: Warstwa 4: liczba warstw spełniających kryteria w zależności od położenia woksla, natężenie i faza w źrenicy, obraz na siatkówce\]
+
+**Tolerancje.** Okno „±0,02°” z iteracji 24 dotyczyło błędu względnego dwóch warstw. Przeliczenie go na tolerancję jednej warstwy było niespójne o czynnik 2.
+
+Porty liczone z widmem wiązki, a nie z falą płaską, przepuszczają przy kroku 0,110° tylko 0,938. Przy błędzie względnym ±0,04° najmniejsze T spada do 0,74–0,88. Krok potrzebny przy błędzie jednej warstwy ±0,01° wynosi 0,1375°, a przy ±0,02° — 0,1575°.
+
+Pokrętła kalibracji (materiał stały, λ wspólna i stała):
+
+- C0 — bez kalibracji;
+- C1 — kąt wejścia kanału w x i y;
+- C1′ — odstrojenie w akceptacji przy η ≥ 0,9, co przesuwa wyjście o ±0,02–0,03°;
+- C2 — pochylenie płytki przy montażu; niewykonane ilościowo.
+
+Po C1 błąd ±0,01° jednej warstwy odpowiada błędowi okresu (2,0–2,9)·10⁻⁵, skosu 0,0067° albo średniego n 3·10⁻⁵.
+
+Literatura, z rozdzieleniem rezonansu, orientacji i jednorodności:
+
+- rezonans: ±10 pm od celu (Chen i in. 2019, tylko streszczenie); u producentów 0,1–0,5 nm;
+- dryf rezonansu: zmierzone 8 pm/K;
+- orientacja wektora siatki: brak zmierzonej tolerancji;
+- jednorodność sprawności: < 5%, a na 13 × 17 mm ≤ 1%;
+- gradient współczynnika załamania w grubości: 20–28 ppm/mm, w modelu bez znaczenia;
+- mapa rezonansu w poprzek apertury: nie znaleziono.
+
+**Przesłuch i optimum.**
+
+- Kanały co 2°: odbicia innych warstw trafiają przy oku 13–54 mm od sygnału, więc w źrenicy dają 0.
+- Duch etalonowy dwóch powierzchni: modulacja ±2,7% bez powłoki antyrefleksyjnej, ±0,2% z powłoką R = 0,25%.
+- Kanały co 0,38°: przesłuch do 1,2·10⁻² w źrenicy (ponad kryterium 1%). Trafia w inne komórki obrazu, nie w komórkę sygnału.
+
+Gęste przemiatanie L = 0,75–1,0 mm co 0,025 mm (pełne dane: wyniki\_it25/grubosc.txt):
+
+| L \[mm\] | krok δ przy E = 0 / 0,01 / 0,02° | skok woksla, warstwa 4, A / C | maks. woksli E = 0 (N) | E = 0,01° (N) | N = 5 |
+| --- | --- | --- | --- | --- | --- |
+| 0,75 | 0,129 / 0,149 / 0,169 | 400 / 419 µm | 291 (3) | 268 (2) | 1 kolumna |
+| 0,85 | 0,118 / 0,138 / 0,158 | 430 / 457 µm | 303 (3) | 272 (2) | 1 kolumna |
+| 1,00 | 0,104 / 0,124 / 0,144 | 471 / 528 µm | 300 (3) | 214 (2) | 1 kolumna |
+
+Liczba woksli we wspólnym obszarze jest płaska w L (±3%). Sprawność maleje z L. Faza dodaje 5–12% do skoku woksla i przesuwa korzyść w stronę cieńszych siatek, ale nie odwraca rankingu. Pojedynczego optimum nie ma; teza „L\_opt = 0,85 mm” nie ma oparcia.
+
+**Dowody.**
+
+- Zbieżność siatki obliczeniowej 512²–2048²: różnice < 0,7%.
+- Szerokość widma źródła 0,05 nm: η spada o 4%.
+- Bilans energii: suma mocy 1,000000.
+- RCWA z M = 5 daje to samo co z M = 3.
+- Skończona apertura siatek leżących wyżej nie zmienia wyniku, jeśli krawędź jest ≥ 1 mm od woksla.
+
+| twierdzenie | wynik | werdykt |
+| --- | --- | --- |
+| Kogelnik 3D zgodny z RCWA, także w fazie | ≤ 0,0012 i ≤ 0,002 rad | spełnione w modelu |
+| woksel 205 µm, 13 woksli x na warstwę | 218–303 µm, skok 348–457 µm | obalone (model) |
+| faza odbicia pomijalna | poszerzenie do 18%, skok +27 µm | obalone dla warstw 2–4 |
+| 5 warstw widocznych w jednej źrenicy | 1 kolumna × 30 wierszy | obalone w podanych warunkach |
+| odporność ±0,02° przy kroku 0,110° | T\_min 0,74 przy ±0,04° | obalone (model) |
+| L\_opt = 0,85 mm | brak optimum, maksimum przy N = 2–3 | obalone |
+| tolerancje okresu i skosu osiągalne | brak pomiaru orientacji i mapy rezonansu | nierozstrzygnięte |
+| przesłuch < 1% przy kanałach co 2° | 0 w źrenicy, etalon ±0,2% z powłoką AR | spełnione w modelu |
+| kanały co 0,38° | do 1,2·10⁻² w źrenicy | obalone (kryterium 1%) |
+| kalibracja montażowa C2 | brak danych | niewykonany |
+
+Werdykt iteracji: ODRZUCONE, w modelu i w podanych warunkach. Pięć warstw nie daje użytecznego obrazu we wspólnej źrenicy po uwzględnieniu pełnej fazy, skończonego pola i względnych błędów wykonania. Nominalnie zostaje jedna kolumna woksli, a przy błędzie względnym ±0,04° — żadna. Maksimum wspólnej objętości daje N = 2–3 warstwy, około 210–306 woksli.
+
+Następne pytanie: czy kompensacja fazy na wejściu i ustawienie płytek przy montażu (rozdzielczość ≤ 0,003°) dają N = 3 warstwom ≥ 5 kolumn? I czy liczba warstw N ≥ 5 wymaga wyjść zbieżnych do źrenicy? Tego mechanizmu nie badano.
 
 ## Źródła
 
