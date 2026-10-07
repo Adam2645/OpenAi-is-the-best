@@ -1,0 +1,35 @@
+== Płaszczyzny odniesienia, test niezmienniczości, rozkład fazy (L = 0,85 mm, krok 0,110°, siatka 1024²) ==
+Płaszczyzny odniesienia amplitud:
+  RCWA: R w z = 0 (górna granica siatki), T w z = d (dolna) dla fali exp(−jkz·(z − d)).
+  Kogelnik: r = S(0)·√(|cS|/cR) w z = 0 (płaszczyzna wejścia); t = R(d) BEZ fazy swobodnej exp(−jρz·d) — faza swobodna jest w fali płaskiej; porównanie z RCWA: T_RCWA·exp(+jkz·d) = R(d) (iteracja 25: zgodne do 0,0011 rad).
+  Stos: r_k w górnej płaszczyźnie siatki k (z_k), porty t_j bez fazy swobodnej, propagacja exp(−j|σz|·z_k) od z_k do powierzchni raz (obejmuje grubości siatek wyżej), potem powietrze D.
+Szerokości (FWHM w x) w tych samych płaszczyznach dla wszystkich wariantów:
+  k=0 A: warstwa z_k: FWHM 218 µm, szczyt +0 µm; powierzchnia z = 0: FWHM 218 µm, szczyt +0 µm; źrenica: FWHM 380 µm, szczyt -0 µm
+  k=0 B: warstwa z_k: FWHM 223 µm, szczyt +120 µm; powierzchnia z = 0: FWHM 223 µm, szczyt +120 µm; źrenica: FWHM 378 µm, szczyt +103 µm
+  k=0 C: warstwa z_k: FWHM 223 µm, szczyt +120 µm; powierzchnia z = 0: FWHM 223 µm, szczyt +120 µm; źrenica: FWHM 378 µm, szczyt +103 µm
+  k=4 A: warstwa z_k: FWHM 257 µm, szczyt +0 µm; powierzchnia z = 0: FWHM 258 µm, szczyt +17 µm; źrenica: FWHM 342 µm, szczyt -0 µm
+  k=4 B: warstwa z_k: FWHM 304 µm, szczyt +171 µm; powierzchnia z = 0: FWHM 303 µm, szczyt +187 µm; źrenica: FWHM 325 µm, szczyt +182 µm
+  k=4 C: warstwa z_k: FWHM 303 µm, szczyt +185 µm; powierzchnia z = 0: FWHM 302 µm, szczyt +201 µm; źrenica: FWHM 322 µm, szczyt +196 µm
+
+Test niezmienniczości (warstwa 4, wariant C): odbicie odniesione do płaszczyzny z_k + Δ; wejście przeliczone do tej płaszczyzny A·exp(−jρz·Δ), odbicie r_Δ = r·exp(+j(ρz + |σz|)·Δ), propagacja w górę od z_k + Δ. Obraz w źrenicy i na siatkówce porównany z obliczeniem podstawowym:
+  Δ = +0.50 mm: max|ΔE_źrenica|/max|E| = 2.5e-10; max|ΔI_siatkówka|/max I = 5.1e-13
+  Δ = -0.50 mm: max|ΔE_źrenica|/max|E| = 2.5e-10; max|ΔI_siatkówka|/max I = 5.9e-13
+  Δ = +0.85 mm: max|ΔE_źrenica|/max|E| = 2.5e-10; max|ΔI_siatkówka|/max I = 4.8e-13
+  kontrola ujemna — grubość 4 siatek liczona dwukrotnie (+3,4 mm szkła): w płaszczyźnie z_k FWHM 303 → 302 µm, szczyt +185 → +190 µm; obraz na siatkówce zmienia się o 5.7e-02 maksimum (test wykrywa podwójne liczenie, ale nie może ono dać przesunięcia ~180 µm)
+
+Przesunięcie z samego nachylenia fazy odbicia r(kx) w z = 0 (bez propagacji), s = +dφ/dκ przy pole ∝ exp(−jκx):
+  k=0: dφ/dκ = +117 µm (szczyt woksla B: patrz tabela), głębokość efektywna s/(tanθ − tan o) = 0.320 mm (L = 0.85 mm); człon sześcienny φ3 = 9.06e-14 rad·m³
+  k=1: dφ/dκ = +132 µm (szczyt woksla B: patrz tabela), głębokość efektywna s/(tanθ − tan o) = 0.326 mm (L = 0.85 mm); człon sześcienny φ3 = 1.24e-13 rad·m³
+  k=2: dφ/dκ = +147 µm (szczyt woksla B: patrz tabela), głębokość efektywna s/(tanθ − tan o) = 0.331 mm (L = 0.85 mm); człon sześcienny φ3 = 1.66e-13 rad·m³
+  k=3: dφ/dκ = +163 µm (szczyt woksla B: patrz tabela), głębokość efektywna s/(tanθ − tan o) = 0.336 mm (L = 0.85 mm); człon sześcienny φ3 = 2.17e-13 rad·m³
+  k=4: dφ/dκ = +178 µm (szczyt woksla B: patrz tabela), głębokość efektywna s/(tanθ − tan o) = 0.337 mm (L = 0.85 mm); człon sześcienny φ3 = -3.78e-14 rad·m³
+
+Rozkład fazy całkowitej funkcji przenoszenia H (wariant C) na część stałą, liniową (w κx, κy) i resztę; obrazy:
+  k=0, bez kompensacji: FWHM w z_k 223 µm, szczyt +120 µm; siatkówka FWHM 2.56′, kontrast 400/500 µm 0.69/0.93, skok dla 0,5: 353 µm
+  k=0, usunięta tylko część liniowa: FWHM w z_k 223 µm, szczyt +4 µm; siatkówka FWHM 2.56′, kontrast 400/500 µm 0.70/0.93, skok dla 0,5: 350 µm
+  k=0, usunięta cała faza (|H|): FWHM w z_k 218 µm, szczyt +0 µm; siatkówka FWHM 2.50′, kontrast 400/500 µm 0.70/0.93, skok dla 0,5: 348 µm
+     część liniowa: nachylenie +117 µm (x), +0.0 µm (y); reszta fazy rms (ważona mocą) 0.05 rad
+  k=4, bez kompensacji: FWHM w z_k 303 µm, szczyt +185 µm; siatkówka FWHM 3.40′, kontrast 400/500 µm 0.30/0.66, skok dla 0,5: 457 µm
+  k=4, usunięta tylko część liniowa: FWHM w z_k 303 µm, szczyt -3 µm; siatkówka FWHM 3.41′, kontrast 400/500 µm 0.30/0.67, skok dla 0,5: 454 µm
+  k=4, usunięta cała faza (|H|): FWHM w z_k 262 µm, szczyt +0 µm; siatkówka FWHM 2.96′, kontrast 400/500 µm 0.41/0.70, skok dla 0,5: 432 µm
+     część liniowa: nachylenie +188 µm (x), +0.0 µm (y); reszta fazy rms (ważona mocą) 0.11 rad

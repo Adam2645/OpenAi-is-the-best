@@ -1365,3 +1365,170 @@ Warunki: D = 300 mm, źrenica 3,5 mm, w₀x = 150 µm, wejście gaussowskie bez 
 fazy (wariant C → A) i płytka ustawiana przy montażu (C2) z rozdzielczością ≤ 0,003° zwiększają wspólny obszar N = 3 warstw
 na tyle, by spełnić warunek 2 na ≥ 5 kolumnach? Czy jedyną drogą do N ≥ 5 jest zmiana kierunku wyjścia wzdłuż warstwy (zbieżność
 do źrenicy)? Tego mechanizmu nie badano.
+
+## Iteracja 26 — kontrola odrzucenia z iteracji 25 (`research/iteracja26.py`, wyniki w `research/wyniki_it26/`)
+
+Commity lokalnie. Pytanie: czy w obecnej rodzinie modeli istnieje pięciowarstwowa konfiguracja, która po optymalizacji kierunków
+wyjść i położenia oka daje wspólny obraz spełniający jawne kryteria — nominalnie i przy zdefiniowanych błędach?
+Bez nowych symulacji bezpieczeństwa i bez nowego materiału.
+
+**Rodzina i przeszukanie.**
+- Stałe: płytki PTR n₀ = 1,5; n₁·L = 0,2 µm; wejścia wewnątrz 20/22/24/26/28°; przekładki 1 mm; w₀x = 150 µm, w₀y = 25 µm
+  w płaszczyźnie warstwy; D = 300 mm; źrenica 3,5 mm; λ stała i wspólna.
+- Przeszukane:
+  - L = 0,85 mm z wyjściami równymi co δ = 0–0,12° (10 wartości);
+  - L = 0,75 i 1,0 mm (po 6 wartości δ);
+  - wyjścia nierówne przy L = 0,85 mm — zejście współrzędnościowe po 4 odstępach z krokiem 0,01°, około 50 konfiguracji,
+    dla dwóch zestawów kryteriów;
+  - położenie oka: dowolne (układ niezmienniczy względem przesunięcia, siatka woksli optymalizowana co próbkę);
+  - skok woksla 250–700 µm.
+- Model: pełny potok z iteracji 25 (wariant C, widmo 2D, zespolone r i t), siatka 512² (zgodna z 1024² do 1%).
+  Przyspieszony skan oka zgodny ze starym do 0,001 w x i 0,013 w y.
+
+**1. Odrzucenie zależało od kryteriów.**
+
+*Pięć warunków pierwotnych nie wymaga wspólnej źrenicy.* Warunek 1 (≥ 10% mocy w stożku o pełnym kącie < 1°) spełnia każdy
+kanał projektu z iteracji 25 (0,43–0,55). Warunek 2 spełniają warstwy co 1,85 mm przy tej samej λ. Warunki 3–4 nie były
+w tym audycie przeliczane ponownie. „ODRZUCONE” z iteracji 25 dotyczyło wymagania dodatkowego, nie warunków pierwotnych.
+
+*Uzgodnienie liczb (projekt z iteracji 25, skok 500 µm, siatka 1024², woksli na warstwę / razem):*
+
+| kryteria | N = 1 | N = 2 | N = 3 | N = 4 | N = 5 |
+|---|---|---|---|---|---|
+| iteracji 25: kontrast tylko w x, przy Δy = 0 | 208/208 | 164/328 | 102/306 | 62/248 | 30/150 |
+| pełne: kontrast x zależny od Δy, kontrast y | 153/153 | 108/216 | 64/192 | 29/116 | 0/0 |
+
+- Liczby iteracji 25 odtworzone co do jednego woksla. Były zawyżone, bo pomijały spadek kontrastu przy oku przesuniętym w y
+  i kontrast w osi y.
+- Maksimum przy N = 2 (328 > 306): zdanie „maksimum przy N = 2–3” mieszało model per warstwa przy stałym skoku z przybliżeniem
+  warstwą 4 i skokiem optymalizowanym. W modelu uzgodnionym maksimum jest przy N = 2 dla obu sposobów doboru skoku
+  (512², pełne kryteria: razem 164 / 236 / 210 / 124 / 0 przy 500 µm; 201 / 256 / 237 / 124 / 0 przy skoku optymalizowanym).
+
+*Progi (projekt iteracji 25, N = 5, skok optymalizowany, woksli na warstwę):*
+
+| próg mocy | kontrast ≥ 0,15 | ≥ 0,3 | ≥ 0,5 |
+|---|---|---|---|
+| ≥ 20% maksimum warstwy | 64 (2 kol.) | 39 (1) | 0 |
+| ≥ 50% | 42 (2) | 30 (1) | 0 |
+| ≥ 80% | 11 (1) | 11 (1) | 0 |
+| ≥ 0,05 mocy sondy | 70 (2) | 39 (1) | 0 |
+| ≥ 0,1 | 59 (2) | 39 (1) | 0 |
+| ≥ 0,3 | 19 (1) | 19 (1) | 0 |
+
+- „Zero kolumn” wynika z progu kontrastu 0,5 przy kroku 0,110°, a nie z granicy optycznej.
+- Ograniczenie geometryczne rodziny z wyjściami równoległymi:
+  - W_5 ≤ min_k(p + f_k) − (X_max − X_min), gdzie p — źrenica, f_k — ślad wiązki przy oku (0,54–0,80 mm), X_k — przesunięcie
+    łatki warstwy;
+  - wynosi 3,57 / 2,92 / 1,78 / 0,82 mm przy δ = 0,03 / 0,06 / 0,110 / 0,1575°;
+  - kontrast zawęża obszar poniżej tej granicy (przy δ = 0,110° do zera, przy 0,03° do 1,45 mm).
+- Jedna kolumna × 30 wierszy to adresowalny przekrój y–z: 150 woksli w 5 głębokościach. Nie spełnia celu „obraz 2D w każdej
+  warstwie”. Jednym okiem widać go jako linię, bo akomodacja różni się tylko o 0,014 D na warstwę. Brak obrazu przestrzennego
+  — nie.
+
+**2. Liczby i odwzorowanie kx.**
+- kx to składowa równoległa do powierzchni płytki, zachowana na wszystkich granicach. Sonda jest zadana w płaszczyźnie warstwy.
+  - Jacobiany: dθ/dkx = 1/(β·cosθ), da/dkx = 1/(k₀·cos a).
+  - Iteracje 20–24 miały da/dfx = λ, czyli Δkx = 2π·fx·cos a₀.
+  - Czynnik to cos kąta **w powietrzu**: a₀ = 30,87° (warstwa 0) → 0,858; a₀ = 44,77° (28° wewnątrz) → 0,710. Nie cos 28° = 0,883.
+- Gdyby talię 150 µm zadać prostopadle do wiązki, a nie w płaszczyźnie warstwy: warstwa 0 — η 0,593, FWHM 225 µm;
+  warstwa 4 — η 0,512, FWHM 276 µm.
+- FWHM w iteracji 25 dla A, B i C podawane były w tej samej płaszczyźnie warstwy. Sprawdzenie:
+  - warstwa 4: 257 / 304 / 303 µm w płaszczyźnie z_k i 258 / 303 / 302 µm przy powierzchni;
+  - w źrenicy 342 / 325 / 322 µm (inna płaszczyzna, inne liczby).
+- Uzgodniona tabela z danych: `wyniki_it26/tabela_uzgodniona.csv` — 948 wierszy z etykietami (skok stały/optymalizowany, próg
+  mocy, próg kontrastu, model błędów, warunek K1).
+
+**3. Faza i moc obrazu.**
+- Płaszczyzny odniesienia:
+  - RCWA: R w z = 0, T w z = d;
+  - Kogelnik: r w z = 0, t = R(d) bez fazy swobodnej;
+  - stos: propagacja exp(−j|σz|·z_k) liczona raz.
+- Test niezmienniczości (odbicie odniesione do z_k ± 0,5 mm i do dna siatki, wejście i propagacja przekształcone):
+  pole w źrenicy zgodne do 2,5·10⁻¹⁰, obraz do 6·10⁻¹³.
+- Kontrola ujemna: podwójne liczenie grubości 4 siatek przesuwa szczyt tylko o 5 µm.
+- Przesunięcie 117–178 µm wynika z nachylenia fazy samego r(kx) w z = 0 (bez propagacji). Odpowiada głębokości wnikania
+  0,32–0,34 mm; nachylenie potwierdza RCWA.
+- Rozkład fazy H dla warstwy 4:
+  - usunięcie części liniowej przesuwa szczyt do −3 µm, FWHM bez zmian (303 µm), najmniejszy skok 454 µm;
+  - usunięcie całej fazy daje 262 µm i skok 432 µm;
+  - reszta fazy ma 0,11 rad rms (warstwa 0: 0,05 rad);
+  - poszerzenie pochodzi z reszty nieliniowej. Jej kompensacja wymaga elementu fazowego na wejściu (nie badano).
+- Moc 0,321 to moc w komórce woksla 330 × 90 µm (±1,86′ × ±0,51′ przy D_eff = 304,9 mm), nie cała moc obrazu:
+  - w źrenicy 0,397, na siatkówce 0,395;
+  - w komórce 0,321, w sąsiednich komórkach x 0,061, y 0,008, dalej 0,006;
+  - przy komórce 500 µm: 0,373;
+  - energia rozlana do sąsiednich komórek nie jest stracona.
+
+**4. Geometria i optymalizacja na całym stosie (bez progu 0,95 dla pojedynczego portu).**
+- Łatki we wspólnych współrzędnych fizycznych liczone z pełnego pola.
+  - X_k różni się od D·tan o_k o ≤ 19 µm (warstwa 4, z_k·tan o_int), więc przybliżenie wystarcza do ~4% skoku.
+  - Przesunięcie odbicia s_k (120–185 µm) jest skompensowane adresowaniem.
+  - Apertury nie ograniczają, jeśli siatki sięgają ≥ 1 mm poza używane pole (iteracja 25).
+- Kryteria jawne: K1 (pierwotny warunek 1, każdy kanał ≥ 0,10 w stożku 1°); moc w źrenicy ≥ próg; kontrast Michelsona par x
+  (skok p) i y (90 µm) ≥ C; zmiana położenia obrazu ≤ p/4.
+
+| L, δ | K1 (min stożek) | rel 0,5 / C 0,5 | abs 0,1 / C 0,5 | abs 0,1 / C 0,3 |
+|---|---|---|---|---|
+| 0,85 mm, 0,000° | NIE (0,014) | 195 | 0 | 0 |
+| 0,85 mm, 0,020° | tak (0,109) | 80 | 0 | 0 |
+| 0,85 mm, 0,030° | tak (0,183) | **97 (3 × 39)** | 93 | 130 |
+| 0,85 mm, 0,040° | tak (0,246) | **90 (3 × 39)** | 90 | **150 (4 × 43)** |
+| 0,85 mm, 0,060° | tak (0,346) | 59 | 59 | 128 |
+| 0,85 mm, 0,110° | tak (0,432) | 0 | 0 | 39 |
+| 0,75 mm, 0,030° | tak (0,164) | 101 | 89 | 118 |
+| 1,00 mm, 0,030° | tak (0,204) | 82 | 80 | 122 |
+
+Liczby to woksle na warstwę we wspólnym obszarze pięciu warstw; razem × 5.
+- Wyjścia nierówne:
+  - przy kryterium rel 0,5 / C 0,5: najlepsze odstępy [0,01; 0,04; 0,03; 0,01]° dają 106 woksli na warstwę, ale K1 ma zapas
+    tylko do 0,109;
+  - przy kryterium abs 0,1 / C 0,3: kroku równego 0,04° nie poprawiono.
+- Próg 0,95 na pojedynczy port (iteracje 19–25) był ograniczeniem dodatkowym. Po jego zdjęciu porty głębszych kanałów
+  przepuszczają 0,4–0,6, a cały stos nadal spełnia K1 i kryteria obrazu.
+
+**5. Błędy (najgorszy wektor).**
+- Model błędów: niezależne błędy okresu |ε_j| ≤ ε₀ i orientacji wektora siatki |φ_j| ≤ φ₀ każdej warstwy; kalibracja C1
+  (kąt wejścia kanału), a dla porównania C0.
+- Wybór wektora: model zastępczy (przesunięcia wyjść u_j, siatka 5⁵ wartości, porty z widmem wiązki) wskazuje wektory
+  „największy wachlarz” i „najmniejsza transmisja portów”.
+- Weryfikacja: oba sprawdzone pełnym modelem siatek z błędami K′ (rezonans, η, faza, porty, łatki). Wachlarz i iloczyn portów
+  z modelu zastępczego zgadzają się z pełnym, np. 0,192° wobec 0,191°.
+
+| konfiguracja | budżet ε₀ / φ₀ | najgorszy wektor (pełny model, C1) | K1 | rel 0,5 / C 0,5 |
+|---|---|---|---|---|
+| δ = 0,04° | 1·10⁻⁵ / 0,002° | ε = [+1, +1, −1, −1, −1]·10⁻⁵, φ = [−, −, +, +, +]·0,002° | tak (0,181) | 85–94 |
+| δ = 0,04° | 2·10⁻⁵ / 0,005° | ε = [+2, +2, +2, −2, −2]·10⁻⁵, φ = [−, −, −, +, +]·0,005° | tak (0,123) | 77–92 |
+| δ = 0,04° | 5·10⁻⁵ / 0,01° | ε = [+5, +5, 0, −5, −5]·10⁻⁵, φ = [−, −, 0, +, +]·0,01° | **NIE (0,054)** | 64–85 |
+| δ = 0,03° | 1·10⁻⁵ / 0,002° | ε = [+1, +1, +1, −1, −1]·10⁻⁵, φ = [−, −, −, +, +]·0,002° | tak (0,123) | 91–97 |
+| δ = 0,03° | 2·10⁻⁵ / 0,005° | ε = [+2, +2, +2, −2, −2]·10⁻⁵, φ = [−, −, −, +, +]·0,005° | **NIE (0,071)** | 81–92 |
+| odstępy nierówne (106) | 1·10⁻⁵ / 0,002° | ε = [+1, +1, +1, +0,5, −1]·10⁻⁵ | **NIE (0,072)** | 103–117 |
+
+- Najgorsze dla K1 są wektory, które zbliżają wyjścia warstw środkowych, a z nimi rośnie strata portów. Najgorsze dla obszaru są
+  te, które rozszerzają wachlarz.
+- C0 (bez kalibracji) daje przy tych budżetach prawie te same liczby, bo odstrojenie Bragga jest małe.
+
+**Odpowiedź na pytanie iteracji.**
+- Nominalnie: **tak, znaleziono w określonym przeszukaniu.** L = 0,85 mm, wyjścia co 0,03–0,04°, jedno położenie oka. Spełnia
+  K1, moc ≥ 50% maksimum warstwy, kontrast ≥ 0,5 w x i y, zmianę położenia obrazu ≤ p/4. Daje 90–97 woksli na warstwę
+  (3 kolumny × 39 wierszy, skok 550 × 90 µm), 450–485 razem.
+- Przy błędach: tak dla δ = 0,04° i budżetu |ε| ≤ 2·10⁻⁵, |φ| ≤ 0,005° (najgorszy sprawdzony wektor: 77 woksli na warstwę,
+  K1 0,123). Nie przy |ε| ≤ 5·10⁻⁵, |φ| ≤ 0,01°, gdzie najsłabszy kanał spada do 0,054 w stożku.
+- Ograniczenia wniosku:
+  - przeszukanie wektorów błędów jest pełne tylko w modelu zastępczym;
+  - pełnym modelem sprawdzono 2 wektory na budżet;
+  - L przeszukane w 3 wartościach;
+  - w₀x, wejścia i n₁·L stałe.
+- „Wykluczono” nie wolno napisać ani dla N = 5 przy kroku 0,110° (to tylko wynik progu kontrastu), ani dla wyjść zbieżnych
+  (nie badano).
+
+**Mechanizm:** bez zmian. **Dowód:** model (RCWA dla odpowiedzi siatki, Kogelnik zespolony dla stosu); pomiaru brak.
+**Test zabójczy:** zmierzyć różnicę kierunków wyjścia dwóch płytek PTR z jednej serii po dopasowaniu Bragga kątem wejścia.
+Względny błąd > 0,03° (2E przy E = 0,015°) wyklucza konfigurację 0,04° w tym budżecie.
+
+**Werdykt iteracji: NIEROZSTRZYGNIĘTE.** „ODRZUCONE” z iteracji 25 wycofane: wynikało z progu 0,95 na pojedynczy port,
+z kryterium kontrastu przy kroku 0,110° i z niepełnych kryteriów obrazu. W modelu pięć warstw daje wspólny obraz 3 × 39 woksli
+na warstwę nominalnie i przy budżecie |ε| ≤ 2·10⁻⁵, |φ| ≤ 0,005°. Czy taki budżet jest osiągalny, nie wiadomo, bo brak
+zmierzonej tolerancji orientacji siatek PTR.
+
+**Następne pytanie:** jaki jest zmierzony rozrzut kierunku wyjścia (po kalibracji kątem wejścia) między płytkami PTR z jednej
+serii, i czy mieści się w ±0,015° na płytkę?

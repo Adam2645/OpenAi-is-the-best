@@ -1,0 +1,19 @@
+== Odwzorowanie kx → kąt i Jacobian ==
+kx — składowa wektora falowego równoległa do powierzchni płytki (oś x w płaszczyźnie padania). Zachowana na wszystkich granicach (płytki, przekładki, powierzchnia). Sonda zadana w płaszczyźnie warstwy: E(x, y) = exp(−x²/w0x² − y²/w0y²)·exp(−jρx0·x), więc jej widmo jest gaussem w kx wokół ρx0 = β·sinθ_k (β = 2πn0/λ).
+Fala o kx: kąt wewnątrz θ, β·sinθ = kx; kąt w powietrzu a, k0·sin a = kx. Jacobiany: dθ/dkx = 1/(β·cosθ), da/dkx = 1/(k0·cos a).
+Iteracje 20–24: przesunięcie kąta w powietrzu t = arcsin(λ·fx), czyli da/dfx = λ ⇒ Δkx = k0·cos a0·λ·fx = 2π·fx·cos a0 zamiast 2π·fx. Czynnik = cos a0 (kąt wejścia W POWIETRZU), nie cos θ (wewnątrz).
+  θ = 20° wewn. → a = 30.87° w powietrzu: cos a = 0.858 (= √(1 − n0²·sin²θ)); cos θ = 0.940
+  θ = 22° wewn. → a = 34.19° w powietrzu: cos a = 0.827 (= √(1 − n0²·sin²θ)); cos θ = 0.927
+  θ = 24° wewn. → a = 37.60° w powietrzu: cos a = 0.792 (= √(1 − n0²·sin²θ)); cos θ = 0.914
+  θ = 26° wewn. → a = 41.11° w powietrzu: cos a = 0.753 (= √(1 − n0²·sin²θ)); cos θ = 0.899
+  θ = 28° wewn. → a = 44.77° w powietrzu: cos a = 0.710 (= √(1 − n0²·sin²θ)); cos θ = 0.883
+
+sprawdzenie: η i FWHM odbitego woksla (1D, Kogelnik, L = 0,85 mm, w0x = 150 µm) dla trzech odwzorowań:
+  θ = 20°, (a) poprawne: kx = ρx0 + 2πfx, θ z β·sinθ = kx, w0x na warstwie = 150 µm: η = 0.5828, FWHM 217 µm
+  θ = 20°, (a) poprawne: kx = ρx0 + 2πfx, θ z β·sinθ = kx, w⊥ = 150 µm (na warstwie 150/cosθ): η = 0.5926, FWHM 225 µm
+  θ = 20°, (b) iteracje 20–24: a = a0 + arcsin(λfx), w0x na warstwie = 150 µm: η = 0.6051, FWHM 205 µm
+  θ = 20°, (b) iteracje 20–24: a = a0 + arcsin(λfx), w⊥ = 150 µm (na warstwie 150/cosθ): η = 0.6126, FWHM 212 µm
+  θ = 28°, (a) poprawne: kx = ρx0 + 2πfx, θ z β·sinθ = kx, w0x na warstwie = 150 µm: η = 0.4828, FWHM 256 µm
+  θ = 28°, (a) poprawne: kx = ρx0 + 2πfx, θ z β·sinθ = kx, w⊥ = 150 µm (na warstwie 150/cosθ): η = 0.5123, FWHM 276 µm
+  θ = 28°, (b) iteracje 20–24: a = a0 + arcsin(λfx), w0x na warstwie = 150 µm: η = 0.5562, FWHM 222 µm
+  θ = 28°, (b) iteracje 20–24: a = a0 + arcsin(λfx), w⊥ = 150 µm (na warstwie 150/cosθ): η = 0.5759, FWHM 239 µm

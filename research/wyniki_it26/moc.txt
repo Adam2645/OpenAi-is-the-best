@@ -1,0 +1,7 @@
+== Moc na siatkówce: komórka woksla, całość, rozlanie (oko na osi wiązki, akomodacja 1/D_eff) ==
+  k=0, komórka 330 × 90 µm (kątowo ±1.89′ × ±0.52′, D_eff = 300.0 mm): w źrenicy 0.512; na siatkówce w oknie ±20′ × ±6′ 0.510; w komórce 0.463; w sąsiednich komórkach x 0.031, y 0.011; dalej 0.005; poza oknem 0.002
+  k=0, komórka 500 × 90 µm (kątowo ±2.86′ × ±0.52′, D_eff = 300.0 mm): w źrenicy 0.512; na siatkówce w oknie ±20′ × ±6′ 0.510; w komórce 0.492; w sąsiednich komórkach x 0.002, y 0.012; dalej 0.004; poza oknem 0.002
+  k=2, komórka 330 × 90 µm (kątowo ±1.88′ × ±0.51′, D_eff = 302.5 mm): w źrenicy 0.440; na siatkówce w oknie ±20′ × ±6′ 0.438; w komórce 0.377; w sąsiednich komórkach x 0.047, y 0.009; dalej 0.005; poza oknem 0.001
+  k=2, komórka 500 × 90 µm (kątowo ±2.84′ × ±0.51′, D_eff = 302.5 mm): w źrenicy 0.440; na siatkówce w oknie ±20′ × ±6′ 0.438; w komórce 0.419; w sąsiednich komórkach x 0.005, y 0.010; dalej 0.004; poza oknem 0.001
+  k=4, komórka 330 × 90 µm (kątowo ±1.86′ × ±0.51′, D_eff = 304.9 mm): w źrenicy 0.397; na siatkówce w oknie ±20′ × ±6′ 0.395; w komórce 0.321; w sąsiednich komórkach x 0.061, y 0.008; dalej 0.006; poza oknem 0.001
+  k=4, komórka 500 × 90 µm (kątowo ±2.82′ × ±0.51′, D_eff = 304.9 mm): w źrenicy 0.397; na siatkówce w oknie ±20′ × ±6′ 0.395; w komórce 0.373; w sąsiednich komórkach x 0.009, y 0.009; dalej 0.004; poza oknem 0.001
