@@ -289,7 +289,7 @@ Pięć zadań rozstrzygnie werdykty, które dziś są otwarte. Każde ma próg s
 - [ ] **G, zwierciadło EIT w parze Rb.** W układzie Bajcsy i in. zmierzyć R przy sondzie 0,25 → 1 mW i sprzężeniu 40 mW na wiązkę. Sukces: R ≥ 0,1 przy 1 mW.
 - [ ] **N, stos przełączalny.** Dla dwóch warstw cholesterycznych zmierzyć stożek odbicia oraz tło odbite od elektrod i warstw wyłączonych. Sukces: ≥ 10% mocy w stożku < 1° i tło ≤ 1% sygnału.
 
-## Aneks C2-Laminat: hipotezy wdrożeniowe (iteracje 15–25)
+## Aneks C2-Laminat: hipotezy wdrożeniowe (iteracje 15–26)
 
 Aneks rozwija C2 w stronę wyświetlacza. Wszystkie wyniki to modele (macierz przejścia, teoria Kogelnika, RCWA) bez pomiaru, więc werdykty z sekcji Wyniki się nie zmieniają. Najważniejszy wniosek: z siatkami niesłantowanymi każda warstwa świeci w innym kierunku. Siatki skośne kierują warstwy do jednego widza, ale górna warstwa odbija wyjście dolnej, jeśli oba wychodzą w tym samym kierunku (iteracja 17). Odchylenie usuwające to cieniowanie (≥ 0,75° na warstwę) przekracza kąt źrenicy widzianej z 30 cm (0,67°), więc przy L = 100 µm jedno oko widzi najwyżej trzy warstwy po ≥ 10% (iteracja 18).
 
@@ -773,7 +773,110 @@ Liczba woksli we wspólnym obszarze jest płaska w L (±3%). Sprawność maleje 
 
 Werdykt iteracji: ODRZUCONE, w modelu i w podanych warunkach. Pięć warstw nie daje użytecznego obrazu we wspólnej źrenicy po uwzględnieniu pełnej fazy, skończonego pola i względnych błędów wykonania. Nominalnie zostaje jedna kolumna woksli, a przy błędzie względnym ±0,04° — żadna. Maksimum wspólnej objętości daje N = 2–3 warstwy, około 210–306 woksli.
 
+Uwaga po iteracji 26: werdykt ODRZUCONE został wycofany. Wynikał z dodatkowych progów, a nie z granicy optycznej. Liczby woksli z tej sekcji obowiązują tylko przy jej kryteriach (kontrast w x przy Δy = 0).
+
 Następne pytanie: czy kompensacja fazy na wejściu i ustawienie płytek przy montażu (rozdzielczość ≤ 0,003°) dają N = 3 warstwom ≥ 5 kolumn? I czy liczba warstw N ≥ 5 wymaga wyjść zbieżnych do źrenicy? Tego mechanizmu nie badano.
+
+### Iteracja 26 — kontrola odrzucenia z iteracji 25
+
+Werdykt iteracji 25 (ODRZUCONE) został wycofany. Wynikał z trzech założeń dodatkowych, których nie ma w pięciu warunkach pierwotnych:
+
+- progu przepuszczalności 0,95 dla każdego pojedynczego portu;
+- progu kontrastu 0,5 przy kroku wyjść 0,110°;
+- niepełnych kryteriów obrazu.
+
+Kod jest w research/iteracja26.py, dane w research/wyniki\_it26. Jedna tabela 948 wyników z etykietami jest w pliku tabela\_uzgodniona.csv. Każdy wiersz ma etykiety: skład stosów, skok, próg mocy, próg kontrastu, model błędów.
+
+**Kryteria.** Pięć warunków pierwotnych nie wymaga wspólnej źrenicy. Warunek 1 (≥ 10% mocy w stożku o pełnym kącie < 1°) spełnia każdy kanał.
+
+Kryteria obrazu są dodatkowe i jawne:
+
+- moc w źrenicy powyżej progu względnego (ułamek maksimum warstwy) albo bezwzględnego (ułamek mocy sondy);
+- kontrast Michelsona par woksli w x i y co najmniej C;
+- zmiana położenia obrazu najwyżej skok/4.
+
+Liczby iteracji 25 odtwarzam co do woksla przy jej kryteriach. Przy pełnych kryteriach, w których kontrast zależy od przesunięcia oka w y i dochodzi kontrast w y, wyniki dla tego samego projektu są niższe:
+
+| liczba warstw | woksli razem (pełne kryteria) | iteracja 25 |
+| --- | --- | --- |
+| 1 | 153 | 208 |
+| 2 | 216 | 328 |
+| 3 | 192 | 306 |
+| 4 | 116 | 248 |
+| 5 | 0 | 150 |
+
+Maksimum przypada na dwie warstwy. Zdanie „maksimum przy N = 2–3” myliło dwa różne modele.
+
+Przy kroku 0,110° i pięciu warstwach wynik zależy od progu kontrastu, nie od progu jasności:
+
+| próg kontrastu | kolumny woksli |
+| --- | --- |
+| 0,5 | 0 (przy każdym progu mocy) |
+| 0,3 | 1 |
+| 0,15 | 2 |
+
+Ograniczenie geometryczne wspólnej szerokości W₅ ≤ min(p + f) − (X\_max − X\_min) wynosi tu 1,78 mm, czyli nie jest zerowe.
+
+Jedna kolumna × 30 wierszy to adresowalny przekrój y–z: 150 woksli w pięciu głębokościach. Nie jest to obraz 2D w każdej warstwie, ale nie jest to też brak obrazu przestrzennego.
+
+**Uzgodnienia.** Czynnik 0,71 to cosinus kąta wejścia w powietrzu (44,77° dla 28° wewnątrz), a nie cos 28°:
+
+- kx to składowa równoległa do powierzchni płytki;
+- da/dkx = 1/(k₀·cos a);
+- iteracje 20–24 miały Δkx = 2π·fx·cos a₀.
+
+Szerokości woksla dla wariantów A, B i C były podane w tej samej płaszczyźnie warstwy. Przy powierzchni różnią się o ≤ 1 µm.
+
+Moc 0,321 to moc w komórce woksla 330 × 90 µm (±1,86′ × ±0,51′). Cała moc na siatkówce wynosi 0,395. W sąsiednich komórkach jest 0,069 — ta energia jest rozlana, nie stracona.
+
+**Faza.** Test niezmienniczości przesuwa płaszczyznę odniesienia o ±0,5 mm albo na dno siatki. Obraz zostaje taki sam do 6·10⁻¹³.
+
+Przesunięcie woksla 117–178 µm wynika z nachylenia fazy samego odbicia r (głębokość wnikania około 0,33 mm). Nie wynika z propagacji: podwójne liczenie grubości siatek przesuwa szczyt tylko o 5 µm.
+
+Rozkład fazy dla warstwy 4:
+
+| co usunięto | szerokość woksla | najmniejszy skok |
+| --- | --- | --- |
+| nic | 303 µm | 457 µm |
+| tylko część liniową | 303 µm | 454 µm |
+| całą fazę | 262 µm | 432 µm |
+
+Część liniowa tylko przesuwa woksel. Poszerzenie powoduje reszta nieliniowa.
+
+**Optymalizacja stosu.** Bez progu 0,95 na pojedynczy port kryteria liczone są dla całego stosu. Liczby to woksle na warstwę we wspólnym obszarze pięciu warstw, z jednego położenia oka:
+
+| L, odstęp wyjść | warunek 1 (najsłabszy kanał) | moc ≥ 50%, kontrast ≥ 0,5 | moc ≥ 0,1 sondy, kontrast ≥ 0,3 |
+| --- | --- | --- | --- |
+| 0,85 mm, 0° | NIE (0,014) | 195 | 0 |
+| 0,85 mm, 0,03° | tak (0,183) | 97 (3 × 39) | 130 |
+| 0,85 mm, 0,04° | tak (0,246) | 90 (3 × 39) | 150 (4 × 43) |
+| 0,85 mm, 0,110° | tak (0,432) | 0 | 39 |
+| 0,75 mm, 0,03° | tak (0,164) | 101 | 118 |
+| 1,00 mm, 0,03° | tak (0,204) | 82 | 122 |
+
+Najlepsze odstępy nierówne dają 106 woksli na warstwę, ale najsłabszy kanał ma wtedy zapas tylko do 0,109.
+
+**Błędy.** Model błędów: niezależne błędy okresu ε i orientacji wektora siatki φ w każdej warstwie, przy kalibracji kątem wejścia. Wektory wybrałem modelem zastępczym i sprawdziłem pełnym modelem siatek (rezonans, sprawność, faza, porty, łatki).
+
+| konfiguracja | budżet ε / φ | najgorszy wektor | warunek 1 | woksli na warstwę |
+| --- | --- | --- | --- | --- |
+| odstęp 0,04° | 1·10⁻⁵ / 0,002° | ε \[+1, +1, −1, −1, −1\]·10⁻⁵, φ przeciwnie | tak (0,181) | 85–94 |
+| odstęp 0,04° | 2·10⁻⁵ / 0,005° | ε \[+2, +2, +2, −2, −2\]·10⁻⁵, φ przeciwnie | tak (0,123) | 77–92 |
+| odstęp 0,04° | 5·10⁻⁵ / 0,01° | ε \[+5, +5, 0, −5, −5\]·10⁻⁵, φ przeciwnie | NIE (0,054) | 64–85 |
+| odstęp 0,03° | 2·10⁻⁵ / 0,005° | ε \[+2, +2, +2, −2, −2\]·10⁻⁵, φ przeciwnie | NIE (0,071) | 81–92 |
+
+**Odpowiedź na pytanie iteracji.** Konfigurację pięciowarstwową znalazłem w określonym przeszukaniu: L = 0,85 mm, wyjścia co 0,03–0,04°, jedno położenie oka. Daje 90–97 woksli na warstwę (3 × 39), nominalnie i przy budżecie |ε| ≤ 2·10⁻⁵, |φ| ≤ 0,005° (konfiguracja 0,04°). Przy budżecie 5·10⁻⁵ / 0,01° nie spełnia warunku 1.
+
+Zakres przeszukania:
+
+- grubość L w trzech wartościach;
+- odstęp wyjść 0–0,12°;
+- wyjścia nierówne przy L = 0,85 mm;
+- w₀x, wejścia i n₁·L stałe.
+
+Werdykt iteracji: NIEROZSTRZYGNIĘTE. Brak zmierzonej tolerancji orientacji siatek PTR, więc nie wiadomo, czy budżet 0,005° jest osiągalny.
+
+Następne pytanie: jaki jest zmierzony rozrzut kierunku wyjścia między płytkami z jednej serii po kalibracji kątem wejścia? Czy mieści się w ±0,015° na płytkę?
 
 ## Źródła
 
