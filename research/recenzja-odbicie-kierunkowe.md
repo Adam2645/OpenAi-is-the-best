@@ -1085,3 +1085,42 @@ jasności i spełnia Klasę 1, ale koherencja obniża kontrast x do 0,30; kryter
 
 **Następne pytanie:** czy dekoherencja sąsiednich woksli w osi y (gdzie akceptacja Bragga jest szeroka, ±1,26°),
 np. ruchomy dyfuzor lub wzór fazowy SLM, przywróci kontrast x ≥ 0,5 bez spadku η i bez wyjścia poza stożek 1°?
+
+## Iteracja 23 — kontrast koherentny, faza 0/π, podramki, adresowanie kątowe (`research/iteracja23.py`)
+
+Commity tej iteracji tylko lokalnie (polecenie użytkownika). Oś x, oko na warstwie: obraz woksla ≈ |pole odbite w warstwie|²
+(wiązka x ≪ źrenica), pole odbite = wejście przefiltrowane amplitudą √η(θ) siatki 1 mm (Kogelnik 3D, faza pominięta).
+
+- **Korekta iteracji 21–22:** kontrast w osi x liczyłem tam bez filtru Bragga. Filtr poszerza woksel (w₀x = 150 µm:
+  FWHM 177 → 217 µm), więc przy skoku 300 µm kontrast zapalania kolejnego to **0,30** (nie 0,56), a jednoczesnego
+  w fazie **0,02** (nie 0,30). Kontrast kolejny w funkcji talii i skoku (300 / 400 / 500 / 660 µm):
+  w₀x = 100 µm (η 0,49): 0,56 / 0,89 / 1,00 / 1,00; 150 µm (η 0,58): 0,30 / 0,70 / 0,93 / 1,00;
+  250 µm (η 0,64): 0,02 / 0,22 / 0,50 / 0,84; 330 µm (η 0,65): 0,00 / 0,04 / 0,20 / 0,54.
+- Para woksli (w₀x = 150 µm, skok 300 µm), kontrast / η / moc średnia względem zapalania kolejnego:
+  kolejno 0,30 / 0,581 / 100%; jednocześnie w fazie 0,02 / 0,624 / 107%; **przeciwfaza 0/π 1,00 / 0,525 / 90%**;
+  **podramki nieparzyste/parzyste (DMD) 0,30 / 0,581 / 50%**; **dwie podramki z fazą względną 0 i π (modulator fazy)
+  0,30 / 0,575 / 99%**. Rząd trzech woksli: kolejno 0,30, w fazie 0,03, 0/π/0 1,00, podramki (0,0,0)+(0,π,0) 0,30.
+- **2A faza 0/π: ODRZUCONE jako naprawa.** Wzór 0/π o skoku 300 µm ma składowe ±λ/(2·skok) = ±0,051° przy połowie
+  akceptacji 0,061°, więc η pary spada o 10%. Kontrast 1,00 bierze się z wymuszonego ciemnego prążka między każdymi
+  dwoma zapalonymi sąsiadami — linia ciągła staje się przerywana; to zmiana obrazu, nie odtworzenie obrazu niekoherentnego.
+- **2B podramki DMD: działa, ale nie „bez strat”** — kontrast jak kolejno (0,30), średnia moc 50% (połowa światła
+  odrzucona). Przy zapasie jasności ~2,5·10⁴ (iteracja 22) strata nieistotna. Wariant z modulatorem fazy (0, potem π)
+  daje ten sam kontrast przy 99% mocy, ale tylko dla najbliższych sąsiadów.
+- **2C losowa faza w osi y: ODRZUCONE.** Maska wspólna dla sąsiadów w x nie zmienia członu interferencyjnego
+  (I = |E1 + E2|²·|g(y)|²). Osobne maski muszą mieć komórki mniejsze od obrazu y na warstwie (45 µm): komórka 25 µm
+  daje rozrzut 1,22° (poza stożkiem 1°), komórka 50 µm (0,61°, w stożku) to tylko 0,9 komórki na element rozdzielczości.
+- **Deflektor:** TBP = D·Δθ/λ = 3967 (8,7 mm, 13,9°: 281 MHz, τ = 14,1 µs). **Teleskop 8,7×: ODRZUCONE** — iloczyn D·Δθ
+  jest niezmiennikiem; deflektor 1 mm przed teleskopem rozszerzającym musiałby dać 121° (2448 MHz). Gęstsze kanały
+  (siatki 1 mm): skok 1,0 / 0,5 / 0,38 / 0,25° wewn. → zakres 6,7 / 3,3 / 2,5 / 1,7°, pasmo 136 / 67 / 51 / 33 MHz,
+  TBP 1921 / 948 / 719 / 471; odbicie sąsiedniej siatki ≤ 6,1·10⁻⁴ / 2,5·10⁻³ / 4,7·10⁻³ / 5,1·10⁻³ sygnału.
+  Dyskretne źródła (jeden laser + przełącznik 1×5 do pięciu kolimatorów pod stałymi kątami) nie mają ograniczenia TBP
+  i zachowują jedną λ (warunek 2); pięć osobnych laserów musiałoby trzymać λ w ±0,03 nm. Wspólna dla wszystkich strata
+  oświetlenia pola wiązką gaussowską: 58 / 25 / 13% mocy w polu przy natężeniu brzegu ≥ 50 / 80 / 90% szczytu.
+  Parametrów rynkowych deflektorów nie sprawdzono.
+
+**Werdykt iteracji: NIEROZSTRZYGNIĘTE.** Teleskop i faza losowa w y odrzucone; faza 0/π zmienia obraz; podramki
+odtwarzają kontrast niekoherentny (DMD kosztem 50% mocy, modulator fazy bez strat). Po uwzględnieniu filtru Bragga
+kontrast w x wymaga skoku ≥ 400 µm (0,70 przy w₀x = 150 µm, 0,89 przy 100 µm).
+
+**Następne pytanie:** jaka grubość siatki (0,5–1 mm) daje najlepszy kompromis: mniejszy woksel x po filtrze Bragga
+(szersza akceptacja) kontra szerszy port (więcej cieniowania) i mniej warstw w wachlarzu 0,48°?
