@@ -1124,3 +1124,41 @@ kontrast w x wymaga skoku ≥ 400 µm (0,70 przy w₀x = 150 µm, 0,89 przy 100 
 
 **Następne pytanie:** jaka grubość siatki (0,5–1 mm) daje najlepszy kompromis: mniejszy woksel x po filtrze Bragga
 (szersza akceptacja) kontra szerszy port (więcej cieniowania) i mniej warstw w wachlarzu 0,48°?
+
+## Iteracja 24 — grubość siatki L przy stałym n₁·L (`research/iteracja24.py`)
+
+Commity tej iteracji tylko lokalnie. L = 0,5 / 0,7 / 0,85 / 1,0 / 1,2 mm, n₁·L = 0,2 µm (η = 0,666 dla każdego L), Kogelnik 3D;
+kontrola RCWA przy L = 0,5 mm: η 0,6650 vs 0,6659, port przy 0,266° 0,9505 vs 0,9502. Wzór funkcji celu z polecenia nie dotarł
+(pusty) — przyjęto F = warstwy w wachlarzu 0,48° × woksle x (kontrast ≥ 0,5 przy zapalaniu kolejnym) × 96 woksli y.
+
+| L [mm] | widmo | akceptacja | T ≥ 0,95: pierwsze / trwale od | warstwy (krok) nominalnie | warstwy (krok) ±0,02° |
+|---|---|---|---|---|---|
+| 0,5 | 0,244 nm | 0,244° | 0,150° / 0,266° | 4 (0,160°) | 3 (0,180°) |
+| 0,7 | 0,174 nm | 0,174° | 0,108° / 0,191° | 5 (0,120°) | 4 (0,131°) |
+| 0,85 | 0,144 nm | 0,144° | 0,089° / 0,157° | 6 (0,096°) | 5 (0,110°) |
+| 1,0 | 0,122 nm | 0,122° | 0,075° / 0,134° | 7 (0,080°) | 4 (0,160°) |
+| 1,2 | 0,102 nm | 0,102° | 0,063° / 0,112° | 8 (0,069°) | 4 (0,146°) |
+
+Krok dobrany tak, by przepuszczalność portu w każdej wielokrotności kroku (δ, 2δ, …) była ≥ 0,95 (wariant odporny: w całym
+przedziale ±0,02° wokół kδ). Kanały nominalnie 0,59–0,62 mocy sondy.
+
+| L [mm] | woksel x po filtrze (wejście 177 µm) | η (w₀x = 150 µm) | kontrast 300 / 400 µm | skok dla kontrastu 0,5 → woksle x | sąsiedni kanał przy skoku 0,38° |
+|---|---|---|---|---|---|
+| 0,5 | 183 µm | 0,646 | 0,53 / 0,87 | 300 µm → 15 | 8,2·10⁻³ sygnału |
+| 0,7 | 193 µm | 0,626 | 0,46 / 0,83 | 310 µm → 14 | 9,4·10⁻³ |
+| 0,85 | 205 µm | 0,605 | 0,38 / 0,78 | 330 µm → 13 | 6,5·10⁻³ |
+| 1,0 | 217 µm | 0,581 | 0,30 / 0,70 | 350 µm → 12 | 4,7·10⁻³ |
+| 1,2 | 237 µm | 0,546 | 0,21 / 0,57 | 390 µm → 11 | 1,2·10⁻³ |
+
+- F nominalnie: 5760 / 6720 / 7488 / 8064 / 8448 — rośnie z L, bez optimum w środku zakresu (więcej warstw wygrywa z mniejszą
+  liczbą woksli x). F z tolerancją ±0,02°: 4320 / 5376 / **6240** / 4608 / 4224 → **L_opt = 0,85 mm** (5 warstw, krok 0,110°,
+  13 woksli x). Ważenie mocą najsłabszego kanału i η woksla nie zmienia kolejności.
+- Tolerancja ±0,02° wyjścia odpowiada (iteracja 20: 0,049° na 1·10⁻⁴) błędowi okresu |δΛ/Λ| ≈ 4·10⁻⁵ albo skosu ≈ 0,013°.
+- Teza „5 warstw zmieści się przy kroku ≤ 0,12°”: nominalnie tak od L = 0,7 mm; z tolerancją dopiero przy L = 0,85 mm.
+- Gęste kanały wejścia (skok 0,38° wewn.) dla cieńszych siatek zbliżają się do kryterium 1% (0,7 mm: 0,94% sygnału).
+
+**Werdykt iteracji: NIEROZSTRZYGNIĘTE (model).** L_opt = 0,85 mm przy tolerancji wyjścia ±0,02°; bez tolerancji
+optimum leży na krańcu przedziału (grubiej = lepiej).
+
+**Następne pytanie:** czy zapis siatek PTR osiąga |δΛ/Λ| ≤ 4·10⁻⁵ i dokładność skosu ≤ 0,013° (pomiar w literaturze)?
+Jeśli nie, ile warstw zostaje przy realnym rozrzucie i czy korekta kątem wejścia na kanał wystarcza?
