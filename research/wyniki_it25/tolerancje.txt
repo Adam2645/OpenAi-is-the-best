@@ -1,0 +1,51 @@
+== 4. Budżet tolerancji (L = 0.85 mm, krok 0.11°; kąty wyjścia w powietrzu) ==
+Interpretacja „±0,02°” z iteracji 24: okno ±0,02° wokół k·δ w przepuszczalności portu = błąd WZGLĘDNY kierunku dwóch warstw. Przy niezależnym błędzie pojedynczej warstwy ±E błąd względny sięga ±2E; iteracja 24 przeliczyła ±0,02° na tolerancję jednej warstwy (okres 4·10⁻⁵, skos 0,013°) — niespójnie o czynnik 2.
+
+-- współczynniki: zmiana kierunku wyjścia x (y) i względne η: C0 = bez kalibracji (wejście nominalne); C1 = kąt wejścia kanału (x, y) dobrany do maksimum Bragga i wyjścia y = 0 --
+  okres δΛ/Λ [°/1e-5]: k=0: C0 x +0.0003 y +0.0000, C1 x +0.0049 (wejście +0.0054° x, +0.0000° y); k=2: C0 x +0.0003 y +0.0000, C1 x +0.0040 (wejście +0.0047° x, +0.0000° y); k=4: C0 x +0.0004 y +0.0000, C1 x +0.0034 (wejście +0.0043° x, +0.0000° y)
+  skos / pochylenie płytki w x–z [°/0,001°]: k=0: C0 x -0.0029 y +0.0000, C1 x -0.0015 (wejście +0.0016° x, +0.0000° y); k=2: C0 x -0.0029 y +0.0000, C1 x -0.0015 (wejście +0.0017° x, +0.0000° y); k=4: C0 x -0.0028 y +0.0000, C1 x -0.0015 (wejście +0.0019° x, +0.0000° y)
+  pochylenie płytki w y–z [°/0,001°]: k=0: C0 x +0.0000 y +0.0029, C1 x -0.0000 (wejście -0.0000° x, -0.0029° y); k=2: C0 x +0.0000 y +0.0029, C1 x -0.0000 (wejście -0.0000° x, -0.0029° y); k=4: C0 x +0.0000 y +0.0028, C1 x -0.0000 (wejście -0.0000° x, -0.0028° y)
+  obrót w płaszczyźnie płytki [°/0,01°]: k=0: C0 x +0.0000 y -0.0052, C1 x -0.0000 (wejście -0.0000° x, +0.0052° y); k=2: C0 x +0.0000 y -0.0061, C1 x +0.0000 (wejście -0.0000° x, +0.0061° y); k=4: C0 x +0.0000 y -0.0070, C1 x +0.0000 (wejście -0.0000° x, +0.0070° y)
+  średni n płytki [°/1e-5]: k=0: C0 x +0.0000 y +0.0000, C1 x +0.0033 (wejście +0.0038° x, +0.0000° y); k=2: C0 x +0.0000 y +0.0000, C1 x +0.0027 (wejście +0.0034° x, +0.0000° y); k=4: C0 x +0.0000 y +0.0000, C1 x +0.0023 (wejście +0.0032° x, +0.0000° y)
+  długość fali (wspólna) [°/1 pm]: k=0: C0 x -0.0001 y +0.0000, C1 x -0.0009 (wejście -0.0010° x, +0.0000° y); k=2: C0 x -0.0001 y +0.0000, C1 x -0.0008 (wejście -0.0009° x, +0.0000° y); k=4: C0 x -0.0001 y +0.0000, C1 x -0.0006 (wejście -0.0008° x, +0.0000° y)
+  kąt wejścia kanału (x) [°/0,001°]: k=0: C0 x +0.0009 y +0.0000, C1 x +0.0000 (wejście +0.0000° x, +0.0000° y); k=2: C0 x +0.0008 y +0.0000, C1 x +0.0000 (wejście +0.0000° x, +0.0000° y); k=4: C0 x +0.0007 y +0.0000, C1 x +0.0000 (wejście +0.0000° x, +0.0000° y)
+
+-- C0: η/η0 i przesunięcie wyjścia x dla przykładowych błędów (warstwa 4) --
+  okres δΛ/Λ = 1e-05: C0 η/η0 = 0.998, wyjście x +0.0004°, y +0.0000°; C1: η/η0 = 1.000, wyjście x +0.0034°, wejście zmienione o +0.0043° (x), +0.0000° (y)
+  okres δΛ/Λ = 0.0001: C0 η/η0 = 0.751, wyjście x +0.0040°, y +0.0000°; C1: η/η0 = 1.000, wyjście x +0.0343°, wejście zmienione o +0.0426° (x), +0.0000° (y)
+  okres δΛ/Λ = 0.0005: C0 η/η0 = 0.016, wyjście x +0.0201°, y +0.0000°; C1: η/η0 = 0.998, wyjście x +0.1707°, wejście zmienione o +0.2125° (x), +0.0000° (y)
+  skos / pochylenie płytki w x–z = 0.005: C0 η/η0 = 0.990, wyjście x -0.0141°, y +0.0000°; C1: η/η0 = 1.000, wyjście x -0.0075°, wejście zmienione o +0.0093° (x), +0.0000° (y)
+  skos / pochylenie płytki w x–z = 0.02: C0 η/η0 = 0.815, wyjście x -0.0565°, y +0.0000°; C1: η/η0 = 1.000, wyjście x -0.0300°, wejście zmienione o +0.0373° (x), +0.0000° (y)
+  skos / pochylenie płytki w x–z = 0.1: C0 η/η0 = 0.002, wyjście x -0.2824°, y +0.0000°; C1: η/η0 = 1.000, wyjście x -0.1500°, wejście zmienione o +0.1868° (x), +0.0000° (y)
+  pochylenie płytki w y–z = 0.02: C0 η/η0 = 1.000, wyjście x +0.0000°, y +0.0565°; C1: η/η0 = 1.000, wyjście x -0.0000°, wejście zmienione o -0.0000° (x), -0.0565° (y)
+  pochylenie płytki w y–z = 0.1: C0 η/η0 = 1.000, wyjście x +0.0000°, y +0.2824°; C1: η/η0 = 1.000, wyjście x -0.0005°, wejście zmienione o -0.0007° (x), -0.2824° (y)
+  obrót w płaszczyźnie płytki = 0.1: C0 η/η0 = 1.000, wyjście x +0.0001°, y -0.0700°; C1: η/η0 = 1.000, wyjście x +0.0000°, wejście zmienione o -0.0001° (x), +0.0700° (y)
+  obrót w płaszczyźnie płytki = 1: C0 η/η0 = 0.993, wyjście x +0.0061°, y -0.7003°; C1: η/η0 = 1.000, wyjście x +0.0000°, wejście zmienione o -0.0086° (x), +0.7003° (y)
+  średni n płytki = 0.0001: C0 η/η0 = 0.864, wyjście x +0.0000°, y +0.0000°; C1: η/η0 = 1.000, wyjście x +0.0229°, wejście zmienione o +0.0322° (x), +0.0000° (y)
+
+-- przepuszczalność portu dla wiązki (widmo 2D woksla) przy odstępie u od wyjścia warstwy wyżej --
+  port 0 dla wiązki 1: T(u) = 0.00°: 0.387, 0.06°: 0.666, 0.09°: 0.867, 0.11°: 0.938, 0.14°: 0.962, 0.22°: 0.988, 0.33°: 0.994, 0.44°: 0.996
+  port 0 dla wiązki 4: T(u) = 0.00°: 0.372, 0.06°: 0.664, 0.09°: 0.883, 0.11°: 0.950, 0.14°: 0.962, 0.22°: 0.989, 0.33°: 0.993, 0.44°: 0.996
+  port 1 dla wiązki 2: T(u) = 0.00°: 0.398, 0.06°: 0.718, 0.09°: 0.905, 0.11°: 0.953, 0.14°: 0.967, 0.22°: 0.988, 0.33°: 0.995, 0.44°: 0.998
+  port 2 dla wiązki 3: T(u) = 0.00°: 0.410, 0.06°: 0.766, 0.09°: 0.931, 0.11°: 0.962, 0.14°: 0.974, 0.22°: 0.990, 0.33°: 0.997, 0.44°: 0.998
+  port 3 dla wiązki 4: T(u) = 0.00°: 0.422, 0.06°: 0.809, 0.09°: 0.948, 0.11°: 0.967, 0.14°: 0.981, 0.22°: 0.993, 0.33°: 0.997, 0.44°: 0.998
+
+-- najmniejszy krok δ (T_eff ≥ 0,95 w oknie ±2E wokół k·δ) i liczba warstw; E — błąd pojedynczej warstwy --
+  E = ±0.000° (względny ±0.000°): N=2: δ = 0.1175° (wachlarz 0.118°), N=3: δ = 0.1175° (wachlarz 0.235°), N=4: δ = 0.1175° (wachlarz 0.353°), N=5: δ = 0.1175° (wachlarz 0.470°), N=6: δ = 0.1175° (wachlarz 0.588°)
+  E = ±0.005° (względny ±0.010°): N=2: δ = 0.1275° (wachlarz 0.128°), N=3: δ = 0.1275° (wachlarz 0.255°), N=4: δ = 0.1275° (wachlarz 0.383°), N=5: δ = 0.1275° (wachlarz 0.510°), N=6: δ = 0.1275° (wachlarz 0.638°)
+  E = ±0.010° (względny ±0.020°): N=2: δ = 0.1375° (wachlarz 0.138°), N=3: δ = 0.1375° (wachlarz 0.275°), N=4: δ = 0.1375° (wachlarz 0.413°), N=5: δ = 0.1375° (wachlarz 0.550°), N=6: δ = 0.1375° (wachlarz 0.688°)
+  E = ±0.015° (względny ±0.030°): N=2: δ = 0.1475° (wachlarz 0.148°), N=3: δ = 0.1475° (wachlarz 0.295°), N=4: δ = 0.1475° (wachlarz 0.443°), N=5: δ = 0.1475° (wachlarz 0.590°), N=6: δ = 0.1475° (wachlarz 0.738°)
+  E = ±0.020° (względny ±0.040°): N=2: δ = 0.1575° (wachlarz 0.158°), N=3: δ = 0.1575° (wachlarz 0.315°), N=4: δ = 0.1575° (wachlarz 0.473°), N=5: δ = 0.1575° (wachlarz 0.630°), N=6: δ = 0.1575° (wachlarz 0.788°)
+  E = ±0.030° (względny ±0.060°): N=2: δ = 0.1775° (wachlarz 0.178°), N=3: δ = 0.1775° (wachlarz 0.355°), N=4: δ = 0.1775° (wachlarz 0.533°), N=5: δ = 0.1775° (wachlarz 0.710°), N=6: δ = 0.1775° (wachlarz 0.888°)
+  E = ±0.040° (względny ±0.080°): N=2: δ = 0.1975° (wachlarz 0.198°), N=3: δ = 0.1975° (wachlarz 0.395°), N=4: δ = 0.1975° (wachlarz 0.593°), N=5: δ = 0.1975° (wachlarz 0.790°), N=6: δ = 0.1975° (wachlarz 0.988°)
+  konfiguracja iteracji 24 (5 warstw, δ = 0,110°): dopuszczalny błąd pojedynczej warstwy E ≤ ±0.0000° (względny ±0.0000°); przy względnym ±0,04° — NIESPEŁNIONE: port 0/wiązka 1: min T = 0.741, port 1/wiązka 2: min T = 0.794, port 2/wiązka 3: min T = 0.838, port 3/wiązka 4: min T = 0.875
+
+-- C1': kąt wejścia odstrojony od Bragga w granicy η ≥ 0,9·η_max (wyjście przesuwa się 1:1 w kx) --
+  k=0: odstrojenie wejścia ±0.030° (η wiązki ≥ 0,9) przesuwa wyjście o ±0.026°
+  k=4: odstrojenie wejścia ±0.027° (η wiązki ≥ 0,9) przesuwa wyjście o ±0.019°
+
+-- jednorodność w grubości: liniowy gradient średniego n przez płytkę (model plastrowy, 200 plastrów) --
+  gradient 0 ppm/mm (±0.0 ppm w płytce): η max 0.6665 przy +0.0000°, akceptacja FWHM 0.1460°, port T(0,11/0,14/0,22°) = 0.991/0.992/0.993
+  gradient 10 ppm/mm (±4.2 ppm w płytce): η max 0.6665 przy +0.0000°, akceptacja FWHM 0.1460°, port T(0,11/0,14/0,22°) = 0.991/0.992/0.993
+  gradient 25 ppm/mm (±10.6 ppm w płytce): η max 0.6664 przy +0.0000°, akceptacja FWHM 0.1460°, port T(0,11/0,14/0,22°) = 0.991/0.992/0.993
+  gradient 50 ppm/mm (±21.2 ppm w płytce): η max 0.6662 przy +0.0000°, akceptacja FWHM 0.1460°, port T(0,11/0,14/0,22°) = 0.991/0.992/0.993

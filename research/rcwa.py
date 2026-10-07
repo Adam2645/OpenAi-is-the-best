@@ -32,13 +32,15 @@ def _toeplitz(coef, N):
     return E
 
 
-def solve(lam, theta_deg, n_I, n_II, pol, layers, M=5, Lx=None):
+def solve(lam, theta_deg, n_I, n_II, pol, layers, M=5, Lx=None, amps=False):
     """layers: lista słowników, każdy opisuje jednorodnie cięty blok:
          {'kind': 'slanted', 'eps0', 'e1', 'Kz', 'L', 'slices'} — siatka skośna
          {'kind': 'zonly', 'eps_slices': [ε_j], 'h'} — profil zależny tylko od z
          {'kind': 'homog', 'eps', 'L'} — warstwa jednorodna
        Lx: okres boczny [m] (wspólny dla wszystkich warstw); None = brak siatki bocznej.
        Zwraca (kx, DE_r, DE_t) — kx/k0 rzędów, sprawności odbicia i transmisji.
+       amps=True: dodatkowo zespolone amplitudy (R, T) i kz/k0 obu ośrodków; R odniesione do górnej
+       granicy (z = 0), T do dolnej (z = d), dla TM — amplitudy Hy przy fali padającej Hy = 1.
     """
     k0 = 2 * np.pi / lam
     orders = np.arange(-M, M + 1)
@@ -120,4 +122,6 @@ def solve(lam, theta_deg, n_I, n_II, pol, layers, M=5, Lx=None):
     else:
         DEr = np.abs(R) ** 2 * np.real(kzI / (n_I * np.cos(th)))
         DEt = np.abs(T) ** 2 * np.real(kzII / n_II**2) / (np.cos(th) / n_I)
+    if amps:
+        return kx, DEr, DEt, R, T, kzI, kzII
     return kx, DEr, DEt
