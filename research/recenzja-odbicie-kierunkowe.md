@@ -1048,3 +1048,40 @@ przy skoku 0,3 mm; teza o astygmatycznej kresce i naprawa fazą cylindryczną od
 
 **Następne pytanie:** czy oko faktycznie akomoduje na warstwę (3,33 D), gdy bodziec niesie tylko oś y — czyli czy
 astygmatyczny bodziec akomodacji jest skuteczny (pomiar optometryczny), i czy przy jego braku obraz nie znika (∞ → kontrast 0)?
+
+## Iteracja 22 — akomodacja kompromisowa, projekcja warstwowa, test laboratoryjny (`research/iteracja22.py`)
+
+Commity tej iteracji tylko lokalnie (polecenie użytkownika). Model siatkówki jak w iteracji 21 (f = 17 mm, źrenica 3,5 mm);
+woksel 300 × 50 µm (w₀x = 150, w₀y = 25 µm); skoki: x 300 µm, y 90 µm. Kontrast: woksle zapalane kolejno (suma natężeń)
+albo jednocześnie przez SLM przy koherentnym laserze (suma pól, w fazie / w przeciwfazie).
+
+| A [D] | FWHM x | FWHM y | kontrast x: kolejno / w fazie / przeciwfaza | kontrast y: kolejno / w fazie |
+|---|---|---|---|---|
+| 2,79 | 1,83′ | 4,24′ | 0,48 / 0,18 / 1 | 0,04 / 0 |
+| 3,06 | 1,91′ | 1,79′ | 0,55 / 0,28 / 1 | 0,00 / 0 |
+| 3,20 | 1,96′ | 0,65′ | 0,57 / 0,31 / 1 | 0,29 / 0 |
+| 3,33 | 2,03′ | 0,52′ | 0,56 / 0,30 / 1 | 0,90 / 0,80 |
+| 3,45 | 2,09′ | 0,60′ | 0,57 / 0,31 / 1 | 0,44 / 0,12 |
+
+- **H1 akomodacja kompromisowa 3,06 D: ODRZUCONE (rachunek falowy).** Wiązka y wypełnia źrenicę, więc błąd 0,27 D
+  rozmywa ją o p·ΔA = 0,95 mrad (3,2′): kontrast y przy skoku 90 µm spada z 0,90 do 0,00. Oś x jest wąska (0,74 mm
+  w źrenicy) i prawie niewrażliwa na A (0,38–0,57 w 2,6–3,6 D). Optimum to akomodacja na warstwę (3,33 D) z tolerancją
+  ok. ±0,1 D dla osi y. „Fizjologiczna głębia ostrości ±0,3–0,5 D” — nie sprawdzono; optycznie obraz y się rozmywa.
+- **H2 projekcja warstwowa SLM/DMD: NIEROZSTRZYGNIĘTE.** Sonda 0,50 mW, T_SLM = 0,65, η = 0,60, 1100 woksli, 5 warstw:
+  295 nW na woksel w czasie warstwy, 35,5 nW średnio w stożku; luminancja ~2,5·10⁷ cd/m² (równoważna z obrazu
+  na siatkówce) — 1000 cd/m² daje już sonda ~20 nW. Bezpieczeństwo (ICNIRP 2013): pełna warstwa 0,195 mW w źrenicy →
+  0,50 / 0,19 / 0,04 granicy (źródło punktowe / plama 4 mrad / obraz 22 mrad). **Nowe:** woksle zapalane jednocześnie
+  koherentnym laserem (Δλ ≤ 0,03 nm) interferują: kontrast x spada z 0,56 do 0,30 (w fazie). Deflektor: wejścia
+  30,87–44,77° w powietrzu (zakres 13,9° przy skoku 2° wewn.), iloczyn z polem 8,7 mm = 121 °·mm — do porównania
+  z kartą urządzenia (nie sprawdzono).
+- **Próba laboratoryjna (kryteria przed pomiarem):** płytka A: wejście 20,0° wewn. (30,87° pow.) → 0°, Λ = 180,07 nm,
+  płaszczyzny nachylone 10,00°; płytka B: wejście 22,0° (34,19°) → +0,10°, Λ = 180,67 nm, 10,97° (dla +0,12°:
+  180,68 nm, 10,96°). RCWA: wyjścia 0/0,10°: A 0,623, B 0,609 (port 0,982); 0/0,12°: B 0,585 (port 0,943) — zalecane 0,10°.
+  Stożek 1°: soczewka f = 200 mm + przesłona 3,49 mm w ognisku. Warunek 2: warstwa B 2 mm głębiej → punkt wyjścia
+  przesunięty o ~0,77 mm na powierzchni (10 µm głębi ↔ 3,8 µm), przy tej samej λ (miernik długości fali).
+
+**Werdykt iteracji: NIEROZSTRZYGNIĘTE.** Akomodacja kompromisowa odrzucona; projekcja warstwowa ma ogromny zapas
+jasności i spełnia Klasę 1, ale koherencja obniża kontrast x do 0,30; kryteria testu laboratoryjnego zapisane.
+
+**Następne pytanie:** czy dekoherencja sąsiednich woksli w osi y (gdzie akceptacja Bragga jest szeroka, ±1,26°),
+np. ruchomy dyfuzor lub wzór fazowy SLM, przywróci kontrast x ≥ 0,5 bez spadku η i bez wyjścia poza stożek 1°?
