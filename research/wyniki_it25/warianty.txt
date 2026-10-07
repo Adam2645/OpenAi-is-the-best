@@ -1,0 +1,48 @@
+== 2. Trzy warianty odpowiedzi (L = 0.85 mm, krok 0.11°, w0x = 150 µm, w0y = 25 µm, siatka 1024×1024, okno 12×12 mm) ==
+A — |r| (model iteracji 21–24), B — zespolone r pojedynczej siatki, C — pełny stos (porty i wejście zespolone, propagacja)
+kontrast: Michelson w położeniach nominalnych (z poprawką na przesunięcie pojedynczego woksla): (min(I1, I2) − I_środek)/(min + I_środek), 0 gdy brak przerwy; 'stary' — funkcja contrast() z iteracji 21–24
+k=0 (20° → -0.22°, z = 0.00 mm) A: η odbicia 0.584, przy powierzchni 0.584, w stożku 1° 0.555, w źrenicy 0.513, w komórce woksla 0.462 | warstwa: FWHM 218 µm, szczyt +0 µm, kontrast 300/400 µm (stary) 0.31/0.71, Michelson kolejno 0.31/0.70, w fazie 0.00/0.48
+      siatkówka: FWHM x 2.50′ y 0.52′, przesunięcie -0.00′ (≙ +0 µm w warstwie), kontrast 300/400 µm kolejno 0.30/0.70, w fazie 0.00/0.47; skok dla kontrastu 0,5: 348 µm; najlepsza akomodacja +0.00 D od 1/D_eff (szczyt ×1.00)
+k=0 (20° → -0.22°, z = 0.00 mm) B: η odbicia 0.584, przy powierzchni 0.584, w stożku 1° 0.555, w źrenicy 0.512, w komórce woksla 0.463 | warstwa: FWHM 223 µm, szczyt +120 µm, kontrast 300/400 µm (stary) 0.29/0.70, Michelson kolejno 0.29/0.70, w fazie 0.00/0.47
+      siatkówka: FWHM x 2.56′ y 0.52′, przesunięcie -1.38′ (≙ +120 µm w warstwie), kontrast 300/400 µm kolejno 0.28/0.69, w fazie 0.00/0.46; skok dla kontrastu 0,5: 353 µm; najlepsza akomodacja +0.00 D od 1/D_eff (szczyt ×1.00)
+k=0 (20° → -0.22°, z = 0.00 mm) C: η odbicia 0.584, przy powierzchni 0.584, w stożku 1° 0.555, w źrenicy 0.512, w komórce woksla 0.463 | warstwa: FWHM 223 µm, szczyt +120 µm, kontrast 300/400 µm (stary) 0.29/0.70, Michelson kolejno 0.29/0.70, w fazie 0.00/0.47
+      siatkówka: FWHM x 2.56′ y 0.52′, przesunięcie -1.38′ (≙ +120 µm w warstwie), kontrast 300/400 µm kolejno 0.28/0.69, w fazie 0.00/0.46; skok dla kontrastu 0,5: 353 µm; najlepsza akomodacja +0.00 D od 1/D_eff (szczyt ×1.00)
+k=1 (22° → -0.11°, z = 1.85 mm) A: η odbicia 0.560, przy powierzchni 0.560, w stożku 1° 0.532, w źrenicy 0.491, w komórce woksla 0.436 | warstwa: FWHM 228 µm, szczyt -0 µm, kontrast 300/400 µm (stary) 0.25/0.63, Michelson kolejno 0.25/0.63, w fazie 0.00/0.36
+      siatkówka: FWHM x 2.61′ y 0.52′, przesunięcie -0.00′ (≙ +0 µm w warstwie), kontrast 300/400 µm kolejno 0.24/0.63, w fazie 0.00/0.35; skok dla kontrastu 0,5: 367 µm; najlepsza akomodacja +0.00 D od 1/D_eff (szczyt ×1.00)
+k=1 (22° → -0.11°, z = 1.85 mm) B: η odbicia 0.560, przy powierzchni 0.560, w stożku 1° 0.532, w źrenicy 0.490, w komórce woksla 0.436 | warstwa: FWHM 239 µm, szczyt +134 µm, kontrast 300/400 µm (stary) 0.21/0.62, Michelson kolejno 0.21/0.62, w fazie 0.00/0.33
+      siatkówka: FWHM x 2.72′ y 0.52′, przesunięcie -1.53′ (≙ +134 µm w warstwie), kontrast 300/400 µm kolejno 0.21/0.61, w fazie 0.00/0.32; skok dla kontrastu 0,5: 372 µm; najlepsza akomodacja +0.00 D od 1/D_eff (szczyt ×1.00)
+k=1 (22° → -0.11°, z = 1.85 mm) C: η odbicia 0.560, przy powierzchni 0.525, w stożku 1° 0.499, w źrenicy 0.459, w komórce woksla 0.400 | warstwa: FWHM 247 µm, szczyt +145 µm, kontrast 300/400 µm (stary) 0.18/0.56, Michelson kolejno 0.18/0.56, w fazie 0.00/0.27
+      siatkówka: FWHM x 2.82′ y 0.52′, przesunięcie -1.66′ (≙ +146 µm w warstwie), kontrast 300/400 µm kolejno 0.17/0.56, w fazie 0.00/0.26; skok dla kontrastu 0,5: 386 µm; najlepsza akomodacja +0.00 D od 1/D_eff (szczyt ×1.00)
+k=2 (24° → +0.00°, z = 3.70 mm) A: η odbicia 0.535, przy powierzchni 0.535, w stożku 1° 0.508, w źrenicy 0.468, w komórce woksla 0.407 | warstwa: FWHM 238 µm, szczyt +0 µm, kontrast 300/400 µm (stary) 0.20/0.56, Michelson kolejno 0.20/0.56, w fazie 0.00/0.25
+      siatkówka: FWHM x 2.71′ y 0.52′, przesunięcie -0.00′ (≙ +0 µm w warstwie), kontrast 300/400 µm kolejno 0.19/0.55, w fazie 0.00/0.24; skok dla kontrastu 0,5: 386 µm; najlepsza akomodacja +0.00 D od 1/D_eff (szczyt ×1.00)
+k=2 (24° → +0.00°, z = 3.70 mm) B: η odbicia 0.535, przy powierzchni 0.535, w stożku 1° 0.508, w źrenicy 0.467, w komórce woksla 0.404 | warstwa: FWHM 258 µm, szczyt +147 µm, kontrast 300/400 µm (stary) 0.14/0.53, Michelson kolejno 0.14/0.52, w fazie 0.00/0.18
+      siatkówka: FWHM x 2.92′ y 0.52′, przesunięcie -1.67′ (≙ +147 µm w warstwie), kontrast 300/400 µm kolejno 0.13/0.51, w fazie 0.00/0.16; skok dla kontrastu 0,5: 397 µm; najlepsza akomodacja +0.00 D od 1/D_eff (szczyt ×1.00)
+k=2 (24° → +0.00°, z = 3.70 mm) C: η odbicia 0.534, przy powierzchni 0.504, w stożku 1° 0.479, w źrenicy 0.440, w komórce woksla 0.377 | warstwa: FWHM 264 µm, szczyt +161 µm, kontrast 300/400 µm (stary) 0.11/0.49, Michelson kolejno 0.11/0.49, w fazie 0.00/0.13
+      siatkówka: FWHM x 2.99′ y 0.52′, przesunięcie -1.83′ (≙ +161 µm w warstwie), kontrast 300/400 µm kolejno 0.11/0.48, w fazie 0.00/0.12; skok dla kontrastu 0,5: 408 µm; najlepsza akomodacja +0.00 D od 1/D_eff (szczyt ×1.00)
+k=3 (26° → +0.11°, z = 5.55 mm) A: η odbicia 0.508, przy powierzchni 0.508, w stożku 1° 0.483, w źrenicy 0.444, w komórce woksla 0.378 | warstwa: FWHM 248 µm, szczyt -0 µm, kontrast 300/400 µm (stary) 0.16/0.49, Michelson kolejno 0.16/0.49, w fazie 0.00/0.16
+      siatkówka: FWHM x 2.82′ y 0.52′, przesunięcie -0.00′ (≙ +0 µm w warstwie), kontrast 300/400 µm kolejno 0.15/0.48, w fazie 0.00/0.14; skok dla kontrastu 0,5: 408 µm; najlepsza akomodacja +0.00 D od 1/D_eff (szczyt ×1.00)
+k=3 (26° → +0.11°, z = 5.55 mm) B: η odbicia 0.508, przy powierzchni 0.508, w stożku 1° 0.483, w źrenicy 0.443, w komórce woksla 0.373 | warstwa: FWHM 279 µm, szczyt +160 µm, kontrast 300/400 µm (stary) 0.07/0.42, Michelson kolejno 0.06/0.41, w fazie 0.00/0.03
+      siatkówka: FWHM x 3.15′ y 0.52′, przesunięcie -1.81′ (≙ +160 µm w warstwie), kontrast 300/400 µm kolejno 0.06/0.40, w fazie 0.00/0.01; skok dla kontrastu 0,5: 427 µm; najlepsza akomodacja +0.00 D od 1/D_eff (szczyt ×1.00)
+k=3 (26° → +0.11°, z = 5.55 mm) C: η odbicia 0.508, przy powierzchni 0.479, w stożku 1° 0.455, w źrenicy 0.417, w komórce woksla 0.348 | warstwa: FWHM 281 µm, szczyt +174 µm, kontrast 300/400 µm (stary) 0.06/0.41, Michelson kolejno 0.06/0.41, w fazie 0.00/0.00
+      siatkówka: FWHM x 3.17′ y 0.52′, przesunięcie -1.97′ (≙ +174 µm w warstwie), kontrast 300/400 µm kolejno 0.05/0.40, w fazie 0.00/0.00; skok dla kontrastu 0,5: 427 µm; najlepsza akomodacja +0.00 D od 1/D_eff (szczyt ×1.00)
+k=4 (28° → +0.22°, z = 7.40 mm) A: η odbicia 0.481, przy powierzchni 0.481, w stożku 1° 0.457, w źrenicy 0.419, w komórce woksla 0.348 | warstwa: FWHM 257 µm, szczyt +0 µm, kontrast 300/400 µm (stary) 0.13/0.42, Michelson kolejno 0.13/0.42, w fazie 0.00/0.09
+      siatkówka: FWHM x 2.91′ y 0.52′, przesunięcie -0.00′ (≙ +0 µm w warstwie), kontrast 300/400 µm kolejno 0.12/0.42, w fazie 0.00/0.08; skok dla kontrastu 0,5: 430 µm; najlepsza akomodacja +0.00 D od 1/D_eff (szczyt ×1.00)
+k=4 (28° → +0.22°, z = 7.40 mm) B: η odbicia 0.481, przy powierzchni 0.481, w stożku 1° 0.457, w źrenicy 0.418, w komórce woksla 0.338 | warstwa: FWHM 304 µm, szczyt +171 µm, kontrast 300/400 µm (stary) 0.00/0.30, Michelson kolejno 0.00/0.30, w fazie 0.00/0.00
+      siatkówka: FWHM x 3.41′ y 0.52′, przesunięcie -1.93′ (≙ +171 µm w warstwie), kontrast 300/400 µm kolejno 0.00/0.29, w fazie 0.00/0.00; skok dla kontrastu 0,5: 457 µm; najlepsza akomodacja +0.00 D od 1/D_eff (szczyt ×1.00)
+k=4 (28° → +0.22°, z = 7.40 mm) C: η odbicia 0.480, przy powierzchni 0.456, w stożku 1° 0.433, w źrenicy 0.397, w komórce woksla 0.321 | warstwa: FWHM 303 µm, szczyt +185 µm, kontrast 300/400 µm (stary) 0.00/0.31, Michelson kolejno 0.00/0.31, w fazie 0.00/0.00
+      siatkówka: FWHM x 3.40′ y 0.52′, przesunięcie -2.09′ (≙ +185 µm w warstwie), kontrast 300/400 µm kolejno 0.00/0.30, w fazie 0.00/0.00; skok dla kontrastu 0,5: 457 µm; najlepsza akomodacja +0.00 D od 1/D_eff (szczyt ×1.00)
+
+== obrazy złożone (oko na środku wzoru), skok 400 µm i 500 µm ==
+linia: zafalowanie (niżej = ciągła); naprzemienne: M; grupy 3+3 z przerwą: V
+  k=0 A, skok 400 µm: kolejno: linia 0.72, naprzemienne 1.00, przerwa 1.00; w fazie: linia 0.50, naprzemienne 1.00, przerwa 1.00
+  k=0 A, skok 500 µm: kolejno: linia 0.94, naprzemienne 1.00, przerwa 1.00; w fazie: linia 0.89, naprzemienne 1.00, przerwa 1.00
+  k=0 B, skok 400 µm: kolejno: linia 0.72, naprzemienne 1.00, przerwa 1.00; w fazie: linia 0.51, naprzemienne 1.00, przerwa 1.00
+  k=0 B, skok 500 µm: kolejno: linia 0.94, naprzemienne 1.00, przerwa 1.00; w fazie: linia 0.89, naprzemienne 1.00, przerwa 1.00
+  k=0 C, skok 400 µm: kolejno: linia 0.72, naprzemienne 1.00, przerwa 1.00; w fazie: linia 0.51, naprzemienne 1.00, przerwa 1.00
+  k=0 C, skok 500 µm: kolejno: linia 0.94, naprzemienne 1.00, przerwa 1.00; w fazie: linia 0.89, naprzemienne 1.00, przerwa 1.00
+  k=4 A, skok 400 µm: kolejno: linia 0.45, naprzemienne 1.00, przerwa 1.00; w fazie: linia 0.13, naprzemienne 1.00, przerwa 1.00
+  k=4 A, skok 500 µm: kolejno: linia 0.74, naprzemienne 0.99, przerwa 0.99; w fazie: linia 0.47, naprzemienne 0.98, przerwa 0.98
+  k=4 B, skok 400 µm: kolejno: linia 0.37, naprzemienne 0.99, przerwa 0.99; w fazie: linia 0.22, naprzemienne 0.99, przerwa 1.00
+  k=4 B, skok 500 µm: kolejno: linia 0.72, naprzemienne 0.99, przerwa 0.99; w fazie: linia 0.51, naprzemienne 0.99, przerwa 0.99
+  k=4 C, skok 400 µm: kolejno: linia 0.38, naprzemienne 0.98, przerwa 0.98; w fazie: linia 0.21, naprzemienne 0.99, przerwa 0.99
+  k=4 C, skok 500 µm: kolejno: linia 0.73, naprzemienne 0.98, przerwa 0.99; w fazie: linia 0.49, naprzemienne 0.98, przerwa 0.98

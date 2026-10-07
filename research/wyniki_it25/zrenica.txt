@@ -1,0 +1,31 @@
+== 3. Najgłębszy woksel, źrenica i wspólny obszar (wariant C, L = 0.85 mm, krok 0.11°) ==
+  k=0: X = -1.152 mm (środek wiązki nominalnej przy oku względem wejścia), stałe przesunięcie odbicia s = +120 µm (kompensowane adresowaniem), C_max = 0.512
+  k=1: X = -0.578 mm (środek wiązki nominalnej przy oku względem wejścia), stałe przesunięcie odbicia s = +145 µm (kompensowane adresowaniem), C_max = 0.460
+  k=2: X = +0.000 mm (środek wiązki nominalnej przy oku względem wejścia), stałe przesunięcie odbicia s = +161 µm (kompensowane adresowaniem), C_max = 0.440
+  k=3: X = +0.583 mm (środek wiązki nominalnej przy oku względem wejścia), stałe przesunięcie odbicia s = +174 µm (kompensowane adresowaniem), C_max = 0.418
+  k=4: X = +1.171 mm (środek wiązki nominalnej przy oku względem wejścia), stałe przesunięcie odbicia s = +185 µm (kompensowane adresowaniem), C_max = 0.398
+
+-- najgłębsza warstwa k = 4: moce (sonda = 1) --
+  odbita przez siatkę 4 (wiązka): 0.480; przy powierzchni po 4 portach i wejściu: 0.456; w powietrzu (Fresnel): 0.438; w stożku o pełnym kącie 1°: 0.433
+  w źrenicy 3,5 mm na osi wiązki: 0.397; w komórce woksla 330 × 90 µm na siatkówce: 0.321 (całość obrazu w oknie siatkówki 0.395)
+  k=0: przedział położeń oka z mocą ≥ 50% / 80% C_max (oś x, Δy = 0): 3.14 / 2.53 mm; kontrast ≥ 0,5 przy skoku 330/400/500 µm: 0.00 / 2.39 / 2.72 mm
+        oś y (Δx = 0): moc ≥ 50% / 80%: 3.66 / 2.16 mm; kontrast y (skok 90 µm) ≥ 0,5: 3.52 mm
+  k=1: przedział położeń oka z mocą ≥ 50% / 80% C_max (oś x, Δy = 0): 3.09 / 2.53 mm; kontrast ≥ 0,5 przy skoku 330/400/500 µm: 0.00 / 1.73 / 2.62 mm
+        oś y (Δx = 0): moc ≥ 50% / 80%: 3.66 / 2.16 mm; kontrast y (skok 90 µm) ≥ 0,5: 3.56 mm
+  k=2: przedział położeń oka z mocą ≥ 50% / 80% C_max (oś x, Δy = 0): 3.14 / 2.53 mm; kontrast ≥ 0,5 przy skoku 330/400/500 µm: 0.00 / 0.00 / 2.53 mm
+        oś y (Δx = 0): moc ≥ 50% / 80%: 3.66 / 2.16 mm; kontrast y (skok 90 µm) ≥ 0,5: 3.56 mm
+  k=3: przedział położeń oka z mocą ≥ 50% / 80% C_max (oś x, Δy = 0): 3.14 / 2.58 mm; kontrast ≥ 0,5 przy skoku 330/400/500 µm: 0.00 / 0.00 / 2.48 mm
+        oś y (Δx = 0): moc ≥ 50% / 80%: 3.66 / 2.16 mm; kontrast y (skok 90 µm) ≥ 0,5: 3.56 mm
+  k=4: przedział położeń oka z mocą ≥ 50% / 80% C_max (oś x, Δy = 0): 3.14 / 2.53 mm; kontrast ≥ 0,5 przy skoku 330/400/500 µm: 0.00 / 0.00 / 2.30 mm
+        oś y (Δx = 0): moc ≥ 50% / 80%: 3.66 / 2.16 mm; kontrast y (skok 90 µm) ≥ 0,5: 3.52 mm
+  k=4 przy Δy = 1.0 mm: moc ≥ 50% C_max w x: 2.81 mm; kontrast ≥ 0,5 (400 µm): 0.00 mm
+  k=4 przy Δy = 1.5 mm: moc ≥ 50% C_max w x: 2.06 mm; kontrast ≥ 0,5 (400 µm): 0.00 mm
+
+-- wspólny obszar woksli widoczny z jednego położenia oka (pola różnych położeń oka nie są sumowane) --
+kryteria: moc w źrenicy ≥ thr·C_max warstwy; kontrast pary w x ≥ 0,5 przy skoku p; zmiana położenia obrazu względem oka na osi wiązki ≤ p/4; liczone w siatce woksli p × 90 µm
+  thr 50%, skok 330 µm: N=1: szer. x 0.00 mm, y 0.00 mm, kolumn 0, woksli/warstwę 0, razem 0; N=2: szer. x 0.00 mm, y 0.00 mm, kolumn 0, woksli/warstwę 0, razem 0; N=3: szer. x 0.00 mm, y 0.00 mm, kolumn 0, woksli/warstwę 0, razem 0; N=4: szer. x 0.00 mm, y 0.00 mm, kolumn 0, woksli/warstwę 0, razem 0; N=5: szer. x 0.00 mm, y 0.00 mm, kolumn 0, woksli/warstwę 0, razem 0
+  thr 50%, skok 400 µm: N=1: szer. x 2.44 mm, y 3.71 mm, kolumn 7, woksli/warstwę 246, razem 246; N=2: szer. x 1.56 mm, y 3.64 mm, kolumn 4, woksli/warstwę 146, razem 292; N=3: szer. x 0.00 mm, y 0.00 mm, kolumn 0, woksli/warstwę 0, razem 0; N=4: szer. x 0.00 mm, y 0.00 mm, kolumn 0, woksli/warstwę 0, razem 0; N=5: szer. x 0.00 mm, y 0.00 mm, kolumn 0, woksli/warstwę 0, razem 0
+  thr 50%, skok 500 µm: N=1: szer. x 2.77 mm, y 3.71 mm, kolumn 6, woksli/warstwę 208, razem 208; N=2: szer. x 2.06 mm, y 3.67 mm, kolumn 5, woksli/warstwę 164, razem 328; N=3: szer. x 1.51 mm, y 3.50 mm, kolumn 3, woksli/warstwę 102, razem 306; N=4: szer. x 0.90 mm, y 3.22 mm, kolumn 2, woksli/warstwę 62, razem 248; N=5: szer. x 0.22 mm, y 2.75 mm, kolumn 1, woksli/warstwę 30, razem 150
+  thr 80%, skok 330 µm: N=1: szer. x 0.00 mm, y 0.00 mm, kolumn 0, woksli/warstwę 0, razem 0; N=2: szer. x 0.00 mm, y 0.00 mm, kolumn 0, woksli/warstwę 0, razem 0; N=3: szer. x 0.00 mm, y 0.00 mm, kolumn 0, woksli/warstwę 0, razem 0; N=4: szer. x 0.00 mm, y 0.00 mm, kolumn 0, woksli/warstwę 0, razem 0; N=5: szer. x 0.00 mm, y 0.00 mm, kolumn 0, woksli/warstwę 0, razem 0
+  thr 80%, skok 400 µm: N=1: szer. x 2.44 mm, y 2.21 mm, kolumn 7, woksli/warstwę 128, razem 128; N=2: szer. x 1.56 mm, y 2.17 mm, kolumn 4, woksli/warstwę 80, razem 160; N=3: szer. x 0.00 mm, y 0.00 mm, kolumn 0, woksli/warstwę 0, razem 0; N=4: szer. x 0.00 mm, y 0.00 mm, kolumn 0, woksli/warstwę 0, razem 0; N=5: szer. x 0.00 mm, y 0.00 mm, kolumn 0, woksli/warstwę 0, razem 0
+  thr 80%, skok 500 µm: N=1: szer. x 2.59 mm, y 2.21 mm, kolumn 6, woksli/warstwę 100, razem 100; N=2: szer. x 2.00 mm, y 2.17 mm, kolumn 4, woksli/warstwę 74, razem 148; N=3: szer. x 1.43 mm, y 2.00 mm, kolumn 3, woksli/warstwę 50, razem 150; N=4: szer. x 0.82 mm, y 1.68 mm, kolumn 2, woksli/warstwę 26, razem 104; N=5: szer. x 0.14 mm, y 1.02 mm, kolumn 1, woksli/warstwę 11, razem 55

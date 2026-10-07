@@ -1,0 +1,25 @@
+== 7. Zbieżność, bilans energii, apertury ==
+-- siatka kątowa/przestrzenna (warstwa 4, wariant C) --
+  512² okno 12 mm (dx = 23.4 µm, dθ = 0.044 mrad): η przy powierzchni 0.4560, FWHM warstwy 303.0 µm, szczyt +185.4 µm, w źrenicy 0.3940, FWHM siatk. 3.401′, kontrast 400/460 µm 0.297/0.520
+  1024² okno 12 mm (dx = 11.7 µm, dθ = 0.044 mrad): η przy powierzchni 0.4560, FWHM warstwy 302.9 µm, szczyt +184.8 µm, w źrenicy 0.3966, FWHM siatk. 3.400′, kontrast 400/460 µm 0.297/0.520
+  1024² okno 16 mm (dx = 15.6 µm, dθ = 0.033 mrad): η przy powierzchni 0.4560, FWHM warstwy 302.9 µm, szczyt +184.9 µm, w źrenicy 0.3964, FWHM siatk. 3.402′, kontrast 400/460 µm 0.298/0.521
+  2048² okno 24 mm (dx = 11.7 µm, dθ = 0.022 mrad): η przy powierzchni 0.4560, FWHM warstwy 302.9 µm, szczyt +184.8 µm, w źrenicy 0.3966, FWHM siatk. 3.400′, kontrast 400/460 µm 0.297/0.520
+-- widmo źródła (średnia natężeń po długościach fali, gauss FWHM Δλ), warstwa 4, wariant C --
+  Δλ = 0.00 nm, 1 próbek: η 0.4560, FWHM warstwy 302.9 µm, szczyt +184.8 µm
+  Δλ = 0.01 nm, 5 próbek: η 0.4552, FWHM warstwy 303.0 µm, szczyt +184.7 µm
+  Δλ = 0.01 nm, 9 próbek: η 0.4552, FWHM warstwy 303.1 µm, szczyt +184.7 µm
+  Δλ = 0.05 nm, 9 próbek: η 0.4364, FWHM warstwy 307.3 µm, szczyt +183.4 µm
+  Δλ = 0.05 nm, 17 próbek: η 0.4365, FWHM warstwy 307.3 µm, szczyt +183.4 µm
+-- bilans energii kanału 4 (moc sondy = 1) --
+  straty wejścia (odbicia warstw 0–3 w drodze w dół) 5.49e-05; przejście przez warstwę 4 w dół 0.5195; odbicie warstwy 4 0.4805 = do powierzchni 0.4560 + porty w dół 0.0245; suma 1.000000
+-- propagacja jawna między warstwami i skończona apertura siatek wyżej (warstwa 4) --
+  brak krawędzi: moc 0.4560, FWHM 302.9 µm, szczyt +184.8 µm
+  krawędź siatek 0–3 w x = +1.0 mm od woksla: moc 0.4560, FWHM 302.9 µm, szczyt +184.8 µm
+  krawędź siatek 0–3 w x = +0.4 mm od woksla: moc 0.4607, FWHM 303.0 µm, szczyt +184.6 µm
+  krawędź siatek 0–3 w x = +0.2 mm od woksla: moc 0.4865, FWHM 234.2 µm, szczyt +232.1 µm
+  krawędź siatek 0–3 w x = +0.0 mm od woksla: moc 0.4840, FWHM 314.7 µm, szczyt +156.8 µm
+  wariant C (iloczyn funkcji przenoszenia): moc 0.4560, FWHM 302.9 µm, szczyt +184.8 µm
+-- RCWA: zbieżność (punkt Bragga, L = 0,85 mm) --
+  M = 3 (rzędów 7), 32 plastrów/okres: η = 0.66498, faza R = +1.5708 rad
+  M = 5 (rzędów 11), 32 plastrów/okres: η = 0.66498, faza R = +1.5708 rad
+  M = 3 (rzędów 7), 16 plastrów/okres: η = 0.66196, faza R = +1.5708 rad

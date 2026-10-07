@@ -1,0 +1,21 @@
+== 1. Kogelnik zespolony vs RCWA (L = 0.85 mm, n1 = 2.353e-04, TM, M = 3, 32 plastry/okres; 51 s) ==
+odbicie: faza względem punktu Bragga (RCWA: amplituda Hy w z = 0; Kogelnik: S(0)·√(|cS|/cR))
+  wejście -0.12°: η RCWA 0.0007 / Kogelnik 0.0007; Δφ RCWA -3.064 / Kogelnik -3.064 rad (różnica -0.000)
+  wejście -0.08°: η RCWA 0.2571 / Kogelnik 0.2580; Δφ RCWA -1.821 / Kogelnik -1.820 rad (różnica -0.001)
+  wejście -0.05°: η RCWA 0.5194 / Kogelnik 0.5206; Δφ RCWA -1.038 / Kogelnik -1.037 rad (różnica -0.001)
+  wejście -0.02°: η RCWA 0.6441 / Kogelnik 0.6451; Δφ RCWA -0.394 / Kogelnik -0.394 rad (różnica -0.000)
+  wejście +0.00°: η RCWA 0.6650 / Kogelnik 0.6660; Δφ RCWA +0.000 / Kogelnik -0.000 rad (różnica +0.000)
+  wejście +0.02°: η RCWA 0.6439 / Kogelnik 0.6449; Δφ RCWA +0.395 / Kogelnik +0.394 rad (różnica +0.000)
+  wejście +0.05°: η RCWA 0.5181 / Kogelnik 0.5193; Δφ RCWA +1.041 / Kogelnik +1.041 rad (różnica +0.001)
+  wejście +0.08°: η RCWA 0.2532 / Kogelnik 0.2542; Δφ RCWA +1.831 / Kogelnik +1.830 rad (różnica +0.001)
+  wejście +0.12°: η RCWA 0.0004 / Kogelnik 0.0004; Δφ RCWA +3.087 / Kogelnik +3.085 rad (różnica +0.001)
+port (fala w górę odchylona o δ): t = R(d) bez fazy swobodnej propagacji; RCWA: T·exp(+j·kz·d)
+  δ = 0.00°: |t|² RCWA 0.3350 / Kogelnik 0.3340; φ RCWA +0.0000 / Kogelnik +0.0000 rad; |r|²+|t|² Kogelnik = 1.000000
+  δ = 0.03°: |t|² RCWA 0.4025 / Kogelnik 0.4014; φ RCWA -0.2531 / Kogelnik -0.2536 rad; |r|²+|t|² Kogelnik = 1.000000
+  δ = 0.06°: |t|² RCWA 0.6451 / Kogelnik 0.6439; φ RCWA -0.3715 / Kogelnik -0.3726 rad; |r|²+|t|² Kogelnik = 1.000000
+  δ = 0.09°: |t|² RCWA 0.9590 / Kogelnik 0.9586; φ RCWA -0.2732 / Kogelnik -0.2742 rad; |r|²+|t|² Kogelnik = 1.000000
+  δ = 0.11°: |t|² RCWA 0.9959 / Kogelnik 0.9959; φ RCWA -0.1799 / Kogelnik -0.1805 rad; |r|²+|t|² Kogelnik = 1.000000
+  δ = 0.14°: |t|² RCWA 0.9433 / Kogelnik 0.9432; φ RCWA -0.1365 / Kogelnik -0.1369 rad; |r|²+|t|² Kogelnik = 1.000000
+  δ = 0.18°: |t|² RCWA 0.9864 / Kogelnik 0.9863; φ RCWA -0.1234 / Kogelnik -0.1238 rad; |r|²+|t|² Kogelnik = 1.000000
+  δ = 0.22°: |t|² RCWA 0.9892 / Kogelnik 0.9892; φ RCWA -0.0862 / Kogelnik -0.0865 rad; |r|²+|t|² Kogelnik = 1.000000
+  δ = 0.33°: |t|² RCWA 0.9903 / Kogelnik 0.9904; φ RCWA -0.0591 / Kogelnik -0.0593 rad; |r|²+|t|² Kogelnik = 1.000000
