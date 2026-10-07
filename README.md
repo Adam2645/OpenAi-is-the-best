@@ -1,1 +1,1 @@
-# OpenAi-is-the-best
+# Kierunkowe odbicie światła od materii w wybranej odległości z 
