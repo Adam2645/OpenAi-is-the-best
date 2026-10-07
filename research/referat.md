@@ -289,7 +289,7 @@ Pięć zadań rozstrzygnie werdykty, które dziś są otwarte. Każde ma próg s
 - [ ] **G, zwierciadło EIT w parze Rb.** W układzie Bajcsy i in. zmierzyć R przy sondzie 0,25 → 1 mW i sprzężeniu 40 mW na wiązkę. Sukces: R ≥ 0,1 przy 1 mW.
 - [ ] **N, stos przełączalny.** Dla dwóch warstw cholesterycznych zmierzyć stożek odbicia oraz tło odbite od elektrod i warstw wyłączonych. Sukces: ≥ 10% mocy w stożku < 1° i tło ≤ 1% sygnału.
 
-## Aneks C2-Laminat: hipotezy wdrożeniowe (iteracje 15–21)
+## Aneks C2-Laminat: hipotezy wdrożeniowe (iteracje 15–24)
 
 Aneks rozwija C2 w stronę wyświetlacza. Wszystkie wyniki to modele (macierz przejścia, teoria Kogelnika, RCWA) bez pomiaru, więc werdykty z sekcji Wyniki się nie zmieniają. Najważniejszy wniosek: z siatkami niesłantowanymi każda warstwa świeci w innym kierunku. Siatki skośne kierują warstwy do jednego widza, ale górna warstwa odbija wyjście dolnej, jeśli oba wychodzą w tym samym kierunku (iteracja 17). Odchylenie usuwające to cieniowanie (≥ 0,75° na warstwę) przekracza kąt źrenicy widzianej z 30 cm (0,67°), więc przy L = 100 µm jedno oko widzi najwyżej trzy warstwy po ≥ 10% (iteracja 18).
 
@@ -539,6 +539,106 @@ Werdykty iteracji 21:
 - **Warunek 3: NIEROZSTRZYGNIĘTE (spełniony w modelu).** SNR od 10² do 2·10⁷ zależnie od stabilności lasera; brak pomiaru.
 
 Następne pytanie: czy oko faktycznie akomoduje na warstwę, gdy bodziec niesie tylko oś y? Bez akomodacji na 3,33 D obraz znika, więc potrzebny jest pomiar optometryczny reakcji na bodziec astygmatyczny.
+
+### Iteracja 22: akomodacja, projekcja warstwowa i plan próby
+
+Model siatkówki jak w iteracji 21; woksel 300 × 50 µm, skok 300 µm w osi x i 90 µm w osi y (skrypt iteracja22.py). Kontrast sąsiednich woksli liczono dla woksli zapalanych kolejno (suma natężeń) oraz jednocześnie przez modulator przy koherentnym laserze (suma pól).
+
+| Akomodacja | FWHM x | FWHM y | Kontrast x: kolejno / jednocześnie w fazie | Kontrast y: kolejno / jednocześnie |
+| --- | --- | --- | --- | --- |
+| 2,79 D | 1,83′ | 4,24′ | 0,48 / 0,18 | 0,04 / 0 |
+| 3,06 D | 1,91′ | 1,79′ | 0,55 / 0,28 | 0,00 / 0 |
+| 3,20 D | 1,96′ | 0,65′ | 0,57 / 0,31 | 0,29 / 0 |
+| 3,33 D (warstwa) | 2,03′ | 0,52′ | 0,56 / 0,30 | 0,90 / 0,80 |
+| 3,45 D | 2,09′ | 0,60′ | 0,57 / 0,31 | 0,44 / 0,12 |
+
+**Akomodacja kompromisowa.** Wiązka y wypełnia źrenicę, więc błąd akomodacji 0,27 D rozmywa ją o p·ΔA = 0,95 mrad (3,2′), a kontrast w osi y spada z 0,90 do 0. Oś x ma w źrenicy tylko 0,74 mm i jest prawie niewrażliwa na akomodację. Najlepsza jest akomodacja na warstwę (3,33 D), z tolerancją około ±0,1 D dla osi y.
+
+**Projekcja warstwowa przez modulator.** Przy sondzie 0,50 mW, sprawności modulatora 0,65, η = 0,60, 1100 wokslach i pięciu warstwach na woksel przypada 295 nW w czasie świecenia warstwy i 35,5 nW średnio w stożku. Luminancja równoważna to około 2,5·10⁷ cd/m², więc 1000 cd/m² daje już sonda około 20 nW. Cała zapalona warstwa wnosi do źrenicy 0,195 mW, czyli 0,50 / 0,19 / 0,04 granicy ICNIRP dla źródła punktowego / plamy 4 mrad / obrazu 22 mrad. Woksle zapalane jednocześnie koherentnym laserem interferują: kontrast w osi x spada z 0,56 do 0,30. Przełączanie warstw wymaga zmiany kąta wejścia w zakresie 30,87–44,77° (13,9°) przy wiązce szerokiej na 8,7 mm; czy da to deflektor akustooptyczny, trzeba sprawdzić w karcie urządzenia.
+
+**Plan próby z dwiema płytkami PTR 1 mm.** Płytka A: wejście 20,0° wewnątrz (30,87° w powietrzu), wyjście 0°, okres 180,07 nm, płaszczyzny nachylone o 10,00°. Płytka B: wejście 22,0° (34,19°), wyjście +0,10°, okres 180,67 nm, nachylenie 10,97°. RCWA przewiduje 0,623 dla kanału A i 0,609 dla B przy przepuszczalności portu 0,982; przy wyjściu +0,12° kanał B ma 0,585 przy porcie 0,943. Kryteria zapisane przed pomiarem:
+
+- **Warunek 1:** moc w stożku 1° (soczewka f = 200 mm i przesłona 3,49 mm w jej ognisku) ≥ 10% mocy padającej dla każdego kanału.
+- **Warunek 2:** przy tej samej długości fali (miernik, zmiana < 0,01 nm) przełączenie kąta wejścia przesuwa płaszczyznę odbicia o ≥ 10 µm. Warstwa B leży 2 mm głębiej, więc punkt wyjścia na powierzchni przesuwa się o około 0,77 mm; 10 µm głębi odpowiada 3,8 µm przesunięcia.
+- **Model obalają:** sprawność płytki < 0,5, przepuszczalność portu przy 0,10° < 0,9, akceptacja kątowa poza 0,10–0,15° albo szerokość widma poza 0,10–0,15 nm.
+- **Warunki 3 i 4:** SNR ≥ 100 na detektorze Si 1 cm² z filtrem 532 ± 5 nm w 1 s; zmiana sprawności < 1% w ciągu 1 s odczytu przy 0,5 mW.
+
+Werdykty iteracji 22:
+
+- **Akomodacja kompromisowa 3,06 D: ODRZUCONE.** Rachunek falowy daje kontrast 0 w osi y przy skoku 90 µm wobec 0,90 przy akomodacji na warstwę.
+- **Projekcja warstwowa: NIEROZSTRZYGNIĘTE.** Jasność z zapasem około 2,5·10⁴ razy i Klasa 1 spełniona, ale interferencja obniża kontrast w osi x do 0,30, a zakres deflektora nie jest sprawdzony.
+
+Następne pytanie: czy dekoherencja sąsiednich woksli w osi y, gdzie akceptacja Bragga jest szeroka (±1,26°), przywróci kontrast w osi x ≥ 0,5 bez spadku sprawności i bez wyjścia poza stożek 1°?
+
+### Iteracja 23: kontrast przy oświetleniu koherentnym i adresowanie warstw
+
+W osi x oko zogniskowane na warstwie odwzorowuje pole odbite w warstwie, bo wiązka x jest dużo węższa od źrenicy. Pole odbite to pole wejściowe przefiltrowane amplitudą √η(θ) siatki 1 mm z modelu Kogelnika 3D; fazę odbicia pominięto (skrypt iteracja23.py).
+
+**Korekta iteracji 21–22.** Tam kontrast w osi x liczono bez filtru Bragga. Filtr poszerza woksel z 177 do 217 µm (FWHM, w₀x = 150 µm), więc przy skoku 300 µm kontrast zapalania kolejnego wynosi 0,30 zamiast 0,56, a jednoczesnego w fazie 0,02 zamiast 0,30.
+
+| Talia w₀x | η | Kontrast przy skoku 300 / 400 / 500 / 660 µm |
+| --- | --- | --- |
+| 100 µm | 0,49 | 0,56 / 0,89 / 1,00 / 1,00 |
+| 150 µm | 0,58 | 0,30 / 0,70 / 0,93 / 1,00 |
+| 250 µm | 0,64 | 0,02 / 0,22 / 0,50 / 0,84 |
+| 330 µm | 0,65 | 0,00 / 0,04 / 0,20 / 0,54 |
+
+**Sposoby zapalania pary sąsiednich woksli** (w₀x = 150 µm, skok 300 µm):
+
+| Sposób | Kontrast | η | Moc średnia względem zapalania kolejnego |
+| --- | --- | --- | --- |
+| kolejno | 0,30 | 0,581 | 100% |
+| jednocześnie, w fazie | 0,02 | 0,624 | 107% |
+| jednocześnie, przeciwfaza 0/π | 1,00 | 0,525 | 90% |
+| podramki nieparzyste/parzyste (DMD) | 0,30 | 0,581 | 50% |
+| dwie podramki z fazą względną 0 i π | 0,30 | 0,575 | 99% |
+
+Wzór 0/π o skoku 300 µm ma składowe kątowe ±0,051° przy połowie akceptacji 0,061°, więc sprawność spada o 10%. Kontrast 1,00 bierze się z wymuszonego ciemnego prążka między każdymi dwoma zapalonymi sąsiadami, więc linia ciągła staje się przerywana. Podramki odtwarzają obraz niekoherentny: DMD kosztem połowy światła, modulator fazy prawie bez strat, ale tylko dla najbliższych sąsiadów. Losowa faza w osi y wspólna dla sąsiadów w osi x nie zmienia ich interferencji. Osobne maski działają dopiero przy komórkach mniejszych od obrazu y w warstwie (45 µm), a komórka 25 µm rozprasza już na 1,22°, poza stożek 1°.
+
+**Adresowanie warstw.** Iloczyn czasu i pasma deflektora akustooptycznego to TBP = D·Δθ/λ = 3967 dla wiązki 8,7 mm i zakresu 13,9° (281 MHz). Teleskop nie zmienia tego iloczynu: deflektor o aperturze 1 mm przed teleskopem rozszerzającym 8,7× musiałby odchylać o 121° (2448 MHz). Gęstsze kanały obniżają wymaganie, bo grube siatki prawie nie odbijają wiązek sąsiednich kanałów:
+
+| Skok kanałów (wewnątrz) | Zakres w powietrzu | Pasmo | TBP | Odbicie sąsiedniej siatki |
+| --- | --- | --- | --- | --- |
+| 2,0° | 13,9° | 281 MHz | 3967 | 1,6·10⁻⁴ sygnału |
+| 0,5° | 3,3° | 67 MHz | 948 | 2,5·10⁻³ sygnału |
+| 0,38° | 2,5° | 51 MHz | 719 | 4,7·10⁻³ sygnału |
+| 0,25° | 1,7° | 33 MHz | 471 | 5,1·10⁻³ sygnału |
+
+Dyskretne źródła, na przykład jeden laser z przełącznikiem 1×5 do pięciu kolimatorów pod stałymi kątami, nie mają ograniczenia TBP i zachowują jedną długość fali, czego wymaga warunek 2. Strata na oświetlenie prostokątnego pola wiązką gaussowską jest wspólna dla wszystkich wariantów: w polu zostaje 58 / 25 / 13% mocy przy natężeniu brzegu ≥ 50 / 80 / 90% szczytu. Parametrów rynkowych deflektorów nie sprawdzono.
+
+Werdykty iteracji 23:
+
+- **Teleskop przy deflektorze: ODRZUCONE.** Iloczyn D·Δθ jest niezmiennikiem.
+- **Faza 0/π: ODRZUCONE jako naprawa kontrastu.** Zmienia obraz (sztuczne przerwy) i obniża sprawność o 10%.
+- **Losowa faza w osi y: ODRZUCONE.** Wspólna maska nie działa, osobne maski wyprowadzają światło poza stożek 1°.
+- **Podramki: NIEROZSTRZYGNIĘTE (działają w modelu).** Odtwarzają kontrast niekoherentny; DMD traci 50% mocy, co przy zapasie jasności około 2,5·10⁴ nie ma znaczenia.
+
+Następne pytanie: jaka grubość siatki (0,5–1 mm) daje najlepszy kompromis między mniejszym wokslem x po filtrze Bragga (szersza akceptacja) a szerszym portem, czyli większym cieniowaniem i mniejszą liczbą warstw w wachlarzu 0,48°?
+
+### Iteracja 24: grubość siatki
+
+Grubość L zmieniano przy stałym iloczynie n₁·L = 0,2 µm, więc sprawność dla fali płaskiej zostaje 0,666 przy każdej grubości. Liczono modelem Kogelnika 3D; przy L = 0,5 mm RCWA daje η = 0,665 (Kogelnik 0,666) i przepuszczalność portu 0,9505 (Kogelnik 0,9502) (skrypt iteracja24.py). Krok wyjść dobrano tak, żeby port każdej warstwy wyżej przepuszczał ≥ 0,95 w każdej wielokrotności kroku. Wariant odporny wymaga tego w całym przedziale ±0,02° wokół niej, co odpowiada błędowi okresu siatki około 4·10⁻⁵ (iteracja 20).
+
+| L | Warstwy w 0,48° (krok), nominalnie | Warstwy (krok), tolerancja ±0,02° | Woksel x po filtrze (wejście 177 µm) | Kontrast przy skoku 300 / 400 µm | Woksle x z kontrastem ≥ 0,5 |
+| --- | --- | --- | --- | --- | --- |
+| 0,5 mm | 4 (0,160°) | 3 (0,180°) | 183 µm | 0,53 / 0,87 | 15 |
+| 0,7 mm | 5 (0,120°) | 4 (0,131°) | 193 µm | 0,46 / 0,83 | 14 |
+| 0,85 mm | 6 (0,096°) | 5 (0,110°) | 205 µm | 0,38 / 0,78 | 13 |
+| 1,0 mm | 7 (0,080°) | 4 (0,160°) | 217 µm | 0,30 / 0,70 | 12 |
+| 1,2 mm | 8 (0,069°) | 4 (0,146°) | 237 µm | 0,21 / 0,57 | 11 |
+
+Wzór funkcji celu nie dotarł w poleceniu, więc przyjęto F = liczba warstw w wachlarzu 0,48° × liczba woksli x z kontrastem ≥ 0,5 × 96 woksli w osi y.
+
+&#91;embedded content: skrypt iteracja24.py · L = 0,5–1,2 mm, n₁·L = 0,2 µm, w₀x = 150 µm\]
+
+Nominalnie F rośnie z grubością: grubsza siatka mieści więcej warstw, a traci tylko po jednym wokslu x. Kroki 0,07–0,10° leżą jednak tuż przy stromym zboczu portu, więc tolerancja ±0,02° zabiera grubym siatkom najwięcej warstw i optimum wypada przy 0,85 mm. Ważenie mocą najsłabszego kanału (0,59–0,62 sondy) i sprawnością woksla nie zmienia kolejności. Szerokość widma maleje z 0,244 do 0,102 nm, a odbicie sąsiedniego kanału przy skoku wejść 0,38° rośnie dla cieńszych siatek do 0,94% sygnału przy 0,7 mm.
+
+Werdykty iteracji 24:
+
+- **Pięć warstw przy kroku ≤ 0,12°: NIEROZSTRZYGNIĘTE (model).** Nominalnie od L = 0,7 mm; z tolerancją ±0,02° dopiero przy 0,85 mm.
+- **Grubość optymalna: NIEROZSTRZYGNIĘTE (model).** L\_opt = 0,85 mm przy tolerancji wyjścia ±0,02°; bez tolerancji optimum leży na krańcu badanego przedziału.
+
+Następne pytanie: czy zapis siatek PTR osiąga błąd okresu ≤ 4·10⁻⁵ i dokładność skosu ≤ 0,013° (pomiar w literaturze)? Jeśli nie, ile warstw zostaje przy realnym rozrzucie?
 
 ## Źródła
 
